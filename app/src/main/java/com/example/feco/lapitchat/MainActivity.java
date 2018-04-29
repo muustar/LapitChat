@@ -1,6 +1,8 @@
 package com.example.feco.lapitchat;
 
 import android.content.Intent;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +20,10 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
 
+    private ViewPager mViewPager;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private TabLayout mTabLayout;
+
     private FirebaseAuth mAuth;
 
     @Override
@@ -27,9 +33,19 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        mToolbar = (Toolbar)findViewById(R.id.main_page_toolbar);
+        mToolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Lapit Chat");
+
+        // Tabs
+        mViewPager = findViewById(R.id.main_tabPager);
+        mSectionsPagerAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
+
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        mTabLayout = findViewById(R.id.main_tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+
     }
 
 
@@ -68,6 +84,12 @@ public class MainActivity extends AppCompatActivity {
             if (mAuth.getCurrentUser()==null){
                 sendToStart();
             }
+            return true;
+        }
+
+        if(item.getItemId()== R.id.main_account_settings){
+            Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(settingsIntent);
             return true;
         }
         return false;

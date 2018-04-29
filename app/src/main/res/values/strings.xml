@@ -12,4 +12,19 @@
     <string name="login">Login</string>
     <string name="login_to_the_account">Login to the Account</string>
 
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="display_name">Display Name</string>
+    <string name="hi_there_i_m_using_lapit_chat_app">Hi there, I\'m using Lapit Chat App</string>
+    <string name="change_status">Change status</string>
+    <string name="change_image">Change Image</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="all_users">All Users</string>
+    <string name="log_out">Log Out</string>
+    <string name="chats">CHATS</string>
+    <string name="hello">HELLO</string>
+    <string name="requests">REQUESTS</string>
+    <string name="your_status">Your Status...</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="done">Done</string>
+
 </resources>
