@@ -1,16 +1,25 @@
 package com.example.feco.lapitchat;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.google.android.gms.common.GooglePlayServicesUtilLight;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
     private CircleImageView mImage;
     private TextView mDisplayname, mStatus;
     private Button mChangeImageBtn, mChangeStatusBtn;
+    private ProgressBar mProgressBar;
     private String status;
     private Uri resultUri;
     private String TAG = "FECO";
@@ -53,15 +63,18 @@ public class SettingsActivity extends AppCompatActivity {
         mChangeImageBtn = findViewById(R.id.settings_changeImage);
         mChangeStatusBtn = findViewById(R.id.settings_changeStatus);
         mImage = findViewById(R.id.settings_image);
+        mProgressBar = findViewById(R.id.settings_progressBar);
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
         mStorageRef = FirebaseStorage.getInstance().getReference().child("profile_images");
 
+        mProgressBar.setVisibility(View.VISIBLE);
         mUsersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                mProgressBar.setVisibility(View.VISIBLE);
                 String name = dataSnapshot.child("name").getValue().toString();
                 status = dataSnapshot.child("status").getValue().toString();
                 String image = dataSnapshot.child("image").getValue().toString();
@@ -69,7 +82,25 @@ public class SettingsActivity extends AppCompatActivity {
 
                 mDisplayname.setText(name);
                 mStatus.setText(status);
-                Glide.with(SettingsActivity.this).load(image_thumb).into(mImage);
+
+
+
+                    Glide.with(getApplicationContext())
+                            .load(image)
+                            .listener(new RequestListener<Drawable>() {
+                                @Override
+                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                    mProgressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                    mProgressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+                            })
+                            .into(mImage);
 
             }
 

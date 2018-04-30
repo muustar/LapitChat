@@ -39,6 +39,7 @@
         android:layout_marginTop="171dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:textColor="@android:color/white"
         android:background="@color/colorAccent"
         android:text="@string/save_changes" />
 

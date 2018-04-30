@@ -27,4 +27,6 @@
     <string name="save_changes">Save Changes</string>
     <string name="done">Done</string>
 
+    <string name="facebook_app_id">373503593149023</string>
+    <string name="fb_login_protocol_scheme">fb373503593149023</string>
 </resources>

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -25,6 +24,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class StartActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
@@ -32,6 +40,7 @@ public class StartActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private String TAG = "FECO";
     private SignInButton mGoogleSignIn;
+
 
     FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
@@ -43,6 +52,7 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
 
         mAuth = FirebaseAuth.getInstance();
+
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -66,6 +76,7 @@ public class StartActivity extends AppCompatActivity {
         regBtn = (Button) findViewById(R.id.start_reg_btn);
         loginBtn = (Button) findViewById(R.id.start_login_btn);
         mGoogleSignIn = (SignInButton) findViewById(R.id.start_google_signin);
+
 
         regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +132,7 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -132,12 +143,52 @@ public class StartActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            final FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
-                                Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
-                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(mainIntent);
-                                finish();
+
+
+                                String display_name = acct.getDisplayName();
+                                String status = acct.getEmail();
+                                String image = acct.getPhotoUrl().toString();
+
+                                final Map<String, String> userMap = new HashMap<>();
+                                userMap.put("name", display_name);
+                                userMap.put("status",status);
+                                userMap.put("image",image);
+                                userMap.put("image_thumb",image);
+
+                                DatabaseReference mLetezike = FirebaseDatabase.getInstance().getReference().child("Users");
+
+                                mLetezike.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (!dataSnapshot.exists()){
+                                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+                                            mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        tovabbAFokepernyore();
+                                                    }
+                                                }
+                                            });
+                                        }else{
+                                            tovabbAFokepernyore();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
+
+
+
+
+
                             }
 
                         } else {
@@ -150,6 +201,13 @@ public class StartActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+
+    private void tovabbAFokepernyore() {
+        Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mainIntent);
+        finish();
     }
 
 }
