@@ -163,6 +163,8 @@ public class StartActivity extends AppCompatActivity {
                                 userMap.put("status", funnyStatus);
                                 userMap.put("image",image);
                                 userMap.put("image_thumb",image);
+                                userMap.put("email", user.getEmail());
+                                userMap.put("uid", user.getUid());
 
                                 DatabaseReference mLetezike = FirebaseDatabase.getInstance().getReference().child("Users");
 

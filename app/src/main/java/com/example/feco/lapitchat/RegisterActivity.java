@@ -62,10 +62,6 @@ public class RegisterActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
-
-
-
         mDisplayname = findViewById(R.id.reg_name);
         mEmail = findViewById(R.id.reg_email);
         mPassword = findViewById(R.id.reg_password);
@@ -101,7 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
                             String uid = currentUser.getUid();
 
                             // a statusnak beállítunk egy véletlen funnystringet
-                            int funnyPosition = r.nextInt(mFunnyStrings.length)+1;
+                            int funnyPosition = r.nextInt(mFunnyStrings.length) + 1;
                             String funnyStatus = mFunnyStrings[funnyPosition];
 
                             mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
@@ -111,6 +107,8 @@ public class RegisterActivity extends AppCompatActivity {
                             userMap.put("status", funnyStatus);
                             userMap.put("image", DEFAULT_IMAGE_ON_STORAGE);
                             userMap.put("image_thumb", DEFAULT_IMAGE_ON_STORAGE);
+                            userMap.put("email", currentUser.getEmail());
+                            userMap.put("uid", currentUser.getUid());
 
                             mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

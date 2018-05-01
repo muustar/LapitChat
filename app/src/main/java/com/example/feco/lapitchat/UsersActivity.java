@@ -49,7 +49,8 @@ public class UsersActivity extends AppCompatActivity {
 
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
-                .child("Users");
+                .child("Users")
+                .orderByChild("name");
 
         FirebaseRecyclerOptions<User> options =
                 new FirebaseRecyclerOptions.Builder<User>()
@@ -71,6 +72,7 @@ public class UsersActivity extends AppCompatActivity {
                 holder.setmSingleImage(getApplicationContext(), model.getImage());
                 holder.setmSingleDisplayname(model.getName());
                 holder.setmSingleStatus(model.getStatus());
+                holder.setmEmail(model.getEmail());
             }
 
 
@@ -96,9 +98,12 @@ public class UsersActivity extends AppCompatActivity {
 
         private View mView;
         private CircleImageView mSingleImage;
-        private TextView mSingleDisplayname, mSingleStatus;
+        private TextView mSingleDisplayname, mSingleStatus, mEmail;
 
-
+        public void setmEmail(String mail){
+            mEmail = mView.findViewById(R.id.users_single_email);
+            mEmail.setText(mail);
+        }
 
         public void setmSingleImage(Context ctx, String imgurl) {
             mSingleImage = mView.findViewById(R.id.users_single_image);

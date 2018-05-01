@@ -23,13 +23,25 @@
         android:layout_toRightOf="@id/users_single_image"/>
 
     <TextView
-        android:id="@+id/users_single_status"
+        android:id="@+id/users_single_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="0dp"
-        android:text="Status"
+        android:text="email"
+        android:textSize="8sp"
         android:layout_toRightOf="@id/users_single_image"
         android:layout_below="@id/users_single_displayname"/>
+
+    <TextView
+        android:id="@+id/users_single_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="0dp"
+        android:text="Status"
+        android:layout_toRightOf="@id/users_single_image"
+        android:layout_below="@id/users_single_email"/>
 
 </RelativeLayout>
