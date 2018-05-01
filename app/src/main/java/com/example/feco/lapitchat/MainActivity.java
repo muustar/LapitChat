@@ -92,6 +92,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(settingsIntent);
             return true;
         }
+
+        if(item.getItemId()== R.id.main_all_users){
+            Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
+            startActivity(usersIntent);
+            return true;
+        }
         return false;
     }
 }

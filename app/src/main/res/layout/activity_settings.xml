@@ -33,10 +33,11 @@
         android:id="@+id/settings_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/settings_displayname"
         android:layout_marginTop="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:text="@string/hi_there_i_m_using_lapit_chat_app"
         android:textColor="@android:color/white"
         android:textSize="14sp" />

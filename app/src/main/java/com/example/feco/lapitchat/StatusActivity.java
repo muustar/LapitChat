@@ -1,5 +1,6 @@
 package com.example.feco.lapitchat;
 
+import android.content.Context;
 import android.os.CountDownTimer;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -44,11 +46,18 @@ public class StatusActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mInputStatus = findViewById(R.id.status_input);
+
         mSaveBtn = findViewById(R.id.status_saveBtn);
         mImageDone = findViewById(R.id.status_imageDone);
 
         final String currentStatus = getIntent().getStringExtra("status");
         mInputStatus.getEditText().setText(currentStatus);
+        int textLength = mInputStatus.getEditText().getText().length();
+        mInputStatus.getEditText().setSelection(0, textLength);
+
+        //show keyboard
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
         mSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +76,7 @@ public class StatusActivity extends AppCompatActivity {
 
                                     public void onTick(long millisUntilFinished) {
                                         Float a = mImageDone.getAlpha();
-                                        mImageDone.setAlpha(a-0.01f);
+                                        mImageDone.setAlpha(a - 0.01f);
                                     }
 
                                     public void onFinish() {
@@ -83,5 +92,13 @@ public class StatusActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // hide keyboard
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
 }
