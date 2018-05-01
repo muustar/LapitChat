@@ -1,6 +1,7 @@
 package com.example.feco.lapitchat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -68,11 +69,23 @@ public class UsersActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull User model) {
-                holder.setmSingleImage(getApplicationContext(), model.getImage());
+            protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull final User model) {
+                holder.setmSingleImage(getApplicationContext(), model.getImage_thumb());
                 holder.setmSingleDisplayname(model.getName());
                 holder.setmSingleStatus(model.getStatus());
                 holder.setmEmail(model.getEmail());
+
+                // ha nem tárolnám a User osztályban a UID-t, akkor ezzel tudjuk lekérni.
+                // String userID = getRef(position).getKey();
+
+                holder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent profileIntent = new Intent(UsersActivity.this, ProfileActivity.class);
+                        profileIntent.putExtra("uid", model.getUid());
+                        startActivity(profileIntent);
+                    }
+                });
             }
 
 

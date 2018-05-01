@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    tools:context=".ProfileActivity">
+
+
+
+    <ImageView
+        android:id="@+id/profile_image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@color/colorPrimaryDark"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/profile_displayname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Display name"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/profile_image"
+        android:textSize="24sp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/profile_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@+id/profile_displayname"
+        android:layout_centerHorizontal="true"
+        android:text="Current User Status"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/profile_totalFriends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/profile_sendReqBtn"
+        android:layout_marginBottom="10dp"
+        android:text="total friends"
+        android:textColor="@android:color/white"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/profile_sendReqBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Friend Request"
+        android:textAllCaps="false"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorAccent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="@android:color/white"/>
+
+</RelativeLayout>
