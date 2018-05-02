@@ -74,8 +74,22 @@ public class ProfileActivity extends AppCompatActivity {
                 u = dataSnapshot.getValue(User.class);
                 mProfileDisplayName.setText(u.getName());
                 mProfileStatus.setText(u.getStatus());
-                mProfileTotalFriends.setText("sok");
+
                 Glide.with(getApplicationContext()).load(u.getImage()).into(mProfileImage);
+
+                // total friends
+                mFriendDatabase.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        long total_friends = dataSnapshot.getChildrenCount();
+                        mProfileTotalFriends.setText("have "+ total_friends + " friends");
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 // ------------------------- FRIEND REQUEST FEATURES -------------------
 
@@ -103,9 +117,9 @@ public class ProfileActivity extends AppCompatActivity {
                             // nézzük, meg h barátok vagyunk -e
 
                             mFriendDatabase.child(mCurrent_user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @SuppressLint("ResourceAsColor")
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
+
                                     if (dataSnapshot.hasChild(user_id)) {
                                         mProfileSendFrndsReq.setEnabled(true);
                                         mProfileSendFrndsReq.setBackgroundColor(Color.GRAY);
