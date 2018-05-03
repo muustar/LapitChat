@@ -16,8 +16,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -74,6 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
+        mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van beállítás a LapitChat.java fájlban és a manifestben.
         mProfileImagesRef = FirebaseStorage.getInstance().getReference().child("profile_images");
 
         mProgressBar.setVisibility(View.VISIBLE);
@@ -89,8 +92,10 @@ public class SettingsActivity extends AppCompatActivity {
                 mDisplayname.setText(name);
                 mStatus.setText(status);
 
+                RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
                 Glide.with(getApplicationContext())
                         .load(image_thumb)
+                        .apply(options)
                         .listener(new RequestListener<Drawable>() {
                             @Override
                             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

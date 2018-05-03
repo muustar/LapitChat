@@ -1,10 +1,10 @@
 package com.example.feco.lapitchat;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,6 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String REQUEST_TYPE = "request_type";
@@ -43,7 +45,8 @@ public class ProfileActivity extends AppCompatActivity {
     private String mCurrent_state;
 
 
-    private DatabaseReference mUserDatabase, mFriendReqDatabase, mFriendDatabase;
+    private DatabaseReference mUserDatabase, mFriendReqDatabase, mFriendDatabase, mNotificationDatabase;
+    private long total_friends;
 
 
     @Override
@@ -56,6 +59,7 @@ public class ProfileActivity extends AppCompatActivity {
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
+        mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
 
 
@@ -66,6 +70,8 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileSendFrndsReq = findViewById(R.id.profile_sendReqBtn);
         mProfileDeclineBtn = findViewById(R.id.profile_declineBtn);
 
+        mProfileDeclineBtn.setEnabled(false);
+        mProfileDeclineBtn.setVisibility(View.INVISIBLE);
 
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -81,8 +87,8 @@ public class ProfileActivity extends AppCompatActivity {
                 mFriendDatabase.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        long total_friends = dataSnapshot.getChildrenCount();
-                        mProfileTotalFriends.setText("have "+ total_friends + " friends");
+                        total_friends = dataSnapshot.getChildrenCount();
+                        mProfileTotalFriends.setText("Have " + total_friends + " friends");
                     }
 
                     @Override
@@ -90,6 +96,16 @@ public class ProfileActivity extends AppCompatActivity {
 
                     }
                 });
+
+                // ------ saját profil ellenőrzés -------
+
+                if (TextUtils.equals(user_id, mCurrent_user.getUid())){
+                    mProfileSendFrndsReq.setEnabled(false);
+                    mProfileSendFrndsReq.setVisibility(View.INVISIBLE);
+
+                    mProfileDeclineBtn.setEnabled(false);
+                    mProfileDeclineBtn.setVisibility(View.INVISIBLE);
+                }
 
                 // ------------------------- FRIEND REQUEST FEATURES -------------------
 
@@ -106,6 +122,9 @@ public class ProfileActivity extends AppCompatActivity {
                                 mCurrent_state = REQ_RECEIVED;
                                 mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.myGreen));
                                 mProfileSendFrndsReq.setText("Accept Friend Request");
+
+                                mProfileDeclineBtn.setEnabled(true);
+                                mProfileDeclineBtn.setVisibility(View.VISIBLE);
 
                             } else if (req_type.equals(SENT)) {
 
@@ -125,6 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         mProfileSendFrndsReq.setBackgroundColor(Color.GRAY);
                                         mCurrent_state = FRIEND;
                                         mProfileSendFrndsReq.setText("UnFriend");
+
                                     } else {
                                         mProfileSendFrndsReq.setEnabled(true);
                                         mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
@@ -173,10 +193,18 @@ public class ProfileActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
 
-                                        mProfileSendFrndsReq.setEnabled(true);
-                                        mCurrent_state = REQ_SENT;
-                                        mProfileSendFrndsReq.setText("Cancel Friend Request");
-                                        //Toast.makeText(ProfileActivity.this, "success", Toast.LENGTH_SHORT).show();
+                                        Map<String, String> notificationDataMap = new HashMap<>();
+                                        notificationDataMap.put("from", mCurrent_user.getUid());
+                                        notificationDataMap.put("type", "request");
+
+                                        mNotificationDatabase.child(user_id).push().setValue(notificationDataMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                mProfileSendFrndsReq.setEnabled(true);
+                                                mCurrent_state = REQ_SENT;
+                                                mProfileSendFrndsReq.setText("Cancel Friend Request");
+                                            }
+                                        });
                                     }
                                 });
 
@@ -233,7 +261,10 @@ public class ProfileActivity extends AppCompatActivity {
                                                                     mProfileSendFrndsReq.setEnabled(true);
                                                                     mProfileSendFrndsReq.setBackgroundColor(Color.GRAY);
                                                                     mCurrent_state = FRIEND;
+                                                                    mProfileTotalFriends.setText("Have " + (++total_friends)+ " friends");
                                                                     mProfileSendFrndsReq.setText("UnFriend");
+                                                                    mProfileDeclineBtn.setEnabled(false);
+                                                                    mProfileDeclineBtn.setVisibility(View.INVISIBLE);
                                                                 }
                                                             });
                                                         }
@@ -255,6 +286,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 public void onSuccess(Void aVoid) {
                                     mProfileSendFrndsReq.setEnabled(true);
                                     mCurrent_state = NOT_FRIEND;
+                                    mProfileTotalFriends.setText("Have " + (--total_friends)+ " friends");
                                     mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
                                     mProfileSendFrndsReq.setText("Send Friend Request");
                                 }
@@ -263,6 +295,31 @@ public class ProfileActivity extends AppCompatActivity {
                     });
 
                 }
+            }
+        });
+
+        mProfileDeclineBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                mProfileSendFrndsReq.setEnabled(true);
+                                mCurrent_state = NOT_FRIEND;
+                                mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
+                                mProfileSendFrndsReq.setText("Send Friend Request");
+                                mProfileDeclineBtn.setEnabled(false);
+                                mProfileDeclineBtn.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    }
+                });
+
             }
         });
 

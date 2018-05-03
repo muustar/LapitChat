@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.ChildEventListener;
@@ -120,7 +122,11 @@ public class UsersActivity extends AppCompatActivity {
 
         public void setmSingleImage(Context ctx, String imgurl) {
             mSingleImage = mView.findViewById(R.id.users_single_image);
-            Glide.with(ctx).load(imgurl).into(mSingleImage);
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
+            Glide.with(ctx)
+                    .load(imgurl)
+                    .apply(options)
+                    .into(mSingleImage);
         }
 
         public void setmSingleDisplayname(String name) {
