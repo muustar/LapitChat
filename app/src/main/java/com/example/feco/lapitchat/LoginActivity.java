@@ -15,10 +15,14 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "FECO";
@@ -28,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
 
+    private DatabaseReference mUsersDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //firebase section
         mAuth = FirebaseAuth.getInstance();
-
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
         // displeay elements imitializing
         mProgressBar = (ProgressBar) findViewById(R.id.login_progressbar);
@@ -79,10 +85,21 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null){
-                                Intent mainIntent = new Intent(LoginActivity.this,MainActivity.class);
-                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(mainIntent);
-                                finish();
+
+                                // ------------- device token ---------------------
+                                String deviceToken = FirebaseInstanceId.getInstance().getToken();
+                                mUsersDatabase.child(user.getUid()).child("device_token").setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        Intent mainIntent = new Intent(LoginActivity.this,MainActivity.class);
+                                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(mainIntent);
+                                        finish();
+                                    }
+                                });
+
+
                             }
                         } else {
                             mProgressBar.setVisibility(View.INVISIBLE);

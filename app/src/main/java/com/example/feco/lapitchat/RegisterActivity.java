@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,6 +96,7 @@ public class RegisterActivity extends AppCompatActivity {
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser currentUser = mAuth.getCurrentUser();
                             String uid = currentUser.getUid();
+                            String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
                             // a statusnak beállítunk egy véletlen funnystringet
                             int funnyPosition = r.nextInt(mFunnyStrings.length) + 1;
@@ -109,6 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
                             userMap.put("image_thumb", DEFAULT_IMAGE_ON_STORAGE);
                             userMap.put("email", currentUser.getEmail());
                             userMap.put("uid", currentUser.getUid());
+                            userMap.put("device_token", deviceToken);
 
                             mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

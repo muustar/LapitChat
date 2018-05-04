@@ -18,6 +18,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 
 import java.util.HashMap;
@@ -47,6 +49,7 @@ public class StartActivity extends AppCompatActivity {
     private GoogleApiClient mGoogleApiClient;
     private Random r = new Random();
     private String[] mFunnyStrings;
+    private DatabaseReference mUsersDatabase;
 
 
     @Override
@@ -56,6 +59,7 @@ public class StartActivity extends AppCompatActivity {
         funnyStringInicializalas();
 
         mAuth = FirebaseAuth.getInstance();
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
 
         // Configure sign-in to request the user's ID, email address, and basic
@@ -149,7 +153,7 @@ public class StartActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithCredential:success");
                             final FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
-
+                                final String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
                                 String display_name = acct.getDisplayName();
                                 String image = acct.getPhotoUrl().toString();
@@ -165,6 +169,7 @@ public class StartActivity extends AppCompatActivity {
                                 userMap.put("image_thumb",image);
                                 userMap.put("email", user.getEmail());
                                 userMap.put("uid", user.getUid());
+                                userMap.put("device_token", deviceToken);
 
                                 DatabaseReference mLetezike = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -177,12 +182,25 @@ public class StartActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
-                                                        tovabbAFokepernyore();
+
+                                                       tovabbAFokepernyore();
+
+
                                                     }
                                                 }
                                             });
                                         }else{
-                                            tovabbAFokepernyore();
+
+                                            // ------------- device token ---------------------
+
+                                            mUsersDatabase.child(user.getUid()).child("device_token").setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    tovabbAFokepernyore();
+
+                                                }
+                                            });
+
                                         }
                                     }
 
