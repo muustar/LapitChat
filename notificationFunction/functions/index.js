@@ -17,6 +17,18 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 	//if (!event.after.val()){
 	//	return console.log('A Notification has been deleted from the database: ', notification_id);
 	//}
+
+	const fromUser = admin.database().ref(`/Notifications/${userId}/${notificationId}`).once('value');
+	return fromUser.then(fromUserResult =>{
+		const from_user_id = fromUserResult.val().from;
+		console.log('From User: ', from_user_id);
+
+	const userQuery = admin.database().ref(`/Users/${from_user_id}`).once('value');
+	return userQuery.then(userQueryResult => {
+		const from_user_name = userQueryResult.val().name;
+		console.log('Kuldo user: ', from_user_name);
+	
+
 	
 	const deviceToken = admin.database().ref(`/Users/${userId}/device_token`).once('value');
 	return deviceToken.then(result => {
@@ -24,20 +36,26 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 
 			const payload = {
 					notification: {
-						title: "Friend Request",
-						body: "You've receive a new Friend Request",
-						icon: "default"
+						title: "Friend Request from ",
+						body: `${from_user_name} has sent you a new Friend Request`,
+						icon: "default",
+						click_action: "lapitchat_TARGET_NOTIFICATION"
+					},
+					data: {
+						from_user_id: from_user_id
 					}
 				};
 
 			return admin.messaging().sendToDevice(token_id , payload).then(response => {
 
-				console.log('This was');
+				//console.log('This was');
 				return 0;
 
 			});
 
+	});
 
+	});
 
 	});
 
