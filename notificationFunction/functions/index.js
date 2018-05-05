@@ -42,7 +42,7 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 						click_action: "lapitchat_TARGET_NOTIFICATION"
 					},
 					data: {
-						from_user_id: from_user_id
+						uid: from_user_id
 					}
 				};
 

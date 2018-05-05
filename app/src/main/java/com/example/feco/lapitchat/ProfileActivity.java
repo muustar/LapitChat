@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -49,12 +50,21 @@ public class ProfileActivity extends AppCompatActivity {
     private long total_friends;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                Object value = getIntent().getExtras().get(key);
+                Log.d("FECO", "Key: " + key + " Value: " + value);
+            }
+        }
+
         user_id = getIntent().getStringExtra("uid");
+        Log.d("FECO", "userid: "+user_id);
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
@@ -62,6 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
         mFriendDatabase.keepSynced(false);
         mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
+        mNotificationDatabase.keepSynced(false);
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
 
 
@@ -122,6 +133,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 mProfileSendFrndsReq.setEnabled(true);
                                 mCurrent_state = REQ_RECEIVED;
+                                mProfileSendFrndsReq.setVisibility(View.VISIBLE);
                                 mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.myGreen));
                                 mProfileSendFrndsReq.setText("Accept Friend Request");
 
@@ -131,6 +143,7 @@ public class ProfileActivity extends AppCompatActivity {
                             } else if (req_type.equals(SENT)) {
 
                                 mCurrent_state = REQ_SENT;
+                                mProfileSendFrndsReq.setVisibility(View.VISIBLE);
                                 mProfileSendFrndsReq.setText("Cancel Friend Request");
                             }
                         } else {
@@ -143,12 +156,14 @@ public class ProfileActivity extends AppCompatActivity {
 
                                     if (dataSnapshot.hasChild(user_id)) {
                                         mProfileSendFrndsReq.setEnabled(true);
+                                        mProfileSendFrndsReq.setVisibility(View.VISIBLE);
                                         mProfileSendFrndsReq.setBackgroundColor(Color.GRAY);
                                         mCurrent_state = FRIEND;
                                         mProfileSendFrndsReq.setText("UnFriend");
 
                                     } else {
                                         mProfileSendFrndsReq.setEnabled(true);
+                                        mProfileSendFrndsReq.setVisibility(View.VISIBLE);
                                         mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
                                         mCurrent_state = NOT_FRIEND;
                                         mProfileSendFrndsReq.setText("Send Friend Request");

@@ -1,11 +1,13 @@
 package com.example.feco.lapitchat;
 
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+
 
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -24,7 +26,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String notification_title = remoteMessage.getNotification().getTitle();
         String notification_message = remoteMessage.getNotification().getBody();
         String click_action = remoteMessage.getNotification().getClickAction();
-        String from_user_id = remoteMessage.getData().get("from_user_id");
+        String from_user_id = remoteMessage.getData().get("uid");
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -32,8 +34,9 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 .setContentText(notification_message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-
+        //String intentProfile="lapitchat.ProfileActivity";
         Intent resultIntent = new Intent(click_action);
+        //Intent resultIntent = new Intent(intentProfile);
         resultIntent.putExtra("uid", from_user_id);
 
         PendingIntent resultPendingIntent =
@@ -50,6 +53,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationID, mBuilder.build());
+
+
     }
 
     private void createNotificationChannel(NotificationCompat.Builder mBuilder) {

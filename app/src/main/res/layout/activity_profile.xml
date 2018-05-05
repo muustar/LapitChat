@@ -59,6 +59,7 @@
         android:background="@color/colorAccent"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:visibility="invisible"
         android:textColor="@android:color/white"/>
     <Button
         android:id="@+id/profile_declineBtn"
@@ -72,6 +73,7 @@
         android:background="@color/colorAccent"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:visibility="invisible"
         android:textColor="@android:color/white"/>
 
 </RelativeLayout>
