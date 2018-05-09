@@ -14,25 +14,21 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 	console.log('AfterData: ', afterData);
 
 
-	//if (!event.after.val()){
-	//	return console.log('A Notification has been deleted from the database: ', notification_id);
-	//}
+	
 
 	const fromUser = admin.database().ref(`/Notifications/${userId}/${notificationId}`).once('value');
 	return fromUser.then(fromUserResult =>{
 		const from_user_id = fromUserResult.val().from;
 		console.log('From User: ', from_user_id);
 
-	const userQuery = admin.database().ref(`/Users/${from_user_id}`).once('value');
-	return userQuery.then(userQueryResult => {
-		const from_user_name = userQueryResult.val().name;
-		console.log('Kuldo user: ', from_user_name);
-	
+		const userQuery = admin.database().ref(`/Users/${from_user_id}`).once('value');
+		const deviceToken = admin.database().ref(`/Users/${userId}/device_token`).once('value');
+		
+		return Promise.all([userQuery, deviceToken]).then(result =>{
 
-	
-	const deviceToken = admin.database().ref(`/Users/${userId}/device_token`).once('value');
-	return deviceToken.then(result => {
-			const token_id = result.val();
+			const from_user_name = result[0].val().name;
+			console.log('from_user_name',from_user_name);
+			const token_id = result[1].val();
 
 			const payload = {
 					notification: {
@@ -53,9 +49,8 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 
 			});
 
-	});
 
-	});
+		});
 
 	});
 

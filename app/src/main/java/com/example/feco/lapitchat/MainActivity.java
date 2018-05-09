@@ -16,6 +16,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -80,7 +86,24 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         if(item.getItemId()== R.id.main_logout_btn){
-            FirebaseAuth.getInstance().signOut();
+
+            // kilogoláskor a devicetokent töröljük
+            DatabaseReference mUsersDB = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            Map tokenMap = new HashMap();
+            tokenMap.put("device_token",null);
+            mUsersDB.updateChildren(tokenMap, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null){
+                        String error = databaseError.getMessage();
+                        Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
+                    }else{
+                        FirebaseAuth.getInstance().signOut();
+                    }
+                }
+            });
+
+
             if (mAuth.getCurrentUser()==null){
                 sendToStart();
             }
