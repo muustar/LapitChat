@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -21,8 +22,10 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -30,6 +33,7 @@ public class UsersActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private RecyclerView mUsersList;
     private FirebaseRecyclerAdapter<User, UsersViewHolder> adapter;
+    private DatabaseReference usersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,7 @@ public class UsersActivity extends AppCompatActivity {
         mUsersList.setHasFixedSize(true);
         mUsersList.setLayoutManager(new LinearLayoutManager(this));
 
+        usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
 
         //a firebase UI recycrerview kezelőjét használjuk
@@ -71,11 +76,32 @@ public class UsersActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull final User model) {
+            protected void onBindViewHolder(@NonNull final UsersViewHolder holder, int position, @NonNull final User model) {
                 holder.setmSingleImage(getApplicationContext(), model.getImage_thumb());
                 holder.setmSingleDisplayname(model.getName());
                 holder.setmSingleStatus(model.getStatus());
                 holder.setmEmail(model.getEmail());
+
+                // online dot
+                usersRef.child(model.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Boolean online;
+                        if (dataSnapshot.child("online").getValue() != null){
+                            online = (Boolean) dataSnapshot.child("online").getValue();
+                        }else{
+                            online = false;
+                        }
+
+                        holder.setOnlineDot(online);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 // ha nem tárolnám a User osztályban a UID-t, akkor ezzel tudjuk lekérni.
                 // String userID = getRef(position).getKey();
@@ -114,6 +140,17 @@ public class UsersActivity extends AppCompatActivity {
         private View mView;
         private CircleImageView mSingleImage;
         private TextView mSingleDisplayname, mSingleStatus, mEmail;
+        private ImageView mOnlineDot;
+
+        public void setOnlineDot(Boolean b){
+            mOnlineDot = (ImageView)mView.findViewById(R.id.users_single_dot);
+            if (b){
+                mOnlineDot.setImageResource(R.mipmap.online_dot);
+            }else{
+                mOnlineDot.setImageResource(R.mipmap.offline_dot);
+            }
+
+        }
 
         public void setmEmail(String mail){
             mEmail = mView.findViewById(R.id.users_single_email);

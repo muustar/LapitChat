@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
 
     private FirebaseAuth mAuth;
+    private DatabaseReference mUserDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Tabs
         mViewPager = findViewById(R.id.main_tabPager);
-        mSectionsPagerAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -64,8 +65,18 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser == null) {
             sendToStart();
         } else {
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            mUserDatabase.child("online").setValue(true);
             Toast.makeText(MainActivity.this, "belépve: " + currentUser.getEmail(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+            //mUserDatabase.child("online").setValue(false);
+
     }
 
     private void sendToStart() {
@@ -85,42 +96,36 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-        if(item.getItemId()== R.id.main_logout_btn){
+        if (item.getItemId() == R.id.main_logout_btn) {
 
             // kilogoláskor a devicetokent töröljük
-            DatabaseReference mUsersDB = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+
             Map tokenMap = new HashMap();
-            tokenMap.put("device_token",null);
-            mUsersDB.updateChildren(tokenMap, new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError != null){
-                        String error = databaseError.getMessage();
-                        Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
-                    }else{
-                        FirebaseAuth.getInstance().signOut();
-                    }
-                }
-            });
+            tokenMap.put("device_token", null);
+            mUserDatabase.updateChildren(tokenMap);
+            FirebaseAuth.getInstance().signOut();
+            sendToStart();
 
 
-            if (mAuth.getCurrentUser()==null){
-                sendToStart();
-            }
+            // if (mAuth.getCurrentUser() == null) {
+            //   sendToStart();
+            //}
             return true;
         }
 
-        if(item.getItemId()== R.id.main_account_settings){
+        if (item.getItemId() == R.id.main_account_settings) {
             Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(settingsIntent);
             return true;
         }
 
-        if(item.getItemId()== R.id.main_all_users){
+        if (item.getItemId() == R.id.main_all_users) {
             Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
             startActivity(usersIntent);
             return true;
         }
         return false;
     }
+
+
 }
