@@ -31,6 +31,8 @@ public class LapitChat extends Application {
         //Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_offline);
         //mOnlineDot.startAnimation(animation);
 
+        //https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
+
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());

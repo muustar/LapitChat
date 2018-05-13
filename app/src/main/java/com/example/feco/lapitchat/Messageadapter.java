@@ -2,6 +2,7 @@ package com.example.feco.lapitchat;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,9 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -54,7 +58,7 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
 
 
         //képek betöltése
-        DatabaseReference userRef= FirebaseDatabase.getInstance().getReference().child("Users");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -65,7 +69,7 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
                     holder.messageText.setTextColor(Color.WHITE);
                     Glide.with(ctx).load(currentUserImage).into(holder.profileImage);
                 } else {
-                    holder.messageText.setBackgroundColor(Color.WHITE);
+                    holder.messageText.setBackgroundResource(R.drawable.message_text_bgwhite);
                     holder.messageText.setTextColor(Color.BLACK);
                     Glide.with(ctx).load(fromUserImage).into(holder.profileImage);
                 }
@@ -78,11 +82,29 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
             }
         });
 
-        holder.messageText.setText(mMessageList.get(position).getMessage());
+        if (mMessageList.get(position).getType().equals("image")) {
+            holder.imageMessage.setVisibility(View.VISIBLE);
+            holder.messageText.setVisibility(View.GONE);
+
+            if (fromUser.equals(currentUser)) {
+                holder.imageMessage.setBackgroundResource(R.drawable.message_text_background);
+
+            } else {
+
+                holder.imageMessage.setBackgroundResource(R.drawable.message_text_bgwhite);
+
+            }
+
+
+            holder.setImageMessage(ctx, mMessageList.get(position).getMessage());
+        } else {
+            holder.imageMessage.setVisibility(View.GONE);
+            holder.messageText.setVisibility(View.VISIBLE);
+            holder.messageText.setText(mMessageList.get(position).getMessage());
+        }
         String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(mMessageList.get(position).getTime()));
         holder.timeText.setText(dateString);
         //holder.setProfileImage(ctx, mMessageList.get(position).getFrom());
-
 
         // idő feature
         // ha rá kattintunk az üzenetre akkor jelenik meg
@@ -131,6 +153,7 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
         private TextView messageText;
         private TextView timeText;
         private CircleImageView profileImage;
+        private ImageView imageMessage;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
@@ -139,10 +162,17 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
             messageText = (TextView) mView.findViewById(R.id.message_single_text);
             timeText = (TextView) mView.findViewById(R.id.message_single_time);
             profileImage = (CircleImageView) mView.findViewById(R.id.message_single_profileimage);
+            imageMessage = (ImageView) mView.findViewById(R.id.message_image_layout);
+        }
+
+        public void setImageMessage(Context ctx, String url) {
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
+            Glide.with(ctx).load(url).apply(options).into(imageMessage);
         }
 
         public void setProfileImage(Context ctx, String url) {
-            Glide.with(ctx).load(url).into(profileImage);
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
+            Glide.with(ctx).load(url).apply(options).into(profileImage);
         }
     }
 
