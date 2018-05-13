@@ -2,10 +2,12 @@ package com.example.feco.lapitchat;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -44,6 +46,7 @@ public class FriendsFragment extends Fragment {
     private DatabaseReference friendsRef;
 
 
+
     public FriendsFragment() {
         // Required empty public constructor
     }
@@ -52,10 +55,10 @@ public class FriendsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ctx =  container.getContext();
+        ctx = container.getContext();
         // Inflate the layout for this fragment
-        View v =  inflater.inflate(R.layout.fragment_friends, container, false);
-        mFriendsView = (RecyclerView)v.findViewById(R.id.friends_recycler);
+        View v = inflater.inflate(R.layout.fragment_friends, container, false);
+        mFriendsView = (RecyclerView) v.findViewById(R.id.friends_recycler);
         mFriendsView.setHasFixedSize(true);
         mFriendsView.setLayoutManager(new LinearLayoutManager(ctx));
 
@@ -64,7 +67,7 @@ public class FriendsFragment extends Fragment {
         usersRef.keepSynced(true);
 
 
-        friendsRef= FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrentUser);
+        friendsRef = FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrentUser);
         friendsRef.keepSynced(true);
 
         Query query = friendsRef;
@@ -74,28 +77,82 @@ public class FriendsFragment extends Fragment {
                         .setQuery(query, Friend.class)
                         .build();
 
+
         adapter = new FirebaseRecyclerAdapter<Friend, FriendsFragment.FriendsViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull final FriendsViewHolder holder, int position, @NonNull Friend model) {
+            protected void onBindViewHolder(@NonNull final FriendsViewHolder holder, int position, @NonNull final Friend model) {
+
+
                 holder.setmSingleStatus(model.getDate());
 
-                String list_user_id = getRef(position).getKey();
-
+                //adatfeltöltés a Users táblából
+                final String list_user_id = getRef(position).getKey();
                 usersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        String name= dataSnapshot.child("name").getValue().toString();
-                        String imgUrl = dataSnapshot.child("image_thumb").getValue().toString();
-                        Boolean online;
-                        if (dataSnapshot.child("online").getValue() != null){
-                            online = (Boolean) dataSnapshot.child("online").getValue();
-                        }else{
-                            online = false;
+
+                        final String userName = dataSnapshot.child("name").getValue().toString();
+                        final String chatUserImg = dataSnapshot.child("image_thumb").getValue().toString();
+                        holder.setmSingleDisplayname(userName);
+                        holder.setmSingleImage(ctx, chatUserImg);
+
+
+                        //online ststus ellenőrzés
+
+                        if (dataSnapshot.child("online").getValue() != null) {
+                            String online = dataSnapshot.child("online").getValue().toString();
+                            holder.setOnlineDot(online);
                         }
 
-                        holder.setmSingleDisplayname(name);
-                        holder.setmSingleImage(ctx, imgUrl);
-                        holder.setOnlineDot(online);
+
+
+
+
+                        //kattintás feature
+                        holder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+
+                                // felugró menüből választhatunk, hogy a csetbe megyünk vagy a profilra
+                              /*  CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                                builder.setTitle("Select Options");
+                                builder.setItems(options, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        if (which == 0) {
+                                            Intent profileIntent = new Intent(ctx, ProfileActivity.class);
+                                            profileIntent.putExtra("uid", list_user_id);
+                                            startActivity(profileIntent);
+                                        }
+
+                                        if (which == 1) {
+                                            Intent chatIntent = new Intent(ctx, ChatActivity.class);
+                                            chatIntent.putExtra("uid", list_user_id);
+                                            chatIntent.putExtra("name", userName);
+                                            chatIntent.putExtra("img", chatUserImg);
+                                            startActivity(chatIntent);
+                                        }
+
+                                    }
+                                });
+                                builder.show(); */
+
+
+                                // menü helyett egyből bele ugrik a chatbe
+                                Intent chatIntent = new Intent(ctx, ChatActivity.class);
+                                chatIntent.putExtra("uid", list_user_id);
+                                chatIntent.putExtra("name", userName);
+                                chatIntent.putExtra("img", chatUserImg);
+                                startActivity(chatIntent);
+                            }
+                        });
+
+
 
                     }
 
@@ -104,9 +161,6 @@ public class FriendsFragment extends Fragment {
 
                     }
                 });
-
-                // ha nem tárolnám a User osztályban a UID-t, akkor ezzel tudjuk lekérni.
-                // String userID = getRef(position).getKey();
 
 
             }
@@ -118,15 +172,9 @@ public class FriendsFragment extends Fragment {
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.users_single_layout, parent, false);
                 return new FriendsFragment.FriendsViewHolder(view);
-
             }
-
-
-
-
         };
         mFriendsView.setAdapter(adapter);
-
 
         return v;
     }
@@ -143,21 +191,21 @@ public class FriendsFragment extends Fragment {
         adapter.stopListening();
     }
 
-    public class FriendsViewHolder extends RecyclerView.ViewHolder{
+    public class FriendsViewHolder extends RecyclerView.ViewHolder {
 
         private View mView;
         private CircleImageView mSingleImage;
         private TextView mSingleDisplayname, mSingleStatus, mEmail;
         private ImageView mOnlineDot;
 
-        public void setOnlineDot(Boolean b){
-            mOnlineDot = (ImageView)mView.findViewById(R.id.users_single_dot);
-            if (b){
+        public void setOnlineDot(String b) {
+            mOnlineDot = (ImageView) mView.findViewById(R.id.users_single_dot);
+            if (b.equals("true")) {
                 mOnlineDot.setImageResource(R.mipmap.online_dot);
                 //animáció
                 Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_online);
                 mOnlineDot.startAnimation(animation);
-            }else{
+            } else {
                 mOnlineDot.setImageResource(R.mipmap.offline_dot);
                 //animáció
                 Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_offline);
@@ -167,7 +215,7 @@ public class FriendsFragment extends Fragment {
 
         }
 
-        public void setmEmail(String mail){
+        public void setmEmail(String mail) {
             mEmail = mView.findViewById(R.id.users_single_email);
             mEmail.setText(mail);
         }

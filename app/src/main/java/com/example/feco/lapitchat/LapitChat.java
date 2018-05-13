@@ -7,6 +7,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 /**
@@ -26,6 +27,10 @@ public class LapitChat extends Application {
         // Glide sync
         // http://bumptech.github.io/glide/doc/migrating.html#generated-api
 
+        //animáció
+        //Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_offline);
+        //mOnlineDot.startAnimation(animation);
+
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
@@ -35,7 +40,7 @@ public class LapitChat extends Application {
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
                     if (dataSnapshot != null) {
-                        mUserDatabase.child("online").onDisconnect().setValue(false);
+                        mUserDatabase.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
 
                     }
                 }

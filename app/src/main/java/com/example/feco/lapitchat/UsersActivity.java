@@ -90,14 +90,10 @@ public class UsersActivity extends AppCompatActivity {
                 usersRef.child(model.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Boolean online;
-                        if (dataSnapshot.child("online").getValue() != null){
-                            online = (Boolean) dataSnapshot.child("online").getValue();
-                        }else{
-                            online = false;
+                        if (dataSnapshot.child("online").getValue() != null) {
+                            String online = dataSnapshot.child("online").getValue().toString();
+                            holder.setOnlineDot(online);
                         }
-
-                        holder.setOnlineDot(online);
 
                     }
 
@@ -139,30 +135,29 @@ public class UsersActivity extends AppCompatActivity {
         adapter.stopListening();
     }
 
-    public class UsersViewHolder extends RecyclerView.ViewHolder{
+    public class UsersViewHolder extends RecyclerView.ViewHolder {
 
         private View mView;
         private CircleImageView mSingleImage;
         private TextView mSingleDisplayname, mSingleStatus, mEmail;
         private ImageView mOnlineDot;
 
-        public void setOnlineDot(Boolean b){
-            mOnlineDot = (ImageView)mView.findViewById(R.id.users_single_dot);
-            if (b){
+        public void setOnlineDot(String b) {
+            mOnlineDot = (ImageView) mView.findViewById(R.id.users_single_dot);
+            if (b.equals("true")) {
                 mOnlineDot.setImageResource(R.mipmap.online_dot);
                 //animáció
                 Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_online);
                 mOnlineDot.startAnimation(animation);
-            }else{
+            } else {
                 mOnlineDot.setImageResource(R.mipmap.offline_dot);
                 //animáció
                 Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_offline);
                 mOnlineDot.startAnimation(animation);
             }
-
         }
 
-        public void setmEmail(String mail){
+        public void setmEmail(String mail) {
             mEmail = mView.findViewById(R.id.users_single_email);
             mEmail.setText(mail);
         }

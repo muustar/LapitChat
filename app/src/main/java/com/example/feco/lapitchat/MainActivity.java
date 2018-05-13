@@ -19,7 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,8 +68,9 @@ public class MainActivity extends AppCompatActivity {
             sendToStart();
         } else {
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-            mUserDatabase.child("online").setValue(true);
-            Toast.makeText(MainActivity.this, "belépve: " + currentUser.getEmail(), Toast.LENGTH_SHORT).show();
+            mUserDatabase.child("online").setValue("true");
+            getSupportActionBar().setTitle(currentUser.getEmail());
+
         }
     }
 
@@ -76,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            mUserDatabase.child("online").setValue(false);
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            //mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
         }
 
 
