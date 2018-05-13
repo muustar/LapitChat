@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,11 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +62,9 @@ public class ChatActivity extends AppCompatActivity {
     private static final int TOTAL_ITEMS_TO_LOAD = 5;
     private int mCurrentPage = 1;
     private SwipeRefreshLayout mRefreshLayout;
-    private int itemPosition = 0;
-    private String mLastKey;
+    private int itemPos = 0;
+    private String mLastKey = "";
+    private String mPrevKey = "";
 
 
     @Override
@@ -194,72 +191,53 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 mCurrentPage++;
-                //itemPosition = 0;
-                //Log.d("FECO", "mLastKey: " + mLastKey);
-                loadMoreMessages();
-                Log.d("FECO", "loadmore után tempsize: " + tempList.size());
-                Log.d("FECO", "itemposition loadmore után " + itemPosition);
-                if (tempList.size() > 0 && tempList.size() < TOTAL_ITEMS_TO_LOAD) {
-                    mLastKey = tempList.get(0).getNodeKey();
-                    tempList.remove(tempList.size() - 1);
-                    messagesList.addAll(0, tempList);
-                    tempList.clear();
+                itemPos = 0;
 
-                    mAdapter.notifyDataSetChanged();
-                    //mMessageList.smoothScrollToPosition(itemPosition);
-                    mLinearLayout.scrollToPositionWithOffset(TOTAL_ITEMS_TO_LOAD,0);
-                    mRefreshLayout.setRefreshing(false);
-                    tempList.clear();
-                }
-                itemPosition = 0;
+                loadMoreMessages();
 
             }
         });
     }
 
     private void loadMoreMessages() {
+
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child(mChatUser);
+
         Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(TOTAL_ITEMS_TO_LOAD);
 
         messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+
                 Messages message = dataSnapshot.getValue(Messages.class);
-                message.setNodeKey(dataSnapshot.getKey());
+                String messageKey = dataSnapshot.getKey();
 
-                // ezt még érdemes nézegetni
-                // https://stackoverflow.com/questions/37711220/firebase-android-pagination
+                if(!mPrevKey.equals(messageKey)){
 
-                tempList.add(message);
-                Log.d("FECO", "tempsize: " + tempList.size());
-                if (tempList.size() == TOTAL_ITEMS_TO_LOAD) {
-                    mLastKey = tempList.get(0).getNodeKey();
-                    Log.d("FECO", "mLastKey: " + mLastKey);
-                    //Collections.reverse(tempList);
-                    tempList.remove(tempList.size() - 1);
-                    /*for (Messages m : tempList) {
-                        messagesList.add(0, m);
-                        mAdapter.notifyDataSetChanged();
-                    }*/
+                    messagesList.add(itemPos++, message);
 
-                    messagesList.addAll(0, tempList);
+                } else {
 
-                    tempList.clear();
+                    mPrevKey = mLastKey;
+
                 }
 
-                // messagesList.add(itemPosition,message);
 
+                if(itemPos == 1) {
+
+                    mLastKey = messageKey;
+
+                }
+
+
+                Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
 
                 mAdapter.notifyDataSetChanged();
-                mMessageList.scrollToPosition(itemPosition);
-                mRefreshLayout.setRefreshing(false);
-                itemPosition++;
 
-
-                /*mAdapter.notifyDataSetChanged();
-                mMessageList.scrollToPosition(itemPosition);
                 mRefreshLayout.setRefreshing(false);
-                */
+
+                mLinearLayout.scrollToPositionWithOffset(0, 0);
 
             }
 
@@ -283,32 +261,40 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-
 
     }
 
     private void loadMessages() {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child(mChatUser);
+
         Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
+
 
         messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
                 Messages message = dataSnapshot.getValue(Messages.class);
 
-                if (itemPosition == 0) {
-                    mLastKey = dataSnapshot.getKey();
-                    Log.d("FECO", "mLastKey: " + mLastKey);
+                itemPos++;
+
+                if(itemPos == 1){
+
+                    String messageKey = dataSnapshot.getKey();
+
+                    mLastKey = messageKey;
+                    mPrevKey = messageKey;
+
                 }
-                itemPosition++;
 
                 messagesList.add(message);
-
                 mAdapter.notifyDataSetChanged();
 
                 mMessageList.scrollToPosition(messagesList.size() - 1);
+
                 mRefreshLayout.setRefreshing(false);
+
             }
 
             @Override
@@ -331,6 +317,7 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     private void sendMessage() {
