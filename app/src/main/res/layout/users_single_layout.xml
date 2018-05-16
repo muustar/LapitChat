@@ -8,6 +8,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="10dp"
+        android:transitionName="imageTrans"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp"
         android:src="@mipmap/ic_placeholder_face"/>
@@ -19,6 +20,7 @@
         android:layout_alignTop="@+id/users_single_image"
         android:layout_toEndOf="@+id/users_single_dot"
         android:text="Display Name"
+        android:transitionName="nameTrans"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -41,6 +43,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="0dp"
         android:text="Status"
+        android:transitionName="statusTrans"
         android:layout_toRightOf="@id/users_single_image"
         android:layout_below="@id/users_single_email"/>
 

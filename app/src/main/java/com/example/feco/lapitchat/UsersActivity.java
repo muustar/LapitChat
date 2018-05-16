@@ -1,13 +1,16 @@
 package com.example.feco.lapitchat;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,9 +112,24 @@ public class UsersActivity extends AppCompatActivity {
                 holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+
                         Intent profileIntent = new Intent(UsersActivity.this, ProfileActivity.class);
                         profileIntent.putExtra("uid", model.getUid());
-                        startActivity(profileIntent);
+
+                        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                            startActivity(profileIntent);
+                        } else {
+                            Pair[] pairs = new Pair[3];
+                            pairs[0] = new Pair<View, String>(holder.mSingleImage, "imageTrans");
+                            pairs[1] = new Pair<View, String>(holder.mSingleDisplayname, "nameTrans");
+                            pairs[2] = new Pair<View, String>(holder.mSingleStatus, "statusTrans");
+
+                            ActivityOptions options = ActivityOptions
+                                    .makeSceneTransitionAnimation(UsersActivity.this, pairs);
+
+                            startActivity(profileIntent, options.toBundle());
+                        }
                     }
                 });
             }

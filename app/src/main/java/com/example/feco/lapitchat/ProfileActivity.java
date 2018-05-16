@@ -60,12 +60,12 @@ public class ProfileActivity extends AppCompatActivity {
         if (getIntent().getExtras() != null) {
             for (String key : getIntent().getExtras().keySet()) {
                 Object value = getIntent().getExtras().get(key);
-                Log.d("FECO", "Key: " + key + " Value: " + value);
+                //Log.d("FECO", "Key: " + key + " Value: " + value);
             }
         }
 
         user_id = getIntent().getStringExtra("uid");
-        Log.d("FECO", "userid: " + user_id);
+        Log.d("FECO", "user_id: " + user_id);
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
@@ -112,15 +112,6 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
 
-                // ------ saját profil ellenőrzés -------
-
-                if (TextUtils.equals(user_id, mCurrent_user.getUid())) {
-                    mProfileSendFrndsReq.setEnabled(false);
-                    mProfileSendFrndsReq.setVisibility(View.INVISIBLE);
-
-                    mProfileDeclineBtn.setEnabled(false);
-                    mProfileDeclineBtn.setVisibility(View.INVISIBLE);
-                }
 
                 // ------------------------- FRIEND REQUEST FEATURES -------------------
 
@@ -169,6 +160,14 @@ public class ProfileActivity extends AppCompatActivity {
                                         mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
                                         mCurrent_state = NOT_FRIEND;
                                         mProfileSendFrndsReq.setText("Send Friend Request");
+                                        // ------ saját profil ellenőrzés -------
+                                        if (TextUtils.equals(user_id, mCurrent_user.getUid())) {
+                                            mProfileSendFrndsReq.setEnabled(false);
+                                            mProfileSendFrndsReq.setVisibility(View.INVISIBLE);
+
+                                            mProfileDeclineBtn.setEnabled(false);
+                                            mProfileDeclineBtn.setVisibility(View.INVISIBLE);
+                                        }
                                     }
                                 }
 
@@ -192,6 +191,9 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
+
+
+
 
 
         mProfileSendFrndsReq.setOnClickListener(new View.OnClickListener() {

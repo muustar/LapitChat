@@ -9,7 +9,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="10dp"
-        android:src="@mipmap/ic_placeholder_face" />
+        android:src="@mipmap/ic_placeholder_face"
+        android:transitionName="imageTrans"/>
 
     <TextView
         android:id="@+id/custom_bar_title"

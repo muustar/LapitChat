@@ -1,7 +1,9 @@
 package com.example.feco.lapitchat;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -12,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -155,7 +158,21 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent profileIntent = new Intent(ChatActivity.this, ProfileActivity.class);
                 profileIntent.putExtra("uid", mChatUser);
-                startActivity(profileIntent);
+
+
+
+                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    // Do something for lollipop and above versions
+                    startActivity(profileIntent);
+                } else {
+                    // do something for phones running an SDK before lollipop
+                    Pair[] pairs = new Pair[1];
+                    pairs[0] = new Pair<View, String>(mProfileImage, "imageTrans");
+                    ActivityOptions options = ActivityOptions
+                            .makeSceneTransitionAnimation(ChatActivity.this, pairs);
+
+                    startActivity(profileIntent, options.toBundle());
+                }
             }
         });
 
@@ -217,7 +234,7 @@ public class ChatActivity extends AppCompatActivity {
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
-                startActivityForResult(Intent.createChooser(galleryIntent,"Select Image"),GALLERY_PICK_REQ);
+                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), GALLERY_PICK_REQ);
             }
         });
     }
@@ -226,7 +243,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GALLERY_PICK_REQ && resultCode == RESULT_OK){
+        if (requestCode == GALLERY_PICK_REQ && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
 
             final String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
@@ -236,12 +253,12 @@ public class ChatActivity extends AppCompatActivity {
                     .child(mCurrentUserID).child(mChatUser).push();
             final String push_id = user_message_push.getKey();
 
-            StorageReference filepath = mImageStorage.child("message_images").child(push_id+".jpg");
+            StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
 
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         String download_url = task.getResult().getDownloadUrl().toString();
 
                         Map messageMap = new HashMap();
@@ -254,7 +271,6 @@ public class ChatActivity extends AppCompatActivity {
                         Map messageUserMap = new HashMap();
                         messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
                         messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-
 
 
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
@@ -288,7 +304,7 @@ public class ChatActivity extends AppCompatActivity {
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
 
-                if(!mPrevKey.equals(messageKey)){
+                if (!mPrevKey.equals(messageKey)) {
 
                     messagesList.add(itemPos++, message);
 
@@ -299,7 +315,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
 
 
-                if(itemPos == 1) {
+                if (itemPos == 1) {
 
                     mLastKey = messageKey;
 
@@ -355,7 +371,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 itemPos++;
 
-                if(itemPos == 1){
+                if (itemPos == 1) {
 
                     String messageKey = dataSnapshot.getKey();
 
@@ -368,7 +384,7 @@ public class ChatActivity extends AppCompatActivity {
                 mAdapter.notifyDataSetChanged();
 
                 //mMessageList.scrollToPosition(messagesList.size()+1);
-                mLinearLayout.scrollToPositionWithOffset(messagesList.size()-1, 0);
+                mLinearLayout.scrollToPositionWithOffset(messagesList.size() - 1, 0);
                 //Toast.makeText(ChatActivity.this, "load_sima", Toast.LENGTH_SHORT).show();
 
                 mRefreshLayout.setRefreshing(false);
@@ -423,8 +439,8 @@ public class ChatActivity extends AppCompatActivity {
 
             mChatMessageEdT.setText("");
             mChatSendBtn.setEnabled(true);
-            mMessageList.scrollToPosition(messagesList.size()+1);
-            mLinearLayout.scrollToPositionWithOffset(messagesList.size()+1, 2);
+            mMessageList.scrollToPosition(messagesList.size() + 1);
+            mLinearLayout.scrollToPositionWithOffset(messagesList.size() + 1, 2);
 
             mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                 @Override

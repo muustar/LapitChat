@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,8 +95,11 @@ public class FriendsFragment extends Fragment {
                         final String userName = dataSnapshot.child("name").getValue().toString();
                         final String chatUserImg = dataSnapshot.child("image_thumb").getValue().toString();
                         holder.setmSingleDisplayname(userName);
-                        holder.setmSingleImage(ctx, chatUserImg);
-
+                        try {
+                            holder.setmSingleImage(ctx, chatUserImg);
+                        }catch (Exception e){
+                            Log.d("ERROR", e.getMessage());
+                        }
 
                         //online ststus ellenőrzés
 

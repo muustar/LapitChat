@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:src="@color/colorPrimaryDark"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:transitionName="imageTrans"/>
 
     <TextView
         android:id="@+id/profile_displayname"
@@ -24,6 +25,7 @@
         android:layout_marginTop="20dp"
         android:layout_below="@id/profile_image"
         android:textSize="24sp"
+        android:transitionName="nameTrans"
         android:layout_centerHorizontal="true"/>
 
     <TextView
@@ -35,6 +37,7 @@
         android:layout_centerHorizontal="true"
         android:text="Current User Status"
         android:textAlignment="center"
+        android:transitionName="statusTrans"
         android:textColor="@android:color/white"/>
 
     <TextView
