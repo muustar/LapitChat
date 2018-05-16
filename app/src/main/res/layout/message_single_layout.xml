@@ -11,6 +11,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:src="@mipmap/ic_placeholder_face"
+        android:transitionName="imageTrans"
         />
 
     <TextView
@@ -18,6 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:transitionName="statusTrans"
         android:layout_toEndOf="@+id/message_single_profileimage"
         android:layout_marginLeft="5dp"
 

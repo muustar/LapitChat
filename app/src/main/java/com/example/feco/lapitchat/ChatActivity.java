@@ -77,6 +77,8 @@ public class ChatActivity extends AppCompatActivity {
     private String mLastKey = "";
     private String mPrevKey = "";
     private StorageReference mImageStorage;
+    private Query messageQuery;
+    private ChildEventListener loadMessageChildEvent;
 
 
     @Override
@@ -160,7 +162,6 @@ public class ChatActivity extends AppCompatActivity {
                 profileIntent.putExtra("uid", mChatUser);
 
 
-
                 if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     // Do something for lollipop and above versions
                     startActivity(profileIntent);
@@ -176,37 +177,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        // --- menti a last seen időpontját
-        mRootRef.child("Chat").child(mCurrentUserID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChild(mChatUser)) {
 
-                    Map chatAddMap = new HashMap();
-                    chatAddMap.put("seen", false);
-                    chatAddMap.put("timestamp", ServerValue.TIMESTAMP);
 
-                    Map chatUserMap = new HashMap();
-                    chatUserMap.put("Chat/" + mCurrentUserID + "/" + mChatUser, chatAddMap);
-                    chatUserMap.put("Chat/" + mChatUser + "/" + mCurrentUserID, chatAddMap);
-
-                    mRootRef.updateChildren(chatUserMap, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                            if (databaseError != null) {
-                                Log.d("ERROR", databaseError.getMessage().toString());
-                            }
-                        }
-                    });
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -244,6 +216,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GALLERY_PICK_REQ && resultCode == RESULT_OK) {
+            chatOpening();
             Uri imageUri = data.getData();
 
             final String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
@@ -255,6 +228,7 @@ public class ChatActivity extends AppCompatActivity {
 
             StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
 
+            // képet küldünk üzenetben
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -360,14 +334,22 @@ public class ChatActivity extends AppCompatActivity {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child(mChatUser);
 
-        Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
+        messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
 
 
-        messageQuery.addChildEventListener(new ChildEventListener() {
+        loadMessageChildEvent = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
                 Messages message = dataSnapshot.getValue(Messages.class);
+
+                // a megnyitott üzenetnél oda tesszük h olvasott
+
+                String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
+                String push_id = dataSnapshot.getKey();
+                mRootRef.child(current_user_ref).child(push_id).child("seen").setValue(true);
+
+                // a megnyitott üzenetnél oda tesszük h olvasott <---
 
                 itemPos++;
 
@@ -410,11 +392,33 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        //messageQuery.addChildEventListener(loadMessageChildEvent);
 
     }
 
+    private void chatOpening(){
+        Map chatAddMap = new HashMap();
+        chatAddMap.put("seen", false);
+        chatAddMap.put("timestamp", ServerValue.TIMESTAMP);
+
+        Map chatUserMap = new HashMap();
+        chatUserMap.put("Chat/" + mCurrentUserID + "/" + mChatUser, chatAddMap);
+        chatUserMap.put("Chat/" + mChatUser + "/" + mCurrentUserID, chatAddMap);
+
+        mRootRef.updateChildren(chatUserMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.d("ERROR", databaseError.getMessage().toString());
+                }
+            }
+        });
+    }
+
     private void sendMessage() {
+       chatOpening();
 
         String message = mChatMessageEdT.getText().toString().trim();
         if (!TextUtils.isEmpty(message)) {
@@ -457,5 +461,16 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        messageQuery.addChildEventListener(loadMessageChildEvent);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        messageQuery.removeEventListener(loadMessageChildEvent);
+
+    }
 }

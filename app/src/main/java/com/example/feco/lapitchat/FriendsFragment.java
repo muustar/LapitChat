@@ -47,7 +47,6 @@ public class FriendsFragment extends Fragment {
     private DatabaseReference friendsRef;
 
 
-
     public FriendsFragment() {
         // Required empty public constructor
     }
@@ -97,7 +96,7 @@ public class FriendsFragment extends Fragment {
                         holder.setmSingleDisplayname(userName);
                         try {
                             holder.setmSingleImage(ctx, chatUserImg);
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             Log.d("ERROR", e.getMessage());
                         }
 
@@ -109,9 +108,6 @@ public class FriendsFragment extends Fragment {
                         }
 
 
-
-
-
                         //kattintás feature
                         holder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -119,7 +115,7 @@ public class FriendsFragment extends Fragment {
 
 
                                 // felugró menüből választhatunk, hogy a csetbe megyünk vagy a profilra
-                              /*  CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
+                                CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
@@ -144,18 +140,17 @@ public class FriendsFragment extends Fragment {
 
                                     }
                                 });
-                                builder.show(); */
+                                builder.show();
 
-
+                              /*
                                 // menü helyett egyből bele ugrik a chatbe
                                 Intent chatIntent = new Intent(ctx, ChatActivity.class);
                                 chatIntent.putExtra("uid", list_user_id);
                                 chatIntent.putExtra("name", userName);
                                 chatIntent.putExtra("img", chatUserImg);
-                                startActivity(chatIntent);
+                                startActivity(chatIntent);*/
                             }
                         });
-
 
 
                     }

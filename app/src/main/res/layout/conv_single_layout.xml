@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/conv_single_image"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="10dp"
+        android:transitionName="imageTrans"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@mipmap/ic_placeholder_face"/>
+
+    <TextView
+        android:id="@+id/conv_single_displayname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/conv_single_image"
+        android:layout_toEndOf="@+id/conv_single_dot"
+        android:text="Display Name"
+        android:transitionName="nameTrans"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/conv_single_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/conv_single_displayname"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_toRightOf="@id/conv_single_image"
+        android:textSize="8sp" />
+
+    <TextView
+        android:id="@+id/conv_last_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="0dp"
+        android:text="Utolsó üzenet"
+        android:transitionName="statusTrans"
+        android:layout_toRightOf="@id/conv_single_image"
+        android:layout_below="@id/conv_single_email"/>
+
+    <ImageView
+        android:id="@+id/conv_single_dot"
+        android:layout_width="13dp"
+        android:layout_height="11dp"
+        android:layout_alignStart="@+id/conv_single_email"
+        android:layout_alignTop="@+id/conv_single_image"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="8dp"
+        app:srcCompat="@mipmap/offline_dot" />
+
+</RelativeLayout>
