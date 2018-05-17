@@ -419,6 +419,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessage() {
        chatOpening();
+       chatNotification();
 
         String message = mChatMessageEdT.getText().toString().trim();
         if (!TextUtils.isEmpty(message)) {
@@ -461,9 +462,38 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void chatNotification() {
+
+        // notification
+        DatabaseReference newNotificationRef = mRootRef.child("Notifications").child(mChatUser).push();
+        String newNotificationId = newNotificationRef.getKey();
+        Map notificationDataMap = new HashMap<>();
+        notificationDataMap.put("from", mCurrentUserID);
+        notificationDataMap.put("type", "new_message");
+        notificationDataMap.put("seen", false);
+        notificationDataMap.put("timestamp", ServerValue.TIMESTAMP);
+
+        Map requestMap = new HashMap();
+        requestMap.put("Notifications/" + mChatUser + "/" + newNotificationId, notificationDataMap);
+
+        mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Toast.makeText(ChatActivity.this, "There was some error.", Toast.LENGTH_SHORT).show();
+                } else {
+
+                }
+
+            }
+        });
+
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+        messagesList.clear();
         messageQuery.addChildEventListener(loadMessageChildEvent);
     }
 

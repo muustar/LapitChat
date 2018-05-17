@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="10dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/request_profileimage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="3dp"
+        android:src="@mipmap/ic_placeholder_face" />
+
+    <TextView
+        android:id="@+id/request_displayname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/request_profileimage"
+        android:layout_weight="1"
+        android:text="Display Name"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/request_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/request_displayname"
+        android:layout_toEndOf="@+id/request_profileimage"
+        android:layout_weight="1"
+        android:text="Friend request" />
+
+    <TextView
+        android:id="@+id/request_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="11dp"
+        android:text="timestamp" />
+</RelativeLayout>

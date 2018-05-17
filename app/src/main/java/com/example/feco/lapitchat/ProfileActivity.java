@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
@@ -210,7 +211,9 @@ public class ProfileActivity extends AppCompatActivity {
                     String newNotificationId = newNotificationRef.getKey();
                     Map notificationDataMap = new HashMap<>();
                     notificationDataMap.put("from", mCurrent_user.getUid());
-                    notificationDataMap.put("type", "request");
+                    notificationDataMap.put("type", "friend_request");
+                    notificationDataMap.put("seen", false);
+                    notificationDataMap.put("timestamp", ServerValue.TIMESTAMP);
 
                     Map requestMap = new HashMap();
                     requestMap.put("Friend_req/" + mCurrent_user.getUid() + "/" + user_id + "/" + REQUEST_TYPE, SENT);
