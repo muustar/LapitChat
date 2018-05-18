@@ -5,6 +5,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
@@ -28,14 +31,21 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String click_action = remoteMessage.getNotification().getClickAction();
         String from_user_id = remoteMessage.getData().get("uid");
 
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.notify_icon)
                 .setContentTitle(notification_title)
                 .setContentText(notification_message)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setSound(soundUri)
+                .setVibrate(new long[] {500,500,500})
+                .setLights(Color.RED, 3000,3000);
+
 
         //String intentProfile="lapitchat.ProfileActivity";
         Intent resultIntent = new Intent(click_action);
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         //Intent resultIntent = new Intent(intentProfile);
         resultIntent.putExtra("uid", from_user_id);
 
