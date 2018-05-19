@@ -41,7 +41,6 @@ public class RequestsFragment extends Fragment {
     private String mCurrentUserId;
     private DatabaseReference notificationsRef;
     private FirebaseRecyclerAdapter<NotificationType, RequestsFragment.NotifyViewHolder> adapter;
-    private User u;
 
 
     public RequestsFragment() {
@@ -82,14 +81,15 @@ public class RequestsFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull final NotifyViewHolder holder, final int position, @NonNull final NotificationType model) {
+                final User[] u = new User[1];
                 // Display Name betöltése
                 DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
                 usersRef.child(model.getFrom()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        u = dataSnapshot.getValue(User.class);
-                        holder.mRequestDisplayname.setText(u.getName());
-                        holder.setImage(ctx, u.getImage_thumb());
+                        u[0] = dataSnapshot.getValue(User.class);
+                        holder.mRequestDisplayname.setText(u[0].getName());
+                        holder.setImage(ctx, u[0].getImage_thumb());
                     }
 
                     @Override
@@ -118,8 +118,8 @@ public class RequestsFragment extends Fragment {
                                 notificationsRef.child(getRef(position).getKey()).removeValue();
                                 Intent openChat = new Intent(ctx, ChatActivity.class);
                                 openChat.putExtra("uid", model.getFrom());
-                                openChat.putExtra("name", u.getName());
-                                openChat.putExtra("img", u.getImage_thumb());
+                                openChat.putExtra("name", u[0].getName());
+                                openChat.putExtra("img", u[0].getImage_thumb());
                                 startActivity(openChat);
                                 break;
 
