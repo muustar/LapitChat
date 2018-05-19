@@ -57,14 +57,18 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 							notification: {
 								title: `${type}`,
 								body: `${from_user_name} has sent you a ${type}`,
-								icon: "default",
-								click_action: `${action}`
+								icon: "notify_icon",
+								click_action: `${action}`,
+								sound: "light",
+								vibrate: "ture"
 							},
 							data: {
 								uid: from_user_id,
 								type: notify_type,
 								name: from_user_name,
-								img: from_user_img
+								img: from_user_img,
+								"ledColor": "[0, 0, 255, 0]",
+								"vibrationPattern": "[2000, 1000, 500, 500]"
 							}
 						};
 

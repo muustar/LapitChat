@@ -40,7 +40,7 @@ public class RequestsFragment extends Fragment {
     private Context ctx;
     private String mCurrentUserId;
     private DatabaseReference notificationsRef;
-    private FirebaseRecyclerAdapter<Notification, RequestsFragment.NotifyViewHolder> adapter;
+    private FirebaseRecyclerAdapter<NotificationType, RequestsFragment.NotifyViewHolder> adapter;
     private User u;
 
 
@@ -52,6 +52,7 @@ public class RequestsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         ctx = container.getContext();
         View v = inflater.inflate(R.layout.fragment_requests, container, false);
@@ -64,12 +65,12 @@ public class RequestsFragment extends Fragment {
 
         Query query = notificationsRef;
 
-        FirebaseRecyclerOptions<Notification> options =
-                new FirebaseRecyclerOptions.Builder<Notification>()
-                        .setQuery(query, Notification.class)
+        FirebaseRecyclerOptions<NotificationType> options =
+                new FirebaseRecyclerOptions.Builder<NotificationType>()
+                        .setQuery(query, NotificationType.class)
                         .build();
 
-        adapter = new FirebaseRecyclerAdapter<Notification, RequestsFragment.NotifyViewHolder>(options) {
+        adapter = new FirebaseRecyclerAdapter<NotificationType, RequestsFragment.NotifyViewHolder>(options) {
 
             @NonNull
             @Override
@@ -80,7 +81,7 @@ public class RequestsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull final NotifyViewHolder holder, final int position, @NonNull final Notification model) {
+            protected void onBindViewHolder(@NonNull final NotifyViewHolder holder, final int position, @NonNull final NotificationType model) {
                 // Display Name betöltése
                 DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
                 usersRef.child(model.getFrom()).addValueEventListener(new ValueEventListener() {

@@ -1,9 +1,11 @@
 package com.example.feco.lapitchat;
 
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.RingtoneManager;
@@ -29,9 +31,16 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String notification_title = remoteMessage.getNotification().getTitle();
         String notification_message = remoteMessage.getNotification().getBody();
         String click_action = remoteMessage.getNotification().getClickAction();
+        String sound = "/raw/" + remoteMessage.getNotification().getSound();
+        String ledColor = remoteMessage.getNotification().getColor();
         String from_user_id = remoteMessage.getData().get("uid");
+        String name = remoteMessage.getData().get("name");
+        String img = remoteMessage.getData().get("img");
 
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        //Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+                + "://" + getPackageName() + sound);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.notify_icon)
@@ -39,15 +48,17 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 .setContentText(notification_message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setSound(soundUri)
-                .setVibrate(new long[] {500,500,500})
-                .setLights(Color.RED, 3000,3000);
+                .setAutoCancel(true)
+                .setVibrate(new long[]{500, 500, 500})
+                .setLights(Color.GREEN, 3000, 3000);
 
 
         //String intentProfile="lapitchat.ProfileActivity";
         Intent resultIntent = new Intent(click_action);
-        resultIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         //Intent resultIntent = new Intent(intentProfile);
         resultIntent.putExtra("uid", from_user_id);
+        resultIntent.putExtra("name", name);
+        resultIntent.putExtra("img", img);
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -59,7 +70,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         mBuilder.setContentIntent(resultPendingIntent);
 
-        int mNotificationID = (int)System.currentTimeMillis();
+        int mNotificationID = (int) System.currentTimeMillis();
         NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationID, mBuilder.build());
@@ -78,10 +89,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
-            int mNotificationID = (int)System.currentTimeMillis();
+            int mNotificationID = (int) System.currentTimeMillis();
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
-            notificationManager.notify(mNotificationID, mBuilder.build() );
+            notificationManager.notify(mNotificationID, mBuilder.build());
         }
     }
 

@@ -4,14 +4,14 @@ package com.example.feco.lapitchat;
  * Készítette: feco
  * 2018.05.17.
  */
-public class Notification {
+public class NotificationType {
     private String from, type;
     private Boolean seen;
     private long timestamp;
 
-    public Notification(){}
+    public NotificationType(){}
 
-    public Notification(String from, String type, Boolean seen, long timestamp) {
+    public NotificationType(String from, String type, Boolean seen, long timestamp) {
         this.from = from;
         this.type = type;
         this.seen = seen;

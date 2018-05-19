@@ -1,6 +1,8 @@
 package com.example.feco.lapitchat;
 
 import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.MenuRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -33,7 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference mUserDatabase;
+    private DatabaseReference mUserDatabase, mNotifyDatabase;
+    private MenuItem mDynamicMenuItem;
+    private boolean isVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +59,30 @@ public class MainActivity extends AppCompatActivity {
 
         mTabLayout = findViewById(R.id.main_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+            if (tab.getPosition()==0){
+                isVisible=true;
+            }else{
+                isVisible=false;
+            }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
 
     }
+
 
 
     @Override
@@ -70,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
             mUserDatabase.child("online").setValue("true");
             getSupportActionBar().setTitle(currentUser.getEmail());
+
+            mNotifyDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications").child(currentUser.getUid());
 
         }
     }
@@ -93,10 +122,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if(Build.VERSION.SDK_INT > 11) {
+            invalidateOptionsMenu();
+            mDynamicMenuItem.setVisible(isVisible);
+            //menu.findItem(R.id.main_logout_btn).setVisible(true);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-
+        getMenuInflater().inflate(R.menu.request_menu, menu);
+        mDynamicMenuItem = menu.findItem(R.id.request_clear);
         return true;
     }
 
@@ -130,6 +170,10 @@ public class MainActivity extends AppCompatActivity {
             Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
             startActivity(usersIntent);
             return true;
+        }
+
+        if (item.getItemId() == R.id.request_clear){
+            mNotifyDatabase.removeValue();
         }
         return false;
     }

@@ -79,6 +79,8 @@ public class ChatActivity extends AppCompatActivity {
     private StorageReference mImageStorage;
     private Query messageQuery;
     private ChildEventListener loadMessageChildEvent;
+    private ChildEventListener requestTorloEventListener;
+    private DatabaseReference notifyRef;
 
 
     @Override
@@ -394,11 +396,56 @@ public class ChatActivity extends AppCompatActivity {
             }
         };
 
+        // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük
+        requestTorles();
+
         //messageQuery.addChildEventListener(loadMessageChildEvent);
 
     }
 
+    private void requestTorles() {
+        // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük
+        notifyRef = mRootRef.child("Notifications").child(mCurrentUserID);
+        requestTorloEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                //Log.d("FECO", dataSnapshot.toString());
+                String key = dataSnapshot.getKey();
+                //Log.d("FECO", key);
+
+                NotificationType n = dataSnapshot.getValue(NotificationType.class);
+                if (n.getFrom().equals(mChatUser)){
+                    if (n.getType().equals("new_message")){
+                        Log.d("FECO", n.toString());
+                        notifyRef.child(key).removeValue();
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+    }
+
     private void chatOpening(){
+        // ez hozza létre az adatbátisban a "Chat" táblát ami leírja milyen csetek vannak nyitva , az üzenetek et a messges táblába tároljuk
         Map chatAddMap = new HashMap();
         chatAddMap.put("seen", false);
         chatAddMap.put("timestamp", ServerValue.TIMESTAMP);
@@ -464,7 +511,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private void chatNotification() {
 
-        // notification
+        // REQUEST fragmentbe irja a sorokat
+        // ez az új üzenet írásakor fut le
         DatabaseReference newNotificationRef = mRootRef.child("Notifications").child(mChatUser).push();
         String newNotificationId = newNotificationRef.getKey();
         Map notificationDataMap = new HashMap<>();
@@ -495,12 +543,15 @@ public class ChatActivity extends AppCompatActivity {
         super.onStart();
         messagesList.clear();
         messageQuery.addChildEventListener(loadMessageChildEvent);
+        notifyRef.addChildEventListener(requestTorloEventListener);
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         messageQuery.removeEventListener(loadMessageChildEvent);
+        notifyRef.removeEventListener(requestTorloEventListener);
 
     }
 }
