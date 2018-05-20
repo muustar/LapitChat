@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -110,13 +112,22 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
 
 
             holder.setImageMessage(ctx, mMessageList.get(position).getMessage());
+            holder.imageMessage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+
+                }
+            });
         } else {
             holder.imageMessage.setVisibility(View.GONE);
             holder.messageText.setVisibility(View.VISIBLE);
             holder.messageText.setText(mMessageList.get(position).getMessage());
         }
+        String lattam = String.valueOf(mMessageList.get(position).getSeen());
         String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(mMessageList.get(position).getTime()));
-        holder.timeText.setText(dateString);
+        holder.timeText.setText(dateString + "\n" + lattam);
         //holder.setProfileImage(ctx, mMessageList.get(position).getFrom());
 
         // idő feature

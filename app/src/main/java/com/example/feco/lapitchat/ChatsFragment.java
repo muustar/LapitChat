@@ -178,7 +178,6 @@ public class ChatsFragment extends Fragment {
                         holder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // menü helyett egyből bele ugrik a chatbe
                                 Intent chatIntent = new Intent(ctx, ChatActivity.class);
                                 chatIntent.putExtra("uid", list_user_id);
                                 chatIntent.putExtra("name", userName);

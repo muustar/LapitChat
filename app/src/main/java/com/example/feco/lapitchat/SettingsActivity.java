@@ -256,4 +256,15 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // chehck the user logged in
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
+            mUserDatabase.child("online").setValue("true");
+        }
+    }
 }

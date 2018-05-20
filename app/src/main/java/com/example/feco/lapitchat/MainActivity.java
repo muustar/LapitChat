@@ -62,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-            if (tab.getPosition()==0){
-                isVisible=true;
-            }else{
-                isVisible=false;
-            }
+                if (tab.getPosition() == 0) {
+                    isVisible = true;
+                } else {
+                    isVisible = false;
+                }
             }
 
             @Override
@@ -83,7 +83,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // chehck the user logged in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            mUserDatabase.child("online").setValue("true");
+        }
+    }
 
     @Override
     protected void onStart() {
@@ -94,24 +103,26 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser == null) {
             sendToStart();
         } else {
-            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-            mUserDatabase.child("online").setValue("true");
             getSupportActionBar().setTitle(currentUser.getEmail());
-
             mNotifyDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications").child(currentUser.getUid());
-
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-            //mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
+            mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
         }
-
 
     }
 
@@ -124,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
-        if(Build.VERSION.SDK_INT > 11) {
+        if (Build.VERSION.SDK_INT > 11) {
             invalidateOptionsMenu();
             mDynamicMenuItem.setVisible(isVisible);
             //menu.findItem(R.id.main_logout_btn).setVisible(true);
@@ -172,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        if (item.getItemId() == R.id.request_clear){
+        if (item.getItemId() == R.id.request_clear) {
             mNotifyDatabase.removeValue();
         }
         return false;

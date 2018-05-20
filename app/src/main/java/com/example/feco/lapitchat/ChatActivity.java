@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -178,8 +179,6 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
-
-
 
 
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
@@ -336,7 +335,7 @@ public class ChatActivity extends AppCompatActivity {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child(mChatUser);
 
-        messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
+        messageQuery = messageRef.limitToLast(10);
 
 
         loadMessageChildEvent = new ChildEventListener() {
@@ -414,8 +413,8 @@ public class ChatActivity extends AppCompatActivity {
                 //Log.d("FECO", key);
 
                 NotificationType n = dataSnapshot.getValue(NotificationType.class);
-                if (n.getFrom().equals(mChatUser)){
-                    if (n.getType().equals("new_message")){
+                if (n.getFrom().equals(mChatUser)) {
+                    if (n.getType().equals("new_message")) {
                         Log.d("FECO", n.toString());
                         notifyRef.child(key).removeValue();
                     }
@@ -444,7 +443,7 @@ public class ChatActivity extends AppCompatActivity {
         };
     }
 
-    private void chatOpening(){
+    private void chatOpening() {
         // ez hozza létre az adatbátisban a "Chat" táblát ami leírja milyen csetek vannak nyitva , az üzenetek et a messges táblába tároljuk
         Map chatAddMap = new HashMap();
         chatAddMap.put("seen", false);
@@ -465,8 +464,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage() {
-       chatOpening();
-       chatNotification();
+        chatOpening();
+        chatNotification();
 
         String message = mChatMessageEdT.getText().toString().trim();
         if (!TextUtils.isEmpty(message)) {
@@ -545,6 +544,23 @@ public class ChatActivity extends AppCompatActivity {
         messageQuery.addChildEventListener(loadMessageChildEvent);
         notifyRef.addChildEventListener(requestTorloEventListener);
 
+        // chehck the user logged in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            mUserDatabase.child("online").setValue("true");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // chehck the user logged in
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
+            mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
+        }
     }
 
     @Override
