@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LapitChat</string>
+    <string name="app_name">My Chat</string>
     <string name="welcome_to_lapit_chat_app">Welcome to Lapit Chat App</string>
     <string name="this_is_main_page">This is main page</string>
     <string name="need_a_new_account">Need a New Account</string>

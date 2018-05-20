@@ -218,6 +218,7 @@ public class ChatActivity extends AppCompatActivity {
 
         if (requestCode == GALLERY_PICK_REQ && resultCode == RESULT_OK) {
             chatOpening();
+            chatNotification();
             Uri imageUri = data.getData();
 
             final String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;

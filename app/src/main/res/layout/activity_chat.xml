@@ -39,7 +39,7 @@
             android:layout_width="43dp"
             android:layout_height="43dp"
             android:layout_weight="1"
-            android:src="@mipmap/notify_icon" />
+            android:src="@drawable/ic_image" />
 
         <EditText
             android:id="@+id/chat_message"
@@ -54,7 +54,7 @@
             android:layout_width="43dp"
             android:layout_height="43dp"
             android:layout_weight="1"
-            android:src="@mipmap/ic_green_done" />
+            android:src="@drawable/ic_send" />
     </LinearLayout>
 
 </RelativeLayout>

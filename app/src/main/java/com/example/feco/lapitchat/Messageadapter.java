@@ -18,14 +18,18 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +53,9 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
         ctx = parent.getContext();
         View v = LayoutInflater.from(ctx).inflate(R.layout.message_single_layout, parent, false);
 
+        // kép betöltő inicilizálása
+        Fresco.initialize(ctx);
+
         return new MessageViewHolder(v);
     }
 
@@ -59,7 +66,7 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
         final String fromUser = mMessageList.get(position).getFrom();
 
 
-        //képek betöltése
+        //profil képek betöltése
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -110,16 +117,21 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
 
             }
 
+            final String imgUrl = mMessageList.get(position).getMessage();
+            holder.setImageMessage(ctx, imgUrl);
 
-            holder.setImageMessage(ctx, mMessageList.get(position).getMessage());
+            // üzenetben küldött kép kinagyítása
             holder.imageMessage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-
-
+                    //https://github.com/stfalcon-studio/FrescoImageViewer/blob/master/README.md
+                    new ImageViewer.Builder(ctx, Collections.singletonList(imgUrl))
+                            .setStartPosition(0)
+                            .show();
                 }
             });
+
         } else {
             holder.imageMessage.setVisibility(View.GONE);
             holder.messageText.setVisibility(View.VISIBLE);
