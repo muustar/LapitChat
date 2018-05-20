@@ -92,8 +92,15 @@ public class ProfileActivity extends AppCompatActivity {
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User u = new User();
-                u = dataSnapshot.getValue(User.class);
+                User u;
+                if (!dataSnapshot.exists()) {
+                    //private String name, status, image, image_thumb, email, uid;
+                    u = new User("Törölt profile", "...", "default", "default", "törölt", "null");
+                } else {
+                    u = new User();
+                    u = dataSnapshot.getValue(User.class);
+                }
+
                 mProfileDisplayName.setText(u.getName());
                 mProfileStatus.setText(u.getStatus());
 
@@ -194,9 +201,6 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-
-
-
         mProfileSendFrndsReq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -249,11 +253,11 @@ public class ProfileActivity extends AppCompatActivity {
                     mRootRef.updateChildren(cancelRequestMap, new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                            if (databaseError == null){
+                            if (databaseError == null) {
                                 mProfileSendFrndsReq.setEnabled(true);
                                 mCurrent_state = NOT_FRIEND;
                                 mProfileSendFrndsReq.setText("Send Friend Request");
-                            }else{
+                            } else {
                                 String error = databaseError.getMessage();
                                 Toast.makeText(ProfileActivity.this, error, Toast.LENGTH_SHORT).show();
                             }
@@ -308,19 +312,18 @@ public class ProfileActivity extends AppCompatActivity {
                     mRootRef.updateChildren(unfriendRequestMap, new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                            if (databaseError == null){
+                            if (databaseError == null) {
                                 mProfileSendFrndsReq.setEnabled(true);
                                 mCurrent_state = NOT_FRIEND;
                                 mProfileTotalFriends.setText("Have " + (--total_friends) + " friends");
                                 mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
                                 mProfileSendFrndsReq.setText("Send Friend Request");
-                            }else{
+                            } else {
                                 String error = databaseError.getMessage();
                                 Toast.makeText(ProfileActivity.this, error, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-
 
 
                 }
@@ -338,14 +341,14 @@ public class ProfileActivity extends AppCompatActivity {
                 mRootRef.updateChildren(cancelRequestMap, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        if (databaseError == null){
+                        if (databaseError == null) {
                             mProfileSendFrndsReq.setEnabled(true);
                             mCurrent_state = NOT_FRIEND;
                             mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
                             mProfileSendFrndsReq.setText("Send Friend Request");
                             mProfileDeclineBtn.setEnabled(false);
                             mProfileDeclineBtn.setVisibility(View.INVISIBLE);
-                        }else{
+                        } else {
                             String error = databaseError.getMessage();
                             Toast.makeText(ProfileActivity.this, error, Toast.LENGTH_SHORT).show();
                         }

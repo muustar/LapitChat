@@ -90,9 +90,16 @@ public class FriendsFragment extends Fragment {
                 usersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        User u;
+                        if (!dataSnapshot.exists()) {
+                            //private String name, status, image, image_thumb, email, uid;
+                            u = new User("Törölt profile", "...", "default", "default", "törölt", "null");
+                        } else {
+                            u = dataSnapshot.getValue(User.class);
+                        }
 
-                        final String userName = dataSnapshot.child("name").getValue().toString();
-                        final String chatUserImg = dataSnapshot.child("image_thumb").getValue().toString();
+                        final String userName = u.getName();
+                        final String chatUserImg = u.getImage_thumb();
                         holder.setmSingleDisplayname(userName);
                         try {
                             holder.setmSingleImage(ctx, chatUserImg);

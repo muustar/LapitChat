@@ -17,13 +17,14 @@
         android:id="@+id/users_single_displayname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/users_single_image"
         android:layout_toEndOf="@+id/users_single_dot"
+        android:layout_alignTop="@id/users_single_image"
+        android:layout_marginLeft="5dp"
         android:text="Display Name"
-        android:transitionName="nameTrans"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:transitionName="nameTrans" />
 
     <TextView
         android:id="@+id/users_single_email"
@@ -33,7 +34,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="0dp"
         android:layout_toRightOf="@id/users_single_image"
-        android:textSize="8sp" />
+        android:textSize="8sp"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/users_single_status"
@@ -51,10 +53,10 @@
         android:id="@+id/users_single_dot"
         android:layout_width="13dp"
         android:layout_height="11dp"
-        android:layout_alignStart="@+id/users_single_email"
-        android:layout_alignTop="@+id/users_single_image"
-        android:layout_marginRight="4dp"
-        android:layout_marginTop="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="17dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toEndOf="@+id/users_single_image"
         app:srcCompat="@mipmap/offline_dot" />
 
 </RelativeLayout>

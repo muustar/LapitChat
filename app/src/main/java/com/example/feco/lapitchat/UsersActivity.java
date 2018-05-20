@@ -87,7 +87,12 @@ public class UsersActivity extends AppCompatActivity {
                 holder.setmSingleImage(getApplicationContext(), model.getImage_thumb());
                 holder.setmSingleDisplayname(model.getName());
                 holder.setmSingleStatus(model.getStatus());
-                holder.setmEmail(model.getEmail());
+                if (model.getEmail_visible() != null) {
+                    if (model.getEmail_visible()) {
+                        holder.setmEmail(model.getEmail());
+                    }
+                }
+
 
                 // online dot
                 usersRef.child(model.getUid()).addValueEventListener(new ValueEventListener() {
@@ -177,6 +182,7 @@ public class UsersActivity extends AppCompatActivity {
 
         public void setmEmail(String mail) {
             mEmail = mView.findViewById(R.id.users_single_email);
+            mEmail.setVisibility(View.VISIBLE);
             mEmail.setText(mail);
         }
 

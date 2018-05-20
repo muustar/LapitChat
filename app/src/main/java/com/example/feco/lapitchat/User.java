@@ -2,8 +2,10 @@ package com.example.feco.lapitchat;
 
 public class User {
     private String name, status, image, image_thumb, email, uid;
+    private Boolean email_visible = null;
 
-    public User(){}
+    public User() {
+    }
 
     public User(String name, String status, String image, String image_thumb, String email, String uid) {
         this.name = name;
@@ -12,6 +14,24 @@ public class User {
         this.image_thumb = image_thumb;
         this.email = email;
         this.uid = uid;
+    }
+
+    public User(String name, String status, String image, String image_thumb, String email, String uid, Boolean email_visible) {
+        this.name = name;
+        this.status = status;
+        this.image = image;
+        this.image_thumb = image_thumb;
+        this.email = email;
+        this.uid = uid;
+        this.email_visible = email_visible;
+    }
+
+    public Boolean getEmail_visible() {
+        return email_visible;
+    }
+
+    public void setEmail_visible(Boolean email_visible) {
+        this.email_visible = email_visible;
     }
 
     public String getEmail() {

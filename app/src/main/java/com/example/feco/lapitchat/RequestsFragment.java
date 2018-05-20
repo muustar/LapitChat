@@ -41,6 +41,7 @@ public class RequestsFragment extends Fragment {
     private String mCurrentUserId;
     private DatabaseReference notificationsRef;
     private FirebaseRecyclerAdapter<NotificationType, RequestsFragment.NotifyViewHolder> adapter;
+    private DatabaseReference usersRef;
 
 
     public RequestsFragment() {
@@ -61,6 +62,7 @@ public class RequestsFragment extends Fragment {
 
         mCurrentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         notificationsRef = FirebaseDatabase.getInstance().getReference().child("Notifications").child(mCurrentUserId);
+        usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         Query query = notificationsRef;
 
@@ -83,11 +85,20 @@ public class RequestsFragment extends Fragment {
             protected void onBindViewHolder(@NonNull final NotifyViewHolder holder, final int position, @NonNull final NotificationType model) {
                 final User[] u = new User[1];
                 // Display Name betöltése
-                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
                 usersRef.child(model.getFrom()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        u[0] = dataSnapshot.getValue(User.class);
+                        Log.d("FECO",dataSnapshot.toString());
+                        try {
+                            if (!dataSnapshot.exists()) {
+                                //private String name, status, image, image_thumb, email, uid;
+                                u[0] = new User("Törölt profile", "...", "default", "default", "törölt", "null");
+                            } else {
+                                u[0] = dataSnapshot.getValue(User.class);
+                            }
+                        }catch (Exception e){
+                            Log.d("FECO", e.getMessage());
+                        }
                         holder.mRequestDisplayname.setText(u[0].getName());
                         holder.setImage(ctx, u[0].getImage_thumb());
                     }

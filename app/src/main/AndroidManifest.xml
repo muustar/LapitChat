@@ -60,20 +60,25 @@
             android:theme="@style/Base.Theme.AppCompat" />
         <activity
             android:name=".UsersActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".ProfileActivity">
             <intent-filter>
                 <action android:name="lapitchat_TARGET_FRIENDS" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChatActivity"
+        <activity
+            android:name=".ChatActivity"
             android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="lapitchat_TARGET_CHAT" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".DeleteProfileActivity"
+            android:parentActivityName=".SettingsActivity"></activity>
     </application>
 
 </manifest>

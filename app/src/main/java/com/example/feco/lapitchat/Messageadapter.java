@@ -62,8 +62,21 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String currentUserImage = dataSnapshot.child(currentUser).child("image_thumb").getValue().toString();
-                String fromUserImage = dataSnapshot.child(fromUser).child("image_thumb").getValue().toString();
+                User u;
+                if (!dataSnapshot.child(currentUser).exists()) {
+                    //private String name, status, image, image_thumb, email, uid;
+                    u = new User("Törölt profile", "...", "default", "default", "törölt", "null");
+                } else {
+                    u = dataSnapshot.child(currentUser).getValue(User.class);
+                }
+                String currentUserImage = u.getImage_thumb();
+
+                String fromUserImage;
+                if (!dataSnapshot.child(fromUser).exists()) {
+                    fromUserImage = null;
+                } else {
+                    fromUserImage = dataSnapshot.child(fromUser).child("image_thumb").getValue().toString();
+                }
                 if (fromUser.equals(currentUser)) {
                     holder.messageText.setBackgroundResource(R.drawable.message_text_background);
                     holder.messageText.setTextColor(Color.WHITE);

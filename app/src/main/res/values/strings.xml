@@ -11,6 +11,7 @@
     <string name="already_have_account">Already Have Account</string>
     <string name="login">Login</string>
     <string name="login_to_the_account">Login to the Account</string>
+    <string name="torles_tajekoztato_txt">A Felhasználói fiókod törlését kérted. A fiók törlését meg kell erősítened a bejelentkezési adataiddal, kérlek add meg mégegyszer és utoljára az e-mail címedet és jelszavad.</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="display_name">Display Name</string>

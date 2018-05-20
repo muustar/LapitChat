@@ -104,13 +104,14 @@ public class StartActivity extends AppCompatActivity {
             }
         });
 
+       /*
         mGoogleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signIn();
             }
         });
-
+        */
     }
 
 
@@ -141,7 +142,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        Log.d(TAG, "idToken:" + acct.getIdToken());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)

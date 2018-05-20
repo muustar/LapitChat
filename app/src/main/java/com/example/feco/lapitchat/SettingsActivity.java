@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -54,9 +56,10 @@ public class SettingsActivity extends AppCompatActivity {
     private StorageReference mProfileImagesRef;
 
     private CircleImageView mImage;
-    private TextView mDisplayname, mStatus;
+    private TextView mDisplayname, mStatus, mDeleteProfile;
     private Button mChangeImageBtn, mChangeStatusBtn;
     private ProgressBar mProgressBar;
+    private Switch mEmailSwitch;
     private String status;
     private Uri resultUri;
     private String TAG = "FECO";
@@ -72,6 +75,8 @@ public class SettingsActivity extends AppCompatActivity {
         mChangeStatusBtn = findViewById(R.id.settings_changeStatus);
         mImage = findViewById(R.id.settings_image);
         mProgressBar = findViewById(R.id.settings_progressBar);
+        mEmailSwitch = findViewById(R.id.settings_switch_email);
+        mDeleteProfile = findViewById(R.id.settings_deleteprofile);
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
@@ -83,34 +88,41 @@ public class SettingsActivity extends AppCompatActivity {
         mUsersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                mProgressBar.setVisibility(View.VISIBLE);
-                String name = dataSnapshot.child("name").getValue().toString();
-                status = dataSnapshot.child("status").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
-                String image_thumb = dataSnapshot.child("image_thumb").getValue().toString();
+                if (dataSnapshot.exists()) {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    User u = dataSnapshot.getValue(User.class);
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    status = dataSnapshot.child("status").getValue().toString();
+                    String image = dataSnapshot.child("image").getValue().toString();
+                    String image_thumb = dataSnapshot.child("image_thumb").getValue().toString();
 
-                mDisplayname.setText(name);
-                mStatus.setText(status);
+                    if (dataSnapshot.child("email_visible").exists()) {
+                        Boolean email_visible = u.getEmail_visible();
+                        mEmailSwitch.setChecked(email_visible);
+                    }
 
-                RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
-                Glide.with(getApplicationContext())
-                        .load(image_thumb)
-                        .apply(options)
-                        .listener(new RequestListener<Drawable>() {
-                            @Override
-                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                mProgressBar.setVisibility(View.GONE);
-                                return false;
-                            }
+                    mDisplayname.setText(name);
+                    mStatus.setText(status);
 
-                            @Override
-                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                mProgressBar.setVisibility(View.GONE);
-                                return false;
-                            }
-                        })
-                        .into(mImage);
+                    RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
+                    Glide.with(getApplicationContext())
+                            .load(image_thumb)
+                            .apply(options)
+                            .listener(new RequestListener<Drawable>() {
+                                @Override
+                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                    mProgressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
 
+                                @Override
+                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                    mProgressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+                            })
+                            .into(mImage);
+                }
             }
 
             @Override
@@ -119,6 +131,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        mEmailSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mUsersDatabase.child("email_visible").setValue(isChecked);
+            }
+        });
         mChangeImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,6 +157,14 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        mDeleteProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent deleteprofileIntent = new Intent(SettingsActivity.this, DeleteProfileActivity.class);
+                finish();
+                startActivity(deleteprofileIntent);
+            }
+        });
     }
 
     @Override
