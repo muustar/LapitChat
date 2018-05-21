@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:id="@+id/message_single_layout">
+    android:id="@+id/message_single_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="2dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -11,40 +14,54 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:src="@mipmap/ic_placeholder_face"
-        android:transitionName="imageTrans"
-        />
+        android:transitionName="imageTrans" />
 
-    <TextView
-        android:id="@+id/message_single_text"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:transitionName="statusTrans"
-        android:layout_toEndOf="@+id/message_single_profileimage"
-        android:layout_marginLeft="5dp"
+        android:layout_toEndOf="@+id/message_single_profileimage">
 
-        android:padding="10dp"
-        android:text="TextView"
-        android:textColor="@android:color/white" />
 
-    <TextView
-        android:id="@+id/message_single_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:layout_below="@+id/message_single_text"
-        android:layout_alignStart="@+id/message_single_text"
-        android:text="time"
-        android:visibility="gone"/>
+        <RelativeLayout
+            android:id="@+id/message_single_text_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/message_image_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/message_single_profileimage"
-        android:padding="10dp"
-        android:scaleType="fitCenter"
-        android:layout_below="@id/message_single_text"
-        android:visibility="gone"/>
+            <TextView
+                android:id="@+id/message_single_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="5dp"
+
+                android:background="@drawable/message_text_bgwhite"
+                android:padding="10dp"
+                android:text="TextView"
+                android:textColor="@android:color/black"
+                android:transitionName="statusTrans" />
+
+            <ImageView
+                android:id="@+id/message_image_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/message_text_bgwhite"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/message_single_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/message_single_text_rl"
+            android:layout_below="@id/message_single_text_rl"
+            android:text="time"
+            android:visibility="gone" />
+
+
+    </RelativeLayout>
+
+
 </RelativeLayout>

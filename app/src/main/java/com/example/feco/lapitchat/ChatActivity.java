@@ -71,7 +71,7 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView mMessageList;
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
-    private Messageadapter mAdapter;
+    private MessageAdapter mAdapter;
 
     private static final int TOTAL_ITEMS_TO_LOAD = 5;
     private int mCurrentPage = 1;
@@ -111,7 +111,7 @@ public class ChatActivity extends AppCompatActivity {
         mLinearLayout = new LinearLayoutManager(this);
         mMessageList.setHasFixedSize(true);
         mMessageList.setLayoutManager(mLinearLayout);
-        mAdapter = new Messageadapter(messagesList);
+        mAdapter = new MessageAdapter(messagesList);
         mMessageList.setAdapter(mAdapter);
         loadMessages();
 
