@@ -49,13 +49,13 @@ public class UsersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_users);
         mToolbar = (Toolbar) findViewById(R.id.users_appbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Users");
+        getSupportActionBar().setTitle(getString(R.string.users));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mUsersList = findViewById(R.id.users_list);
         mUsersList.setHasFixedSize(true);
         mUsersList.setLayoutManager(new LinearLayoutManager(this));
 
-        usersRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users));
+        usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
 
         //a firebase UI recycrerview kezelőjét használjuk
