@@ -1,5 +1,6 @@
 package com.example.feco.lapitchat;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -102,11 +103,11 @@ public class ChatActivity extends AppCompatActivity {
         mChatUserImg = getIntent().getStringExtra("img");
 
 
-        mChatAddBtn = (ImageView) findViewById(R.id.chat_add);
-        mChatMessageEdT = (EditText) findViewById(R.id.chat_message);
-        mChatSendBtn = (ImageView) findViewById(R.id.chat_send);
-        mMessageList = (RecyclerView) findViewById(R.id.message_list);
-        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
+        mChatAddBtn = findViewById(R.id.chat_add);
+        mChatMessageEdT = findViewById(R.id.chat_message);
+        mChatSendBtn = findViewById(R.id.chat_send);
+        mMessageList = findViewById(R.id.message_list);
+        mRefreshLayout = findViewById(R.id.message_swipe_layout);
 
         mLinearLayout = new LinearLayoutManager(this);
         mMessageList.setHasFixedSize(true);
@@ -116,7 +117,7 @@ public class ChatActivity extends AppCompatActivity {
         loadMessages();
 
         //Action bar kialakítása egyedire
-        mChatToolbar = (Toolbar) findViewById(R.id.chat_appbar);
+        mChatToolbar = findViewById(R.id.chat_appbar);
         setSupportActionBar(mChatToolbar);
         ActionBar actionBar = getSupportActionBar();
 
@@ -125,11 +126,11 @@ public class ChatActivity extends AppCompatActivity {
         //actionBar.setTitle(mChatUserName);
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
+        @SuppressLint("InflateParams") View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
 
-        mTitle = (TextView) action_bar_view.findViewById(R.id.custom_bar_title);
+        mTitle = action_bar_view.findViewById(R.id.custom_bar_title);
         mTitle.setText(mChatUserName);
-        mLastSeen = (TextView) action_bar_view.findViewById(R.id.custom_bar_seen);
+        mLastSeen = action_bar_view.findViewById(R.id.custom_bar_seen);
         mProfileImage = action_bar_view.findViewById(R.id.custom_bar_image);
         Glide.with(this).load(mChatUserImg).into(mProfileImage);
 
@@ -142,7 +143,7 @@ public class ChatActivity extends AppCompatActivity {
                 if (dataSnapshot.hasChild("online")) {
                     String seen = dataSnapshot.child("online").getValue().toString();
                     if (seen.equals("true")) {
-                        mLastSeen.setText("online");
+                        mLastSeen.setText(R.string.online);
                     } else {
 
                         GetTimeAgo getTimeAgo = new GetTimeAgo();
@@ -174,7 +175,8 @@ public class ChatActivity extends AppCompatActivity {
                     // do something for phones running an SDK before lollipop
                     Pair[] pairs = new Pair[1];
                     pairs[0] = new Pair<View, String>(mProfileImage, "imageTrans");
-                    ActivityOptions options = ActivityOptions
+                    ActivityOptions options;
+                    options = ActivityOptions
                             .makeSceneTransitionAnimation(ChatActivity.this, pairs);
 
                     startActivity(profileIntent, options.toBundle());
@@ -239,14 +241,14 @@ public class ChatActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         String download_url = task.getResult().getDownloadUrl().toString();
 
-                        Map messageMap = new HashMap();
+                        Map<String, Object> messageMap = new HashMap<>();
                         messageMap.put("message", download_url);
                         messageMap.put("seen", false);
                         messageMap.put("type", "image");
                         messageMap.put("time", ServerValue.TIMESTAMP);
                         messageMap.put("from", mCurrentUserID);
 
-                        Map messageUserMap = new HashMap();
+                        Map<String, Object> messageUserMap = new HashMap<String, Object>();
                         messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
                         messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
@@ -255,9 +257,7 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                                 if (databaseError != null) {
-                                    Log.d("ERROR", databaseError.getMessage().toString());
-                                } else {
-
+                                    Log.d("ERROR", databaseError.getMessage());
                                 }
                             }
                         });
@@ -448,11 +448,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void chatOpening() {
         // ez hozza létre az adatbátisban a "Chat" táblát ami leírja milyen csetek vannak nyitva , az üzenetek et a messges táblába tároljuk
-        Map chatAddMap = new HashMap();
+        Map<String, Object> chatAddMap = new HashMap<String, Object>();
         chatAddMap.put("seen", false);
         chatAddMap.put("timestamp", ServerValue.TIMESTAMP);
 
-        Map chatUserMap = new HashMap();
+        Map<String, Object> chatUserMap = new HashMap<>();
         chatUserMap.put("Chat/" + mCurrentUserID + "/" + mChatUser, chatAddMap);
         chatUserMap.put("Chat/" + mChatUser + "/" + mCurrentUserID, chatAddMap);
 
@@ -460,7 +460,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null) {
-                    Log.d("ERROR", databaseError.getMessage().toString());
+                    Log.d("ERROR", databaseError.getMessage());
                 }
             }
         });
@@ -480,14 +480,14 @@ public class ChatActivity extends AppCompatActivity {
                     .child(mCurrentUserID).child(mChatUser).push();
             String push_id = user_message_push.getKey();
 
-            Map messageMap = new HashMap();
+            Map<String, Object> messageMap = new HashMap<String, Object>();
             messageMap.put("message", message);
             messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
 
-            Map messageUserMap = new HashMap();
+            Map<String, Object> messageUserMap = new HashMap<String, Object>();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
@@ -500,9 +500,7 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     if (databaseError != null) {
-                        Log.d("ERROR", databaseError.getMessage().toString());
-                    } else {
-
+                        Log.d("ERROR", databaseError.getMessage());
                     }
                 }
             });
@@ -517,13 +515,13 @@ public class ChatActivity extends AppCompatActivity {
         // ez az új üzenet írásakor fut le
         DatabaseReference newNotificationRef = mRootRef.child("Notifications").child(mChatUser).push();
         String newNotificationId = newNotificationRef.getKey();
-        Map notificationDataMap = new HashMap<>();
+        Map<String, Object> notificationDataMap = new HashMap<String, Object>();
         notificationDataMap.put("from", mCurrentUserID);
         notificationDataMap.put("type", "new_message");
         notificationDataMap.put("seen", false);
         notificationDataMap.put("timestamp", ServerValue.TIMESTAMP);
 
-        Map requestMap = new HashMap();
+        Map<String, Object> requestMap = new HashMap<String, Object>();
         requestMap.put("Notifications/" + mChatUser + "/" + newNotificationId, notificationDataMap);
 
         mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener() {
@@ -531,8 +529,6 @@ public class ChatActivity extends AppCompatActivity {
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null) {
                     Toast.makeText(ChatActivity.this, "There was some error.", Toast.LENGTH_SHORT).show();
-                } else {
-
                 }
 
             }

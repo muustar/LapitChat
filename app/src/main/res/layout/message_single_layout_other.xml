@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/message_single_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,7 +14,8 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:src="@mipmap/ic_placeholder_face"
-        android:transitionName="imageTrans" />
+        android:transitionName="imageTrans"
+        tools:targetApi="lollipop" />
 
     <RelativeLayout
         android:layout_width="300dp"
@@ -32,13 +33,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
 
                 android:background="@drawable/message_text_bgwhite"
                 android:padding="10dp"
                 android:text="TextView"
                 android:textColor="@android:color/black"
-                android:transitionName="statusTrans" />
+                android:transitionName="statusTrans"
+                tools:ignore="HardcodedText,UnusedAttribute" />
 
             <ImageView
                 android:id="@+id/message_image_layout"
@@ -47,7 +49,8 @@
                 android:background="@drawable/message_text_bgwhite"
                 android:padding="10dp"
                 android:scaleType="fitCenter"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:ignore="ContentDescription" />
 
         </RelativeLayout>
 
@@ -58,7 +61,8 @@
             android:layout_alignEnd="@+id/message_single_text_rl"
             android:layout_below="@id/message_single_text_rl"
             android:text="time"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
 
 
     </RelativeLayout>

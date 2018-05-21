@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">My Chat</string>
+    <string name="welcome_to_lapit_chat_app">Üdvözöl a My Chat</string>
+    <string name="this_is_main_page">Ez a kezdőlap</string>
+    <string name="need_a_new_account">Új fiókot szeretnék</string>
+    <string name="displayname">Megjelenő Név</string>
+    <string name="email">Email</string>
+    <string name="password">Jelszó</string>
+    <string name="create_account">Fiók Létrehozása</string>
+    <string name="create_a_new_account">Új fiók létrehozása</string>
+    <string name="already_have_account">Már regisztráltam</string>
+    <string name="login">Belépés</string>
+    <string name="login_to_the_account">Belépés a fiókomba</string>
+    <string name="torles_tajekoztato_txt">A Felhasználói fiókod törlését kérted. A fiók törlését meg kell erősítened a bejelentkezési adataiddal, kérlek add meg mégegyszer és utoljára az e-mail címedet és jelszavad.</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="display_name">Display Name</string>
+    <string name="hi_there_i_m_using_lapit_chat_app">Hi there, I\'m using Lapit Chat App</string>
+    <string name="change_status">Állapot megváltoztatása</string>
+    <string name="change_image">Kép csere</string>
+    <string name="account_settings">Fiók beállításai</string>
+    <string name="all_users">Minden Felhasználó</string>
+    <string name="log_out">Kijelentkezés</string>
+    <string name="chats">BESZÉLGETÉSEK</string>
+    <string name="hello">HELLO</string>
+    <string name="requests">ÉRTESÍTÉSEK</string>
+    <string name="your_status">Te állapotod</string>
+    <string name="save_changes">Módosítások mentése</string>
+    <string name="done">Kész</string>
+
+    <string name="channel_name">mychat</string>
+    <string name="channel_description">uj_barat</string>
+    <string name="online">aktív</string>
+    <string name="friends">BARÁTOK</string>
+    <string name="visible_email">Email megjelenítés</string>
+    <string name="delete_profile">Fiók Törlése</string>
+    <string name="users">Felhasználók</string>
+    <string name="accept_friend_request">Felkérés elfogadása</string>
+    <string name="send_friend_request">Barátnak jelölöm</string>
+    <string name="cancel_friend_request">Jelölés törlése</string>
+    <string name="unfriend">Szétválás</string>
+    <string name="have">Neki</string>
+    <string name="friends_have">barátja van</string>
+    <string name="decline_friend_request">Felkérés visszautasítása</string>
+
+</resources>

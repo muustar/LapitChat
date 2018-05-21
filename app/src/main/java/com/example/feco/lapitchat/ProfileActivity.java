@@ -115,7 +115,7 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         total_friends = dataSnapshot.getChildrenCount();
-                        mProfileTotalFriends.setText("Have " + total_friends + " friends");
+                        mProfileTotalFriends.setText(getString(R.string.have) +" "+ total_friends +" "+ getString(R.string.friends_have));
                     }
 
                     @Override
@@ -140,7 +140,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 mCurrent_state = REQ_RECEIVED;
                                 mProfileSendFrndsReq.setVisibility(View.VISIBLE);
                                 mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.myGreen));
-                                mProfileSendFrndsReq.setText("Accept Friend Request");
+                                mProfileSendFrndsReq.setText(R.string.accept_friend_request);
 
                                 mProfileDeclineBtn.setEnabled(true);
                                 mProfileDeclineBtn.setVisibility(View.VISIBLE);
@@ -149,7 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 mCurrent_state = REQ_SENT;
                                 mProfileSendFrndsReq.setVisibility(View.VISIBLE);
-                                mProfileSendFrndsReq.setText("Cancel Friend Request");
+                                mProfileSendFrndsReq.setText(R.string.cancel_friend_request);
                             }
                         } else {
                             // ha nincs friend request, az lehet azért mert még nem volt kérés, vagy mert már barátok vagyunk
@@ -164,14 +164,14 @@ public class ProfileActivity extends AppCompatActivity {
                                         mProfileSendFrndsReq.setVisibility(View.VISIBLE);
                                         mProfileSendFrndsReq.setBackgroundColor(Color.GRAY);
                                         mCurrent_state = FRIEND;
-                                        mProfileSendFrndsReq.setText("Unfriend");
+                                        mProfileSendFrndsReq.setText(R.string.unfriend);
 
                                     } else {
                                         mProfileSendFrndsReq.setEnabled(true);
                                         mProfileSendFrndsReq.setVisibility(View.VISIBLE);
                                         mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
                                         mCurrent_state = NOT_FRIEND;
-                                        mProfileSendFrndsReq.setText("Send Friend Request");
+                                        mProfileSendFrndsReq.setText(R.string.send_friend_request);
                                         // ------ saját profil ellenőrzés -------
                                         if (TextUtils.equals(user_id, mCurrent_user.getUid())) {
                                             mProfileSendFrndsReq.setEnabled(false);
@@ -237,7 +237,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 mProfileSendFrndsReq.setEnabled(true);
                                 mCurrent_state = REQ_SENT;
-                                mProfileSendFrndsReq.setText("Cancel Friend Request");
+                                mProfileSendFrndsReq.setText(R.string.cancel_friend_request);
                             }
 
                         }
@@ -260,7 +260,7 @@ public class ProfileActivity extends AppCompatActivity {
                             if (databaseError == null) {
                                 mProfileSendFrndsReq.setEnabled(true);
                                 mCurrent_state = NOT_FRIEND;
-                                mProfileSendFrndsReq.setText("Send Friend Request");
+                                mProfileSendFrndsReq.setText(R.string.send_friend_request);
                             } else {
                                 String error = databaseError.getMessage();
                                 Toast.makeText(ProfileActivity.this, error, Toast.LENGTH_SHORT).show();
@@ -290,8 +290,8 @@ public class ProfileActivity extends AppCompatActivity {
                                 mProfileSendFrndsReq.setEnabled(true);
                                 mProfileSendFrndsReq.setBackgroundColor(Color.GRAY);
                                 mCurrent_state = FRIEND;
-                                mProfileTotalFriends.setText("Have " + (++total_friends) + " friends");
-                                mProfileSendFrndsReq.setText("Unfriend");
+                                mProfileTotalFriends.setText(getString(R.string.have) +" "+ (++total_friends) +" "+ getString(R.string.friends_have));
+                                mProfileSendFrndsReq.setText(R.string.unfriend);
                                 mProfileDeclineBtn.setEnabled(false);
                                 mProfileDeclineBtn.setVisibility(View.INVISIBLE);
 
@@ -319,9 +319,9 @@ public class ProfileActivity extends AppCompatActivity {
                             if (databaseError == null) {
                                 mProfileSendFrndsReq.setEnabled(true);
                                 mCurrent_state = NOT_FRIEND;
-                                mProfileTotalFriends.setText("Have " + (--total_friends) + " friends");
+                                mProfileTotalFriends.setText(getString(R.string.have) +" "+ (--total_friends) +" "+ getString(R.string.friends_have));
                                 mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
-                                mProfileSendFrndsReq.setText("Send Friend Request");
+                                mProfileSendFrndsReq.setText(R.string.send_friend_request);
                             } else {
                                 String error = databaseError.getMessage();
                                 Toast.makeText(ProfileActivity.this, error, Toast.LENGTH_SHORT).show();
@@ -349,7 +349,7 @@ public class ProfileActivity extends AppCompatActivity {
                             mProfileSendFrndsReq.setEnabled(true);
                             mCurrent_state = NOT_FRIEND;
                             mProfileSendFrndsReq.setBackgroundColor(mProfileSendFrndsReq.getContext().getResources().getColor(R.color.colorAccent));
-                            mProfileSendFrndsReq.setText("Send Friend Request");
+                            mProfileSendFrndsReq.setText(R.string.send_friend_request);
                             mProfileDeclineBtn.setEnabled(false);
                             mProfileDeclineBtn.setVisibility(View.INVISIBLE);
                         } else {

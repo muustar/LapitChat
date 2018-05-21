@@ -58,7 +58,7 @@
             android:layout_below="@id/deleteprofile_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Delete Profile"
+            android:text="@string/delete_profile"
             android:layout_centerHorizontal="true"
             android:background="@color/colorAccent"
             android:paddingLeft="10dp"

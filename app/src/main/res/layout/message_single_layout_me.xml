@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/message_single_layout_me"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,11 +15,12 @@
         android:layout_height="36dp"
         android:src="@mipmap/ic_placeholder_face"
         android:transitionName="imageTrans"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        tools:ignore="UnusedAttribute" />
 
     <RelativeLayout
         android:id="@+id/message_single_text_me_rl"
-        android:layout_toRightOf="@id/message_single_profileimage_me"
+        android:layout_toEndOf="@id/message_single_profileimage_me"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -27,23 +28,25 @@
             android:id="@+id/message_single_text_me"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="5dp"
             android:background="@drawable/message_text_background"
             android:padding="10dp"
             android:text="ffd   ddfl khslh lkhs khklh lhk"
             android:textColor="@android:color/white"
-            android:transitionName="statusTrans" />
+            android:transitionName="statusTrans"
+            tools:ignore="HardcodedText,UnusedAttribute" />
 
         <ImageView
             android:id="@+id/message_image_layout_me"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:padding="10dp"
             android:background="@drawable/message_text_background"
             android:scaleType="fitCenter"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
     </RelativeLayout>
 
 
@@ -52,10 +55,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/message_single_text_me_rl"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="0dp"
-        android:text="time"
-        android:visibility="gone" />
+        android:text="@string/requests"
+        android:visibility="gone"
+        tools:ignore="HardcodedText" />
 
 
 </RelativeLayout>

@@ -24,7 +24,7 @@
     <string name="chats">CHATS</string>
     <string name="hello">HELLO</string>
     <string name="requests">REQUESTS</string>
-    <string name="your_status">Your Status...</string>
+    <string name="your_status">Your Status</string>
     <string name="save_changes">Save Changes</string>
     <string name="done">Done</string>
 
@@ -32,4 +32,16 @@
     <string name="fb_login_protocol_scheme">fb373503593149023</string>
     <string name="channel_name">lapitchat</string>
     <string name="channel_description">uj_barat</string>
+    <string name="online">online</string>
+    <string name="friends">FRIENDS</string>
+    <string name="visible_email">Visible Email</string>
+    <string name="delete_profile">Delete Profile</string>
+    <string name="users">Users</string>
+    <string name="accept_friend_request">Accept Friend Request</string>
+    <string name="send_friend_request">Send Friend Request</string>
+    <string name="cancel_friend_request">Cancel Friend Request</string>
+    <string name="unfriend">Unfriend</string>
+    <string name="have">Have</string>
+    <string name="friends_have">friends</string>
+    <string name="decline_friend_request">Decline Friend Request</string>
 </resources>

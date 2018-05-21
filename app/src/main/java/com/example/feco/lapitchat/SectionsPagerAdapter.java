@@ -1,14 +1,18 @@
 package com.example.feco.lapitchat;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 
 class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private Context mContext;
 
-    SectionsPagerAdapter(FragmentManager fm) {
+    SectionsPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
+        this.mContext = context;
     }
 
     @Override
@@ -36,9 +40,9 @@ class SectionsPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         super.getPageTitle(position);
         switch (position){
-            case 0: return "REQUEST";
-            case 1: return "CHATS";
-            case 2: return "FRIENDS";
+            case 0: return mContext.getResources().getString(R.string.requests);
+            case 1: return mContext.getResources().getString(R.string.chats);
+            case 2: return mContext.getResources().getString(R.string.friends);
             default: return null;
         }
     }

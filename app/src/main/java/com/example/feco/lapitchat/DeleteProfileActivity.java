@@ -46,7 +46,7 @@ public class DeleteProfileActivity extends AppCompatActivity {
         mDelButton = (Button) findViewById(R.id.deleteprofile_button);
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Delete Profile");
+        getSupportActionBar().setTitle(getResources().getString(R.string.delete_profile));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mAuth = FirebaseAuth.getInstance();

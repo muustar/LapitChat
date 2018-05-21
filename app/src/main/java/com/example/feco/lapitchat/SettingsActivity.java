@@ -217,13 +217,14 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        /*
         mBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 newNameValidate();
             }
         });
-
+        */
     }
 
     private void newNameValidate() {
