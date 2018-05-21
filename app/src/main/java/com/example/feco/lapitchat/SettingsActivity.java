@@ -73,6 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String status;
     private Uri resultUri;
     private String TAG = "FECO";
+    private String displayname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +117,9 @@ public class SettingsActivity extends AppCompatActivity {
                     mDisplayname.setText(name);
                     mStatus.setText(status);
 
-                    RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
-                    Glide.with(getApplicationContext())
+                    GlideApp.with(getApplicationContext())
                             .load(image_thumb)
-                            .apply(options)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .listener(new RequestListener<Drawable>() {
                                 @Override
                                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -181,7 +181,7 @@ public class SettingsActivity extends AppCompatActivity {
         mDisplayname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String displayname = mDisplayname.getText().toString();
+                displayname = mDisplayname.getText().toString();
                 mDisplayname.setVisibility(View.INVISIBLE);
 
                 mNewDisplayName.setVisibility(View.VISIBLE);
@@ -220,7 +220,7 @@ public class SettingsActivity extends AppCompatActivity {
         mBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               newNameValidate();
+                newNameValidate();
             }
         });
 
@@ -241,7 +241,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void ujNevTarolas(String newName) {
-        mUsersDatabase.child("name").setValue(newName);
+        if (!TextUtils.equals(displayname, newName)) {
+            mUsersDatabase.child("name").setValue(newName);
+        }
     }
 
     @Override

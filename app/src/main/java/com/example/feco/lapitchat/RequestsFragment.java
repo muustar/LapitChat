@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,6 +36,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * A simple {@link Fragment} subclass.
  */
 public class RequestsFragment extends Fragment {
+
     private RecyclerView mRequestRecycler;
     private Context ctx;
     private String mCurrentUserId;
@@ -76,6 +77,7 @@ public class RequestsFragment extends Fragment {
             @NonNull
             @Override
             public NotifyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.request_single_layout, parent, false);
                 return new RequestsFragment.NotifyViewHolder(view);
@@ -83,6 +85,7 @@ public class RequestsFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull final NotifyViewHolder holder, final int position, @NonNull final NotificationType model) {
+
                 final User[] u = new User[1];
                 // Display Name betöltése
                 usersRef.child(model.getFrom()).addValueEventListener(new ValueEventListener() {
@@ -188,7 +191,11 @@ public class RequestsFragment extends Fragment {
 
         public void setImage(Context ctx, String url) {
             try {
-                Glide.with(ctx).load(url).into(mRequestImage);
+                GlideApp
+                        .with(ctx)
+                        .load(url)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(mRequestImage);
             }catch (Exception e){
                 Log.d("ERROR", e.getMessage());
             }

@@ -198,9 +198,10 @@ public class UsersActivity extends AppCompatActivity {
         public void setmSingleImage(Context ctx, String imgurl) {
             mSingleImage = mView.findViewById(R.id.users_single_image);
             RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
-            Glide.with(ctx)
+            GlideApp
+                    .with(ctx)
                     .load(imgurl)
-                    .apply(options)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(mSingleImage);
         }
 

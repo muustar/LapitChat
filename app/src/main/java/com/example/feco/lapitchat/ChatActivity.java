@@ -1,6 +1,8 @@
 package com.example.feco.lapitchat;
 
 import android.app.ActivityOptions;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -367,7 +369,7 @@ public class ChatActivity extends AppCompatActivity {
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
 
-                //mMessageList.scrollToPosition(messagesList.size()+1);
+                mMessageList.scrollToPosition(messagesList.size()-1);
                 mLinearLayout.scrollToPositionWithOffset(messagesList.size() - 1, 0);
                 //Toast.makeText(ChatActivity.this, "load_sima", Toast.LENGTH_SHORT).show();
 
@@ -551,6 +553,13 @@ public class ChatActivity extends AppCompatActivity {
             DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
             mUserDatabase.child("online").setValue("true");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nMgr.cancelAll();
     }
 
     @Override

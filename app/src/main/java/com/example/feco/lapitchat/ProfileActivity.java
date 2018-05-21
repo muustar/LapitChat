@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -104,8 +105,11 @@ public class ProfileActivity extends AppCompatActivity {
                 mProfileDisplayName.setText(u.getName());
                 mProfileStatus.setText(u.getStatus());
 
-                Glide.with(getApplicationContext()).load(u.getImage()).into(mProfileImage);
-
+                GlideApp
+                        .with(getApplicationContext())
+                        .load(u.getImage())
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(mProfileImage);
                 // total friends
                 mFriendDatabase.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

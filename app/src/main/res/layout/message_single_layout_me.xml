@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:id="@+id/message_single_layout"
+    >
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/message_single_profileimage"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@mipmap/ic_placeholder_face"
+        android:transitionName="imageTrans"
+        android:visibility="invisible"
+        />
+
+    <TextView
+        android:id="@+id/message_single_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:transitionName="statusTrans"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="5dp"
+
+        android:padding="10dp"
+        android:text="TextView"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/message_single_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_below="@+id/message_single_text"
+        android:layout_alignStart="@+id/message_single_text"
+        android:text="time"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/message_image_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/message_single_profileimage"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:layout_below="@id/message_single_text"
+        android:visibility="gone"/>
+</RelativeLayout>

@@ -2,22 +2,18 @@ package com.example.feco.lapitchat;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +35,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * 2018.05.11.
  */
 public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageViewHolder> {
+    private static final int VIEW_TYPE_ME = 1;
+    private static final int VIEW_TYPE_OTHER = 2;
     private List<Messages> mMessageList;
     private Context ctx;
 
@@ -51,12 +48,36 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ctx = parent.getContext();
-        View v = LayoutInflater.from(ctx).inflate(R.layout.message_single_layout, parent, false);
+
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        MessageViewHolder viewHolder = null;
+
+        switch (2){
+            case VIEW_TYPE_ME:
+                View viewChatMine = layoutInflater.inflate(R.layout.message_single_layout_me, parent, false);
+                viewHolder = new MessageViewHolder(viewChatMine);
+                break;
+            case VIEW_TYPE_OTHER:
+                View viewChatOther = layoutInflater.inflate(R.layout.message_single_layout_other, parent, false);
+                viewHolder = new MessageViewHolder(viewChatOther);
+                break;
+        }
+        //View v = LayoutInflater.from(ctx).inflate(R.layout.message_single_layout_other, parent, false);
 
         // kép betöltő inicilizálása
         Fresco.initialize(ctx);
 
-        return new MessageViewHolder(v);
+        return viewHolder;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (TextUtils.equals(mMessageList.get(position).getFrom(),
+                FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+            return VIEW_TYPE_ME;
+        } else {
+            return VIEW_TYPE_OTHER;
+        }
     }
 
     @Override
@@ -89,11 +110,13 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
                 if (fromUser.equals(currentUser)) {
                     holder.messageText.setBackgroundResource(R.drawable.message_text_background);
                     holder.messageText.setTextColor(Color.WHITE);
-                    Glide.with(ctx).load(currentUserImage).into(holder.profileImage);
+                    holder.setProfileImage(ctx, currentUserImage);
+                    //Glide.with(ctx).load(currentUserImage).into(holder.profileImage);
                 } else {
                     holder.messageText.setBackgroundResource(R.drawable.message_text_bgwhite);
                     holder.messageText.setTextColor(Color.BLACK);
-                    Glide.with(ctx).load(fromUserImage).into(holder.profileImage);
+                    holder.setProfileImage(ctx, fromUserImage);
+                    //Glide.with(ctx).load(fromUserImage).into(holder.profileImage);
                 }
 
             }
@@ -202,14 +225,23 @@ public class Messageadapter extends RecyclerView.Adapter<Messageadapter.MessageV
         }
 
         public void setImageMessage(Context ctx, String url) {
-            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
-            Glide.with(ctx).load(url).apply(options).into(imageMessage);
+            GlideApp
+                    .with(ctx)
+                    .load(url)
+                    .placeholder(R.mipmap.placeholder)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(imageMessage);
         }
 
         public void setProfileImage(Context ctx, String url) {
-            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
-            Glide.with(ctx).load(url).apply(options).into(profileImage);
+            GlideApp
+                    .with(ctx)
+                    .load(url)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(profileImage);
         }
     }
+
+
 
 }
