@@ -1,5 +1,6 @@
 package com.example.feco.lapitchat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -8,13 +9,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -57,6 +65,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private CircleImageView mImage;
     private TextView mDisplayname, mStatus, mDeleteProfile;
+    private EditText mNewDisplayName;
+    private RelativeLayout mBackground;
     private Button mChangeImageBtn, mChangeStatusBtn;
     private ProgressBar mProgressBar;
     private Switch mEmailSwitch;
@@ -77,6 +87,8 @@ public class SettingsActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.settings_progressBar);
         mEmailSwitch = findViewById(R.id.settings_switch_email);
         mDeleteProfile = findViewById(R.id.settings_deleteprofile);
+        mNewDisplayName = (EditText) findViewById(R.id.settings_displayname_edit);
+        mBackground = (RelativeLayout) findViewById(R.id.settings_background);
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
@@ -165,6 +177,71 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(deleteprofileIntent);
             }
         });
+
+        mDisplayname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String displayname = mDisplayname.getText().toString();
+                mDisplayname.setVisibility(View.INVISIBLE);
+
+                mNewDisplayName.setVisibility(View.VISIBLE);
+                mNewDisplayName.setText(displayname);
+
+
+                //show keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+                int textLength = mNewDisplayName.getText().length();
+                mNewDisplayName.setSelection(0, textLength);
+                mNewDisplayName.setCursorVisible(true);
+
+            }
+        });
+
+        mNewDisplayName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                        actionId == EditorInfo.IME_ACTION_DONE ||
+                        event != null &&
+                                event.getAction() == KeyEvent.ACTION_DOWN &&
+                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    if (event == null || !event.isShiftPressed()) {
+                        // the user is done typing.
+                        newNameValidate();
+                        return true; // consume.
+                    }
+                }
+                return false; // pass on to other listeners.
+            }
+        });
+
+        mBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               newNameValidate();
+            }
+        });
+
+    }
+
+    private void newNameValidate() {
+        //beirt szöveg ellenőrzése, mentése és billenytűzet elrejtése, vissza állítjuk a textview-t
+        String newDisplayName = mNewDisplayName.getText().toString().trim();
+        if (!TextUtils.isEmpty(newDisplayName)) {
+            mDisplayname.setText(newDisplayName);
+            mNewDisplayName.setVisibility(View.GONE);
+            mDisplayname.setVisibility(View.VISIBLE);
+            //billentyűzet elrejtése
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mNewDisplayName.getWindowToken(), 0);
+            ujNevTarolas(newDisplayName);
+        }
+    }
+
+    private void ujNevTarolas(String newName) {
+        mUsersDatabase.child("name").setValue(newName);
     }
 
     @Override

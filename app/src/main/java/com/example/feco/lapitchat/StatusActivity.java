@@ -52,6 +52,8 @@ public class StatusActivity extends AppCompatActivity {
 
         final String currentStatus = getIntent().getStringExtra("status");
         mInputStatus.getEditText().setText(currentStatus);
+
+        //szöveg kijelölése
         int textLength = mInputStatus.getEditText().getText().length();
         mInputStatus.getEditText().setSelection(0, textLength);
 
