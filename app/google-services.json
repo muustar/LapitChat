@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:230015698706:android:8d2435de76ddf556",
         "android_client_info": {
-          "package_name": "com.example.feco.lapitchat"
+          "package_name": "com.muustar.feco.mychat"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "230015698706-9vjfmpfmq63ppff6k8lr6tm8ta2q886s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.feco.lapitchat",
+            "package_name": "com.muustar.feco.mychat",
             "certificate_hash": "a7ff206d8f1d88bacbda845c8ce0dcb6ff7de584"
           }
         },
