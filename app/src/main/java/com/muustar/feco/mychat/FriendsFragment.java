@@ -60,7 +60,9 @@ public class FriendsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_friends, container, false);
         mFriendsView = (RecyclerView) v.findViewById(R.id.friends_recycler);
         mFriendsView.setHasFixedSize(true);
-        mFriendsView.setLayoutManager(new LinearLayoutManager(ctx));
+        LinearLayoutManager mLayout = new LinearLayoutManager(ctx);
+        //mLayout.setReverseLayout(true);
+        mFriendsView.setLayoutManager(mLayout);
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -70,7 +72,7 @@ public class FriendsFragment extends Fragment {
         friendsRef = FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrentUser);
         friendsRef.keepSynced(true);
 
-        Query query = friendsRef;
+        Query query = friendsRef.orderByChild("date");
 
         FirebaseRecyclerOptions<Friend> options =
                 new FirebaseRecyclerOptions.Builder<Friend>()
@@ -180,7 +182,17 @@ public class FriendsFragment extends Fragment {
                 return new FriendsFragment.FriendsViewHolder(view);
             }
         };
+
+        // a megfelelő pozícióra ugrik
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                mFriendsView.smoothScrollToPosition(adapter.getItemCount());
+            }
+        });
         mFriendsView.setAdapter(adapter);
+
 
         return v;
     }

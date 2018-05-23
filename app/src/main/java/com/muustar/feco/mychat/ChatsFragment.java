@@ -64,6 +64,8 @@ public class ChatsFragment extends Fragment {
     private String mCurrentUserId;
     private DatabaseReference usersRef;
     private DatabaseReference messageRef;
+    private LinearLayoutManager mLayoutManager;
+    ;
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -78,7 +80,11 @@ public class ChatsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_chats, container, false);
         mConvView = (RecyclerView) v.findViewById(R.id.chat_recycler);
         mConvView.setHasFixedSize(true);
-        mConvView.setLayoutManager(new LinearLayoutManager(ctx));
+        mLayoutManager = new LinearLayoutManager(ctx);
+        //mLayoutManager.setReverseLayout(true);
+        mConvView.setLayoutManager(mLayoutManager);
+
+
         mCurrentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         convRef = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrentUserId);
@@ -88,7 +94,7 @@ public class ChatsFragment extends Fragment {
         messageRef = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId);
         messageRef.keepSynced(true);
 
-        Query query = convRef;
+        Query query = convRef.orderByChild("timestamp");
 
         FirebaseRecyclerOptions<Conv> options =
                 new FirebaseRecyclerOptions.Builder<Conv>()
@@ -112,7 +118,7 @@ public class ChatsFragment extends Fragment {
 
                 //az utolsó üzenet lekérése
                 Query lastMessageQuery = messageRef.child(list_user_id).orderByKey().limitToLast(1);
-                lastMessageQuery.addChildEventListener(new ChildEventListener() {
+                ChildEventListener lastMessageQueryEventListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         Messages message = dataSnapshot.getValue(Messages.class);
@@ -143,7 +149,8 @@ public class ChatsFragment extends Fragment {
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
-                });
+                };
+                lastMessageQuery.addChildEventListener(lastMessageQueryEventListener);
 
 
                 // profil adatok betöltése, név, kép
@@ -153,7 +160,7 @@ public class ChatsFragment extends Fragment {
                         User u;
                         if (!dataSnapshot.exists()) {
                             //private String name, status, image, image_thumb, email, uid;
-                            u = new User("Törölt profile", "...", "default", "default", "törölt", "null",false);
+                            u = new User("Törölt profile", "...", "default", "default", "törölt", "null", false);
                         } else {
                             u = dataSnapshot.getValue(User.class);
                         }
@@ -247,26 +254,39 @@ public class ChatsFragment extends Fragment {
                 });
 
             }
+
+
         };
 
-        mConvView.setAdapter(adapter);
+        // a megfelelő pozícióra ugrik
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                mConvView.smoothScrollToPosition(adapter.getItemCount()-1);
+            }
+        });
 
+        mConvView.setAdapter(adapter);
+        adapter.startListening();
         return v;
     }
 
 
+
+
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         adapter.startListening();
     }
 
+
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         adapter.stopListening();
     }
-
 
     private class ConvViewHolder extends RecyclerView.ViewHolder {
         private View mView;
