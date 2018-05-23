@@ -53,7 +53,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
     private static final int GALLERY_PICK_REQ = 4;
-    private String mChatUser;
     private Toolbar mChatToolbar;
     private TextView mTitle;
     private TextView mLastSeen;
@@ -65,7 +64,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private DatabaseReference mRootRef;
     private FirebaseAuth mAuth;
-    private String mCurrentUserID;
+    private String mCurrentUserID; // a programot futtató IDja
+    private String mChatUser; // akivel a beszélgetés folyik
     private String mChatUserName;
     private String mChatUserImg;
 
@@ -84,7 +84,8 @@ public class ChatActivity extends AppCompatActivity {
     private Query messageQuery;
     private ChildEventListener loadMessageChildEvent;
     private ChildEventListener requestTorloEventListener;
-    private DatabaseReference notifyRef;
+    private DatabaseReference mUsersRef;
+    private DatabaseReference mNotifyRef;
 
 
     @Override
@@ -94,6 +95,8 @@ public class ChatActivity extends AppCompatActivity {
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mRootRef.keepSynced(true);
+        mUsersRef = mRootRef.child("Users");
+        mNotifyRef = mRootRef.child("Notifications");
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserID = mAuth.getCurrentUser().getUid();
@@ -301,7 +304,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
 
 
-                 mAdapter.notifyDataSetChanged();
+                mAdapter.notifyDataSetChanged();
 
                 mRefreshLayout.setRefreshing(false);
 
@@ -355,7 +358,7 @@ public class ChatActivity extends AppCompatActivity {
                 seenef.child(messageKey).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        message.setSeen( (Boolean) dataSnapshot.child("seen").getValue());
+                        message.setSeen((Boolean) dataSnapshot.child("seen").getValue());
                     }
 
                     @Override
@@ -423,7 +426,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void requestTorles() {
         // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük
-        notifyRef = mRootRef.child("Notifications").child(mCurrentUserID);
+        mNotifyRef.child(mCurrentUserID);
         requestTorloEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -433,7 +436,7 @@ public class ChatActivity extends AppCompatActivity {
                 NotificationType n = dataSnapshot.getValue(NotificationType.class);
                 if (n.getFrom().equals(mChatUser)) {
                     if (n.getType().equals("new_message")) {
-                        notifyRef.child(key).removeValue();
+                        mNotifyRef.child(mCurrentUserID).child(key).removeValue();
                     }
                 }
             }
@@ -482,7 +485,30 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessage() {
         chatOpening();
-        chatNotification();
+
+        // csak akkor futtassuk le ha a másik user nem "online", vagyis ha meg van éppen nyitva a cset ablak akkor ne futtassunk értesítést.
+        mUsersRef.child(mChatUser).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                if (dataSnapshot.child("chat_window_open").exists()) {
+                    Log.d("FECO", "chat_windows_open: "+dataSnapshot.child("chat_window_open").getValue()+ " mCurrent: "+ mCurrentUserID);
+                    if (!dataSnapshot.child("chat_window_open").getValue().equals(mCurrentUserID)) {
+                        chatNotification();
+                    }
+                } else {
+                    chatNotification();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //chatNotification();
 
         String message = mChatMessageEdT.getText().toString().trim();
         if (!TextUtils.isEmpty(message)) {
@@ -525,9 +551,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private void chatNotification() {
 
-        // REQUEST fragmentbe irja a sorokat
+        // notifications adatbázisba bejegyzés
         // ez az új üzenet írásakor fut le
-        DatabaseReference newNotificationRef = mRootRef.child("Notifications").child(mChatUser).push();
+
+        DatabaseReference newNotificationRef = mNotifyRef.child(mChatUser).push();
         String newNotificationId = newNotificationRef.getKey();
         Map<String, Object> notificationDataMap = new HashMap<String, Object>();
         notificationDataMap.put("from", mCurrentUserID);
@@ -555,13 +582,15 @@ public class ChatActivity extends AppCompatActivity {
         super.onStart();
         messagesList.clear();
         messageQuery.addChildEventListener(loadMessageChildEvent);
-        notifyRef.addChildEventListener(requestTorloEventListener);
+        mNotifyRef.child(mCurrentUserID).addChildEventListener(requestTorloEventListener);
 
         // chehck the user logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
             mUserDatabase.child("online").setValue("true");
+            // a chat üzenet nyitva ablakban nem elég azt jelezni, hogy nyitva van az ablak, azt is jelezni kell, hogy éppen kinek az ablka van nyitva.
+            mUserDatabase.child("chat_window_open").setValue(mChatUser);
         }
     }
 
@@ -580,6 +609,7 @@ public class ChatActivity extends AppCompatActivity {
         if (currentUser != null) {
             DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
             mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
+            mUserDatabase.child("chat_window_open").setValue("false");
         }
     }
 
@@ -587,7 +617,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         messageQuery.removeEventListener(loadMessageChildEvent);
-        notifyRef.removeEventListener(requestTorloEventListener);
+        mNotifyRef.child(mCurrentUserID).removeEventListener(requestTorloEventListener);
 
     }
 }

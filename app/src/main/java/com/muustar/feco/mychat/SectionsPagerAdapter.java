@@ -25,7 +25,9 @@ class SectionsPagerAdapter extends FragmentPagerAdapter {
         super(fm);
         this.mContext = context;
         mAuth = FirebaseAuth.getInstance();
-        mCurrentUser = mAuth.getCurrentUser().getUid();
+        if (mAuth.getCurrentUser() != null) {
+            mCurrentUser = mAuth.getCurrentUser().getUid();
+        }
         mNotifyDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
     }
 
@@ -53,11 +55,11 @@ class SectionsPagerAdapter extends FragmentPagerAdapter {
         this.notifyCount = notifyCount;
         notifyDataSetChanged();
     }
+
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
         super.getPageTitle(position);
-
 
 
         switch (position) {
@@ -68,7 +70,7 @@ class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return mContext.getResources().getString(R.string.friends);
             case 2:
                 String requestSzoveg = mContext.getResources().getString(R.string.requests);
-                return requestSzoveg +  " (" + notifyCount + ")";
+                return requestSzoveg + " (" + notifyCount + ")";
 
             default:
                 return null;
