@@ -11,7 +11,9 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.constraint.solver.widgets.Snapshot;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +37,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -42,9 +47,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -66,7 +75,7 @@ public class ChatsFragment extends Fragment {
     private DatabaseReference usersRef;
     private DatabaseReference messageRef;
     private LinearLayoutManager mLayoutManager;
-    ;
+    private boolean torolheto = false;
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -98,7 +107,7 @@ public class ChatsFragment extends Fragment {
         messageRef = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId);
         messageRef.keepSynced(true);
 
-        Query query = convRef.orderByChild("timestamp");
+        final Query query = convRef.orderByChild("timestamp");
 
 
         FirebaseRecyclerOptions<Conv> options =
@@ -219,34 +228,72 @@ public class ChatsFragment extends Fragment {
 
                                 //beszélgetés törlése feature
 
+
                                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(ctx);
                                 alertDialog.setTitle("Delete Chat");
                                 alertDialog.setIcon(android.R.drawable.ic_delete);
                                 alertDialog.setPositiveButton("Delete",
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
+                                                torolheto = true;
+
 
                                                 // Chat és a messages -ből kell törölni
                                                 DatabaseReference chatRefCuUser = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrentUserId).child(list_user_id);
                                                 chatRefCuUser.removeValue();
-                                                //DatabaseReference chatRefListUser = FirebaseDatabase.getInstance().getReference().child("Chat").child(list_user_id).child(mCurrentUserId);
-                                                //chatRefListUser.removeValue();
+
+                                                // az üzenetek törlése esetén meg kell vizsgálni, hogy kép üzenetről van e szó,
+                                                // ha kép üzenetet találunk akkor törölni kell a tárolt képek közül is.
+
+
+                                                // a képek vizsgálata és törlése
+                                                Query queryKepek = messageRef.child(list_user_id).orderByChild("type").equalTo("image");
+                                                queryKepek.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        Iterable<DataSnapshot> ds = dataSnapshot.getChildren();
+                                                        for (DataSnapshot d : ds) {
+                                                            String filenev = d.getKey() + ".jpg";
+                                                            Log.d("FECO", filenev);
+                                                            StorageReference torlendoFajl = FirebaseStorage.getInstance().getReference().child("message_images").child(filenev);
+                                                            torlendoFajl.delete().addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    Log.d("ERROR", e.getMessage());
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
+
+                                                //Log.d("FECO", torlendok.toString());
+                                                // a cset üzenetek törlése
                                                 DatabaseReference messRefCuUser = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId).child(list_user_id);
                                                 messRefCuUser.removeValue();
-                                                //DatabaseReference messRefListUser = FirebaseDatabase.getInstance().getReference().child("messages").child(list_user_id).child(mCurrentUserId);
-                                                //messRefListUser.removeValue();
+
 
                                             }
+
                                         });
                                 alertDialog.setNegativeButton("Cancel",
-                                        new DialogInterface.OnClickListener() {
+                                        new DialogInterface.OnClickListener()
+
+                                        {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 dialog.cancel();
                                             }
                                         });
                                 alertDialog.show();
+
                                 return true;
                             }
+
                         });
 
 
@@ -260,17 +307,21 @@ public class ChatsFragment extends Fragment {
 
             }
 
-        };
+        }
+
+        ;
         adapter.notifyDataSetChanged();
 
         // a megfelelő pozícióra ugrik
-        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver()
+
+        {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
                 //mConvView.smoothScrollToPosition(adapter.getItemCount()-1);
                 //mConvView.smoothScrollToPosition(itemCount);
-                mConvView.scrollToPosition(adapter.getItemCount()-1);
+                mConvView.scrollToPosition(adapter.getItemCount() - 1);
             }
         });
 
@@ -279,8 +330,6 @@ public class ChatsFragment extends Fragment {
         adapter.startListening();
         return v;
     }
-
-
 
 
     @Override

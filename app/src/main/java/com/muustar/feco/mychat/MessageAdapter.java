@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -99,7 +100,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             myChatViewHolder.messageText.setVisibility(View.GONE);
 
 
-
             final String imgUrl = mMessageList.get(position).getMessage();
             myChatViewHolder.setImageMessage(ctx, imgUrl);
 
@@ -122,15 +122,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
 
-
-
-
-
         String lattam = String.valueOf(mMessageList.get(position).getSeen());
 
         //üzenet idejánek beállítása
         String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(mMessageList.get(position).getTime()));
-        myChatViewHolder.timeText.setText(dateString + "\n"+ lattam);
+        myChatViewHolder.timeText.setText(dateString + "\n" + lattam);
         // ha rá kattintunk az üzenetre akkor jelenik meg
         myChatViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,7 +168,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         final String fromUser = mMessageList.get(position).getFrom();
 
 
-
         //profil képek betöltése
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -181,7 +176,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 User u;
                 if (!dataSnapshot.child(mCurrenUserId).exists()) {
                     //private String name, status, image, image_thumb, email, uid;
-                    u = new User("Törölt profile", "...", "default", "default", "törölt", "null",false);
+                    u = new User("Törölt profile", "...", "default", "default", "törölt", "null", false);
                 } else {
                     u = dataSnapshot.child(mCurrenUserId).getValue(User.class);
                 }
@@ -208,7 +203,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             otherChatViewHolder.messageText.setVisibility(View.GONE);
 
 
-
             final String imgUrl = mMessageList.get(position).getMessage();
             otherChatViewHolder.setImageMessage(ctx, imgUrl);
 
@@ -220,6 +214,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     //https://github.com/stfalcon-studio/FrescoImageViewer/blob/master/README.md
                     new ImageViewer.Builder(ctx, Collections.singletonList(imgUrl))
                             .setStartPosition(0)
+                            .setCustomDraweeHierarchyBuilder(new GenericDraweeHierarchyBuilder(ctx.getResources())
+                                                .setFailureImage(R.mipmap.placeholder_sad))
                             .show();
                 }
             });
@@ -229,9 +225,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             otherChatViewHolder.messageText.setVisibility(View.VISIBLE);
             otherChatViewHolder.messageText.setText(mMessageList.get(position).getMessage());
         }
-
-
-
 
 
         //üzenet idejánek beállítása
@@ -332,14 +325,14 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout_me);
 
 
-
         }
 
         public void setImageMessage(Context ctx, String url) {
             GlideApp
                     .with(ctx)
                     .load(url)
-                    .placeholder(R.mipmap.placeholder)
+                    .placeholder(R.mipmap.placeholder_kicsi)
+                    .error(R.mipmap.placeholder_sad)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageMessage);
         }
@@ -371,7 +364,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             GlideApp
                     .with(ctx)
                     .load(url)
-                    .placeholder(R.mipmap.placeholder)
+                    .placeholder(R.mipmap.placeholder_kicsi)
+                    .error(R.mipmap.placeholder_sad)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageMessage);
         }

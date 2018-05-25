@@ -30,7 +30,7 @@
 
     <style name="MyActionBar.MenuTextStyle"
         parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">18sp</item>
     </style>

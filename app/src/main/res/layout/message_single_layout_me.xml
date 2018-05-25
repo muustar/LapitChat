@@ -33,7 +33,7 @@
             android:background="@drawable/message_text_background"
             android:padding="10dp"
             android:text="ffd   ddfl khslh lkhs khklh lhk"
-            android:textColor="@android:color/white"
+            android:textColor="@color/textColor"
             android:transitionName="statusTrans"
             tools:ignore="HardcodedText,UnusedAttribute" />
 
