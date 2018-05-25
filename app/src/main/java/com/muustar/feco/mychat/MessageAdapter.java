@@ -1,11 +1,16 @@
 package com.muustar.feco.mychat;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -225,8 +230,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             otherChatViewHolder.messageText.setText(mMessageList.get(position).getMessage());
         }
 
-        // seen feature
-        // ???
 
 
 
@@ -235,6 +238,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         String lattam = String.valueOf(mMessageList.get(position).getSeen());
         String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(mMessageList.get(position).getTime()));
         otherChatViewHolder.timeText.setText(dateString);
+
         // ha rá kattintunk az üzenetre akkor jelenik meg
         otherChatViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -265,6 +269,30 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         }
                     });
 
+                }
+            }
+        });
+
+        // kattintás az üzenetben a profil képre
+        otherChatViewHolder.profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent profileIntent = new Intent(ctx, ProfileActivity.class);
+                profileIntent.putExtra("uid", fromUser);
+
+
+                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    // Do something for lollipop and above versions
+                    ctx.startActivity(profileIntent);
+                } else {
+                    // do something for phones running an SDK before lollipop
+                    Pair[] pairs = new Pair[1];
+                    pairs[0] = new Pair<View, String>(otherChatViewHolder.profileImage, "imageTrans");
+                    ActivityOptions options;
+                    options = ActivityOptions
+                            .makeSceneTransitionAnimation((Activity) ctx, pairs);
+
+                    ctx.startActivity(profileIntent, options.toBundle());
                 }
             }
         });
@@ -302,6 +330,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             timeText = (TextView) itemView.findViewById(R.id.message_single_time_me);
             profileImage = (CircleImageView) itemView.findViewById(R.id.message_single_profileimage_me);
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout_me);
+
+
+
         }
 
         public void setImageMessage(Context ctx, String url) {

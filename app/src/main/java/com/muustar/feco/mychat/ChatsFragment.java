@@ -3,6 +3,7 @@ package com.muustar.feco.mychat;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -82,6 +83,9 @@ public class ChatsFragment extends Fragment {
         mConvView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(ctx);
         //mLayoutManager.setReverseLayout(true);
+        mLayoutManager.setReverseLayout(true);
+        mLayoutManager.setStackFromEnd(true);
+
         mConvView.setLayoutManager(mLayoutManager);
 
 
@@ -95,6 +99,7 @@ public class ChatsFragment extends Fragment {
         messageRef.keepSynced(true);
 
         Query query = convRef.orderByChild("timestamp");
+
 
         FirebaseRecyclerOptions<Conv> options =
                 new FirebaseRecyclerOptions.Builder<Conv>()
@@ -255,19 +260,22 @@ public class ChatsFragment extends Fragment {
 
             }
 
-
         };
+        adapter.notifyDataSetChanged();
 
         // a megfelelő pozícióra ugrik
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-                mConvView.smoothScrollToPosition(adapter.getItemCount()-1);
+                //mConvView.smoothScrollToPosition(adapter.getItemCount()-1);
+                //mConvView.smoothScrollToPosition(itemCount);
+                mConvView.scrollToPosition(adapter.getItemCount()-1);
             }
         });
 
         mConvView.setAdapter(adapter);
+        mConvView.refreshDrawableState();
         adapter.startListening();
         return v;
     }

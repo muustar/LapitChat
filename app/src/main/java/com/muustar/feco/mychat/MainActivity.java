@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mUserDatabase, mNotifyDatabase;
     private MenuItem mDynamicMenuItem;
-    private boolean isVisible = true;
+    private boolean isVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,8 +153,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
 
         if (Build.VERSION.SDK_INT > 11) {
-            invalidateOptionsMenu();
+
             mDynamicMenuItem.setVisible(isVisible);
+            invalidateOptionsMenu();
             //menu.findItem(R.id.main_logout_btn).setVisible(true);
         }
         return super.onPrepareOptionsMenu(menu);
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.request_menu, menu);
         mDynamicMenuItem = menu.findItem(R.id.request_clear);
+        mDynamicMenuItem.setVisible(false);
         return true;
     }
 

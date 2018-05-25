@@ -6,6 +6,7 @@
         android:id="@+id/request_clear"
         android:title="Clear All"
         android:icon="@drawable/round_done_all_white_48dp"
+        android:visible="false"
         app:showAsAction="always"/>
     <item
         android:id="@+id/main_account_settings"
