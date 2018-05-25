@@ -135,7 +135,12 @@ public class ChatActivity extends AppCompatActivity {
         mTitle.setText(mChatUserName);
         mLastSeen = action_bar_view.findViewById(R.id.custom_bar_seen);
         mProfileImage = action_bar_view.findViewById(R.id.custom_bar_image);
-        Glide.with(this).load(mChatUserImg).into(mProfileImage);
+        GlideApp
+                .with(this)
+                .load(mChatUserImg)
+                .placeholder(R.mipmap.ic_placeholder_face)
+                .error(R.mipmap.ic_placeholder_face)
+                .into(mProfileImage);
 
         actionBar.setCustomView(action_bar_view);
 

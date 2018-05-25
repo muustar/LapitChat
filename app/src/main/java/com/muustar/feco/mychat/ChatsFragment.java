@@ -376,9 +376,11 @@ public class ChatsFragment extends Fragment {
         public void setmSingleImage(Context ctx, String imgurl) {
             mSingleImage = mView.findViewById(R.id.conv_single_image);
             RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
-            Glide.with(ctx)
+            GlideApp
+                    .with(ctx)
                     .load(imgurl)
-                    .apply(options)
+                    .placeholder(R.mipmap.ic_placeholder_face)
+                    .error(R.mipmap.ic_placeholder_face)
                     .into(mSingleImage);
         }
 

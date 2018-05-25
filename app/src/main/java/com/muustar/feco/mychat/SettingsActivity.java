@@ -74,6 +74,8 @@ public class SettingsActivity extends AppCompatActivity {
     private Uri resultUri;
     private String TAG = "FECO";
     private String displayname;
+    private String mTaroltImage;
+    private String mTaroltImage_thumb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,8 +108,8 @@ public class SettingsActivity extends AppCompatActivity {
                     User u = dataSnapshot.getValue(User.class);
                     String name = dataSnapshot.child("name").getValue().toString();
                     status = dataSnapshot.child("status").getValue().toString();
-                    String image = dataSnapshot.child("image").getValue().toString();
-                    String image_thumb = dataSnapshot.child("image_thumb").getValue().toString();
+                    mTaroltImage = dataSnapshot.child("image").getValue().toString();
+                    mTaroltImage_thumb = dataSnapshot.child("image_thumb").getValue().toString();
 
                     if (dataSnapshot.child("email_visible").exists()) {
                         Boolean email_visible = u.getEmail_visible();
@@ -118,7 +120,9 @@ public class SettingsActivity extends AppCompatActivity {
                     mStatus.setText(status);
 
                     GlideApp.with(getApplicationContext())
-                            .load(image_thumb)
+                            .load(mTaroltImage_thumb)
+                            .placeholder(R.mipmap.ic_placeholder_face)
+                            .error(R.mipmap.ic_placeholder_face)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .listener(new RequestListener<Drawable>() {
                                 @Override
@@ -253,7 +257,7 @@ public class SettingsActivity extends AppCompatActivity {
             // start picker to get image for cropping and then use the image in cropping activity
             CropImage.activity(data.getData())
                     .setCropShape(CropImageView.CropShape.OVAL)
-                    .setAspectRatio(16, 9)
+                    //.setAspectRatio(16, 9)
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setInitialCropWindowPaddingRatio(0)
                     .start(this);
@@ -262,7 +266,8 @@ public class SettingsActivity extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 mProgressBar.setVisibility(View.VISIBLE);
-                // elmentjük az új képet a szerveren
+
+                // elmentjük az új képet a szerveren, a régi képet nem kell törölni, mert azonos névvel kerül mentésre az új kép, ez felülírja a korábbit.
                 resultUri = result.getUri();
                 //mImage.setImageURI(resultUri);
 

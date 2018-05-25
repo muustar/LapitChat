@@ -110,6 +110,7 @@ public class ProfileActivity extends AppCompatActivity {
                 GlideApp
                         .with(getApplicationContext())
                         .load(u.getImage())
+                        .error(R.mipmap.ic_placeholder_face)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(mProfileImage);
                 // total friends

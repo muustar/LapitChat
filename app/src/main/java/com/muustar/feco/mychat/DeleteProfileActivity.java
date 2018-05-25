@@ -97,7 +97,7 @@ public class DeleteProfileActivity extends AppCompatActivity {
 
             StorageReference profilkep_utvonal = mStorageRef.child("profile_images").child(mCurrentUserId + ".jpg");
             profilkep_utvonal.delete();
-            StorageReference profilkepThumb_utvonal = mStorageRef.child("profile_images").child(mCurrentUserId + ".jpg");
+            StorageReference profilkepThumb_utvonal = mStorageRef.child("profile_images").child("thumbs").child(mCurrentUserId + ".jpg");
             profilkepThumb_utvonal.delete();
 
 
