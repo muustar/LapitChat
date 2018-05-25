@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -86,6 +89,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChildEventListener requestTorloEventListener;
     private DatabaseReference mUsersRef;
     private DatabaseReference mNotifyRef;
+    private boolean openChatWindow = true;
 
 
     @Override
@@ -143,6 +147,7 @@ public class ChatActivity extends AppCompatActivity {
                 .into(mProfileImage);
 
         actionBar.setCustomView(action_bar_view);
+
 
         // ---  beállítja az online statust,  last seen-t
         mRootRef.child("Users").child(mChatUser).addValueEventListener(new ValueEventListener() {
@@ -364,6 +369,8 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         message.setSeen((Boolean) dataSnapshot.child("seen").getValue());
+
+
                     }
 
                     @Override
@@ -391,6 +398,19 @@ public class ChatActivity extends AppCompatActivity {
                 }
 
                 messagesList.add(message);
+                if (!mCurrentUserID.equals(message.getFrom())) {
+
+                    // vibrálás ha érkezik uj üzenet
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(200);
+                    }
+                }
+
                 mAdapter.notifyDataSetChanged();
 
                 mMessageList.scrollToPosition(messagesList.size() - 1);
@@ -424,6 +444,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük
         requestTorles();
+        openChatWindow = false;
 
         //messageQuery.addChildEventListener(loadMessageChildEvent);
 
@@ -498,7 +519,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 if (dataSnapshot.child("chat_window_open").exists()) {
-                    Log.d("FECO", "chat_windows_open: "+dataSnapshot.child("chat_window_open").getValue()+ " mCurrent: "+ mCurrentUserID);
+                    Log.d("FECO", "chat_windows_open: " + dataSnapshot.child("chat_window_open").getValue() + " mCurrent: " + mCurrentUserID);
                     if (!dataSnapshot.child("chat_window_open").getValue().equals(mCurrentUserID)) {
                         chatNotification();
                     }
@@ -588,7 +609,7 @@ public class ChatActivity extends AppCompatActivity {
         messagesList.clear();
         messageQuery.addChildEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).addChildEventListener(requestTorloEventListener);
-
+        openChatWindow = true;
         // chehck the user logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
@@ -602,6 +623,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        openChatWindow = true;
         NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nMgr.cancelAll();
     }

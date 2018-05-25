@@ -200,6 +200,8 @@ public class UsersActivity extends AppCompatActivity {
             GlideApp
                     .with(ctx)
                     .load(imgurl)
+                    .placeholder(R.mipmap.ic_placeholder_face)
+                    .error(R.mipmap.ic_placeholder_face)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(mSingleImage);
         }

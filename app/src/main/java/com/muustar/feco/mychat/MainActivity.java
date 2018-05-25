@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser == null) {
             sendToStart();
         } else {
-            getSupportActionBar().setTitle(currentUser.getEmail());
+            getSupportActionBar().setTitle("My Chat"+" ("+currentUser.getEmail()+")");
             mNotifyDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications").child(currentUser.getUid());
             mNotifyDatabase.addValueEventListener(new ValueEventListener() {
                 @Override

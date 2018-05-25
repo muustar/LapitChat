@@ -194,6 +194,8 @@ public class RequestsFragment extends Fragment {
                 GlideApp
                         .with(ctx)
                         .load(url)
+                        .placeholder(R.mipmap.ic_placeholder_face)
+                        .error(R.mipmap.ic_placeholder_face)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(mRequestImage);
             }catch (Exception e){
