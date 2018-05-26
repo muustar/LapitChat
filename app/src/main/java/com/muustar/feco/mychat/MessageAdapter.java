@@ -122,11 +122,17 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
 
-        String lattam = String.valueOf(mMessageList.get(position).getSeen());
-
+        Boolean lattam = mMessageList.get(position).getSeen();
+        myChatViewHolder.setSeenText(lattam);
+        String lattamText = "";
+        if (lattam){
+            lattamText = ctx.getString(R.string.seen);
+        }else{
+            lattamText = ctx.getString(R.string.sent);
+        }
         //üzenet idejánek beállítása
         String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(mMessageList.get(position).getTime()));
-        myChatViewHolder.timeText.setText(dateString + "\n" + lattam);
+        myChatViewHolder.timeText.setText(dateString+"\n"+lattamText);
         // ha rá kattintunk az üzenetre akkor jelenik meg
         myChatViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -313,7 +319,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private static class MyChatViewHolder extends RecyclerView.ViewHolder {
         private TextView messageText;
-        private TextView timeText;
+        private TextView timeText, seenText;
         private CircleImageView profileImage;
         private ImageView imageMessage;
 
@@ -323,8 +329,17 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             timeText = (TextView) itemView.findViewById(R.id.message_single_time_me);
             profileImage = (CircleImageView) itemView.findViewById(R.id.message_single_profileimage_me);
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout_me);
+            seenText = (TextView) itemView.findViewById(R.id.message_single_seen_me);
+        }
 
-
+        public void setSeenText(Boolean b){
+            if (b){
+                seenText.setVisibility(View.GONE);
+                seenText.setText(R.string.seen);
+            }else{
+                seenText.setVisibility(View.VISIBLE);
+                seenText.setText(R.string.sent);
+            }
         }
 
         public void setImageMessage(Context ctx, String url) {
@@ -335,14 +350,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .error(R.mipmap.placeholder_sad)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageMessage);
-        }
-
-        public void setProfileImage(Context ctx, String url) {
-            GlideApp
-                    .with(ctx)
-                    .load(url)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(profileImage);
         }
     }
 

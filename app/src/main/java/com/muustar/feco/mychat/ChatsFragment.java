@@ -312,7 +312,7 @@ public class ChatsFragment extends Fragment {
         ;
         adapter.notifyDataSetChanged();
 
-        // a megfelelő pozícióra ugrik
+        // a megfelelő pozícióra ugrik - (többnyire :( )
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver()
 
         {

@@ -44,4 +44,15 @@
     <string name="have">Have</string>
     <string name="friends_have">friends</string>
     <string name="decline_friend_request">Decline Friend Request</string>
+    <string name="seen">seen</string>
+    <string name="enter_message_here">Enter message here ...</string>
+    <string name="sent">not seen yet</string>
+    <string name="less_than_a_minute">less than a miunte</string>
+    <string name="just_now">just now</string>
+    <string name="a_minute_ago">a minute ago</string>
+    <string name="minute_ago">minutes ago</string>
+    <string name="hours_ago">hours ago</string>
+    <string name="an_hour_ago">an hour ago</string>
+    <string name="yesterday">yesterday</string>
+    <string name="days_ago">days ago</string>
 </resources>

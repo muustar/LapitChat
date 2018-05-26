@@ -44,5 +44,16 @@
     <string name="have">Neki</string>
     <string name="friends_have">barátja van</string>
     <string name="decline_friend_request">Felkérés visszautasítása</string>
+    <string name="seen">látta</string>
+    <string name="enter_message_here">Üzenj valamit ...</string>
+    <string name="sent">még nem látta</string>
+    <string name="less_than_a_minute">kevesebb mint egy perce</string>
+    <string name="just_now">épp most járt erre</string>
+    <string name="a_minute_ago">egy perccel ezelőtt</string>
+    <string name="minute_ago">perccel ezelőtt</string>
+    <string name="hours_ago">órával ezelőtt</string>
+    <string name="an_hour_ago">egy órája</string>
+    <string name="yesterday">tegnap</string>
+    <string name="days_ago">nappal ezelőtt</string>
 
 </resources>

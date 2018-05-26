@@ -90,6 +90,7 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mUsersRef;
     private DatabaseReference mNotifyRef;
     private boolean openChatWindow = true;
+    private DatabaseReference mMessagesRef;
 
 
     @Override
@@ -101,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
         mRootRef.keepSynced(true);
         mUsersRef = mRootRef.child("Users");
         mNotifyRef = mRootRef.child("Notifications");
+        mMessagesRef = mRootRef.child("messages");
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserID = mAuth.getCurrentUser().getUid();
@@ -121,7 +123,9 @@ public class ChatActivity extends AppCompatActivity {
         mMessageList.setLayoutManager(mLinearLayout);
         mAdapter = new MessageAdapter(messagesList);
         mMessageList.setAdapter(mAdapter);
+
         loadMessages();
+        loadSeenStatus();
 
         //Action bar kialakítása egyedire
         mChatToolbar = findViewById(R.id.chat_appbar);
@@ -161,7 +165,7 @@ public class ChatActivity extends AppCompatActivity {
 
                         GetTimeAgo getTimeAgo = new GetTimeAgo();
                         long onlineTime = Long.parseLong(seen);
-                        String lastSeen = getTimeAgo.getTimeAgo(onlineTime);
+                        String lastSeen = getTimeAgo.getTimeAgo(onlineTime, ChatActivity.this);
                         mLastSeen.setText(lastSeen);
                     }
                 }
@@ -225,6 +229,33 @@ public class ChatActivity extends AppCompatActivity {
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
                 startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), GALLERY_PICK_REQ);
+            }
+        });
+    }
+
+    private void loadSeenStatus() {
+        Query querySeen = mMessagesRef.child(mChatUser).child(mCurrentUserID).orderByKey().limitToLast(1);
+        querySeen.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> child = dataSnapshot.getChildren();
+
+                for (DataSnapshot c : child) {
+                    Log.d("FECO", "seen: " + c.getValue());
+                    Boolean seenValue = (Boolean) c.child("seen").getValue();
+                    if (messagesList.size() > 0) {
+                        messagesList.get(messagesList.size() - 1).setSeen(seenValue);
+                    }
+
+                    mAdapter.notifyDataSetChanged();
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }
@@ -364,22 +395,7 @@ public class ChatActivity extends AppCompatActivity {
                 String messageKey = dataSnapshot.getKey();
                 message.setNodeKey(messageKey);
 
-                // a másik fél olvasottságát is megnézzük
-                seenef.child(messageKey).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        message.setSeen((Boolean) dataSnapshot.child("seen").getValue());
 
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                message.setSeen(false);
                 // a megnyitott üzenetnél oda tesszük h olvasott
                 String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
                 String push_id = dataSnapshot.getKey();
@@ -519,7 +535,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 if (dataSnapshot.child("chat_window_open").exists()) {
-                    Log.d("FECO", "chat_windows_open: " + dataSnapshot.child("chat_window_open").getValue() + " mCurrent: " + mCurrentUserID);
+                    // Log.d("FECO", "chat_windows_open: " + dataSnapshot.child("chat_window_open").getValue() + " mCurrent: " + mCurrentUserID);
                     if (!dataSnapshot.child("chat_window_open").getValue().equals(mCurrentUserID)) {
                         chatNotification();
                     }
