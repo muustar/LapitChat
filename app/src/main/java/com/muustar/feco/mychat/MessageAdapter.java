@@ -330,6 +330,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             profileImage = (CircleImageView) itemView.findViewById(R.id.message_single_profileimage_me);
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout_me);
             seenText = (TextView) itemView.findViewById(R.id.message_single_seen_me);
+
+
         }
 
         public void setSeenText(Boolean b){

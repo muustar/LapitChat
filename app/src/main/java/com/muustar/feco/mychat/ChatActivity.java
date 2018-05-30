@@ -234,22 +234,33 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadSeenStatus() {
-        Query querySeen = mMessagesRef.child(mChatUser).child(mCurrentUserID).orderByKey().limitToLast(1);
-        querySeen.addValueEventListener(new ValueEventListener() {
+        Query querySeen = mMessagesRef.child(mCurrentUserID).child(mChatUser).orderByKey().limitToLast(1);
+        querySeen.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> child = dataSnapshot.getChildren();
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                for (DataSnapshot c : child) {
-                    Log.d("FECO", "seen: " + c.getValue());
-                    Boolean seenValue = (Boolean) c.child("seen").getValue();
-                    if (messagesList.size() > 0) {
-                        messagesList.get(messagesList.size() - 1).setSeen(seenValue);
-                    }
+            }
 
-                    mAdapter.notifyDataSetChanged();
-                }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
+
+                    Log.d("FECO", "seen: " + dataSnapshot.child("seen").toString());
+
+
+
+
+
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
 
@@ -397,6 +408,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 // a megnyitott üzenetnél oda tesszük h olvasott
+                //String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
                 String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
                 String push_id = dataSnapshot.getKey();
                 mRootRef.child(current_user_ref).child(push_id).child("seen").setValue(true);
@@ -413,7 +425,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 }
 
+
                 messagesList.add(message);
+                loadSeenStatus();
                 if (!mCurrentUserID.equals(message.getFrom())) {
 
                     // vibrálás ha érkezik uj üzenet
