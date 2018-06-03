@@ -1,34 +1,32 @@
 package com.muustar.feco.mychat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.support.annotation.MenuRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+
+import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -47,18 +45,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
-            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
+                    (mAuth.getCurrentUser().getUid());
         }
         mToolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Lapit Chat");
 
+
         // Tabs
         mViewPager = findViewById(R.id.main_tabPager);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
 
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
 
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -84,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
+        initAppbarColor();
     }
 
     @Override
@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
         // chehck the user logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
+                    (mAuth.getCurrentUser().getUid());
             mUserDatabase.child("online").setValue("true");
         }
     }
@@ -104,12 +105,27 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         // chehck the user logged in
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        final FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             sendToStart();
         } else {
-            getSupportActionBar().setTitle("My Chat"+" ("+currentUser.getEmail()+")");
-            mNotifyDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications").child(currentUser.getUid());
+            Query queryUsername = FirebaseDatabase.getInstance().getReference().child("Users")
+                    .child(currentUser.getUid());
+            queryUsername.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    getSupportActionBar().setTitle(dataSnapshot.child("name").getValue().toString
+                            () + " \n(" + currentUser.getEmail() + ")");
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+            mNotifyDatabase = FirebaseDatabase.getInstance().getReference().child
+                    ("Notifications").child(currentUser.getUid());
             mNotifyDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -128,8 +144,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
-
     }
 
     @Override
@@ -137,10 +151,10 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
+                    (mAuth.getCurrentUser().getUid());
             mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
         }
-
     }
 
     private void sendToStart() {
@@ -183,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
             FirebaseAuth.getInstance().signOut();
             sendToStart();
 
-
             // if (mAuth.getCurrentUser() == null) {
             //   sendToStart();
             //}
@@ -205,8 +218,55 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.request_clear) {
             mNotifyDatabase.removeValue();
         }
+
+        if (item.getItemId() == R.id.main_color_picker) {
+            colorPicker();
+        }
         return false;
     }
 
+    private void colorPicker() {
+        ColorPicker colorPicker = new ColorPicker(this);
+        colorPicker.dismissDialog();
+        colorPicker.setRoundColorButton(true);
+        colorPicker.show();
+        colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
+            @Override
+            public void onChooseColor(int position, int color) {
+                saveColor(position, color);
+                setAppBarColor(position, color);
+            }
 
+            @Override
+            public void onCancel() {
+                // put code
+            }
+        });
+    }
+
+    private void initAppbarColor() {
+        // get color info from SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        int colorValue = sharedPref.getInt("color", 0);
+        if (colorValue != 0)
+            setAppBarColor(0, colorValue);
+    }
+
+    private void setAppBarColor(int position, int color) {
+        mTabLayout.setBackgroundColor(color);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(color)); // set your desired color
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(color);
+            getWindow().setStatusBarColor(color);
+        }
+    }
+
+    private void saveColor(int position, int color) {
+        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("position",position);
+        editor.putInt("color", color);
+        editor.apply();
+    }
 }

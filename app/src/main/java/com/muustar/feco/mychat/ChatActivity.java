@@ -5,6 +5,9 @@ import android.app.ActivityOptions;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
@@ -20,7 +23,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -28,8 +30,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,8 +53,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
 public class ChatActivity extends AppCompatActivity {
+    private static final String TAG = "ChatActivity";
     private static final int GALLERY_PICK_REQ = 4;
     private Toolbar mChatToolbar;
     private TextView mTitle;
@@ -78,7 +78,6 @@ public class ChatActivity extends AppCompatActivity {
     private MessageAdapter mAdapter;
 
     private static final int TOTAL_ITEMS_TO_LOAD = 5;
-    private int mCurrentPage = 1;
     private SwipeRefreshLayout mRefreshLayout;
     private int itemPos = 0;
     private String mLastKey = "";
@@ -89,9 +88,8 @@ public class ChatActivity extends AppCompatActivity {
     private ChildEventListener requestTorloEventListener;
     private DatabaseReference mUsersRef;
     private DatabaseReference mNotifyRef;
-    private boolean openChatWindow = true;
     private DatabaseReference mMessagesRef;
-
+    private int colorMyChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +109,6 @@ public class ChatActivity extends AppCompatActivity {
         mChatUserName = getIntent().getStringExtra("name");
         mChatUserImg = getIntent().getStringExtra("img");
 
-
         mChatAddBtn = findViewById(R.id.chat_add);
         mChatMessageEdT = findViewById(R.id.chat_message);
         mChatSendBtn = findViewById(R.id.chat_send);
@@ -121,7 +118,14 @@ public class ChatActivity extends AppCompatActivity {
         mLinearLayout = new LinearLayoutManager(this);
         mMessageList.setHasFixedSize(true);
         mMessageList.setLayoutManager(mLinearLayout);
-        mAdapter = new MessageAdapter(messagesList);
+
+        // get color info from SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        int colorPosition = sharedPref.getInt("position", 0);
+        if (colorPosition != 0) {
+            colorMyChat = colorPosition;
+        }
+        mAdapter = new MessageAdapter(messagesList, colorMyChat);
         mMessageList.setAdapter(mAdapter);
 
         loadMessages();
@@ -137,7 +141,8 @@ public class ChatActivity extends AppCompatActivity {
         //actionBar.setTitle(mChatUserName);
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        @SuppressLint("InflateParams") View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
+        @SuppressLint("InflateParams") View action_bar_view = inflater.inflate(R.layout
+                .chat_custom_bar, null);
 
         mTitle = action_bar_view.findViewById(R.id.custom_bar_title);
         mTitle.setText(mChatUserName);
@@ -151,7 +156,6 @@ public class ChatActivity extends AppCompatActivity {
                 .into(mProfileImage);
 
         actionBar.setCustomView(action_bar_view);
-
 
         // ---  beállítja az online statust,  last seen-t
         mRootRef.child("Users").child(mChatUser).addValueEventListener(new ValueEventListener() {
@@ -184,7 +188,6 @@ public class ChatActivity extends AppCompatActivity {
                 Intent profileIntent = new Intent(ChatActivity.this, ProfileActivity.class);
                 profileIntent.putExtra("uid", mChatUser);
 
-
                 if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     // Do something for lollipop and above versions
                     startActivity(profileIntent);
@@ -201,7 +204,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,11 +214,9 @@ public class ChatActivity extends AppCompatActivity {
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mCurrentPage++;
                 itemPos = 0;
 
                 loadMoreMessages();
-
             }
         });
 
@@ -228,13 +228,17 @@ public class ChatActivity extends AppCompatActivity {
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
-                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), GALLERY_PICK_REQ);
+                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"),
+                        GALLERY_PICK_REQ);
             }
         });
+
+        initAppbarColor();
     }
 
     private void loadSeenStatus() {
-        Query querySeen = mMessagesRef.child(mCurrentUserID).child(mChatUser).orderByKey().limitToLast(1);
+        Query querySeen = mMessagesRef.child(mCurrentUserID).child(mChatUser).orderByKey()
+                .limitToLast(1);
         querySeen.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -244,14 +248,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-
-                    Log.d("FECO", "seen: " + dataSnapshot.child("seen").toString());
-
-
-
-
-
-
+                Log.d("FECO", "seen: " + dataSnapshot.child("seen").toString());
             }
 
             @Override
@@ -287,10 +284,12 @@ public class ChatActivity extends AppCompatActivity {
                     .child(mCurrentUserID).child(mChatUser).push();
             final String push_id = user_message_push.getKey();
 
-            StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
+            StorageReference filepath = mImageStorage.child("message_images").child(push_id + "" +
+                    ".jpg");
 
             // képet küldünk üzenetben
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask
+                    .TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
@@ -307,16 +306,16 @@ public class ChatActivity extends AppCompatActivity {
                         messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
                         messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
-
-                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                        mRootRef.updateChildren(messageUserMap, new DatabaseReference
+                                .CompletionListener() {
                             @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            public void onComplete(DatabaseError databaseError, DatabaseReference
+                                    databaseReference) {
                                 if (databaseError != null) {
                                     Log.d("ERROR", databaseError.getMessage());
                                 }
                             }
                         });
-
                     }
                 }
             });
@@ -325,14 +324,15 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadMoreMessages() {
 
-        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child(mChatUser);
+        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child
+                (mChatUser);
 
-        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(TOTAL_ITEMS_TO_LOAD);
+        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast
+                (TOTAL_ITEMS_TO_LOAD);
 
         messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
 
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
@@ -341,20 +341,15 @@ public class ChatActivity extends AppCompatActivity {
                 if (!mPrevKey.equals(messageKey)) {
 
                     messagesList.add(itemPos++, message);
-
                 } else {
 
                     mPrevKey = mLastKey;
-
                 }
-
 
                 if (itemPos == 1) {
 
                     mLastKey = messageKey;
-
                 }
-
 
                 mAdapter.notifyDataSetChanged();
 
@@ -385,16 +380,16 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void loadMessages() {
 
-        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child(mChatUser);
+        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child
+                (mChatUser);
         messageQuery = messageRef.limitToLast(10);
 
-        final DatabaseReference seenef = mRootRef.child("messages").child(mChatUser).child(mCurrentUserID);
-
+        final DatabaseReference seenef = mRootRef.child("messages").child(mChatUser).child
+                (mCurrentUserID);
 
         loadMessageChildEvent = new ChildEventListener() {
             public Messages message;
@@ -405,7 +400,6 @@ public class ChatActivity extends AppCompatActivity {
                 message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
                 message.setNodeKey(messageKey);
-
 
                 // a megnyitott üzenetnél oda tesszük h olvasott
                 //String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
@@ -419,12 +413,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 if (itemPos == 1) {
 
-
                     mLastKey = messageKey;
                     mPrevKey = messageKey;
-
                 }
-
 
                 messagesList.add(message);
                 loadSeenStatus();
@@ -434,7 +425,8 @@ public class ChatActivity extends AppCompatActivity {
                     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     // Vibrate for 500 milliseconds
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                        v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect
+                                .DEFAULT_AMPLITUDE));
                     } else {
                         //deprecated in API 26
                         v.vibrate(200);
@@ -448,7 +440,6 @@ public class ChatActivity extends AppCompatActivity {
                 //Toast.makeText(ChatActivity.this, "load_sima", Toast.LENGTH_SHORT).show();
 
                 mRefreshLayout.setRefreshing(false);
-
             }
 
             @Override
@@ -474,7 +465,6 @@ public class ChatActivity extends AppCompatActivity {
 
         // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük
         requestTorles();
-        openChatWindow = false;
 
         //messageQuery.addChildEventListener(loadMessageChildEvent);
 
@@ -487,7 +477,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String key = dataSnapshot.getKey();
-
 
                 NotificationType n = dataSnapshot.getValue(NotificationType.class);
                 if (n.getFrom().equals(mChatUser)) {
@@ -520,7 +509,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void chatOpening() {
-        // ez hozza létre az adatbátisban a "Chat" táblát ami leírja milyen csetek vannak nyitva , az üzenetek et a messges táblába tároljuk
+        // ez hozza létre az adatbátisban a "Chat" táblát ami leírja milyen csetek vannak nyitva
+        // , az üzenetek et a messges táblába tároljuk
         Map<String, Object> chatAddMap = new HashMap<String, Object>();
         chatAddMap.put("seen", false);
         chatAddMap.put("timestamp", ServerValue.TIMESTAMP);
@@ -531,7 +521,8 @@ public class ChatActivity extends AppCompatActivity {
 
         mRootRef.updateChildren(chatUserMap, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+            public void onComplete(DatabaseError databaseError, DatabaseReference
+                    databaseReference) {
                 if (databaseError != null) {
                     Log.d("ERROR", databaseError.getMessage());
                 }
@@ -542,14 +533,15 @@ public class ChatActivity extends AppCompatActivity {
     private void sendMessage() {
         chatOpening();
 
-        // csak akkor futtassuk le ha a másik user nem "online", vagyis ha meg van éppen nyitva a cset ablak akkor ne futtassunk értesítést.
+        // csak akkor futtassuk le ha a másik user nem "online", vagyis ha meg van éppen nyitva a
+        // cset ablak akkor ne futtassunk értesítést.
         mUsersRef.child(mChatUser).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-
                 if (dataSnapshot.child("chat_window_open").exists()) {
-                    // Log.d("FECO", "chat_windows_open: " + dataSnapshot.child("chat_window_open").getValue() + " mCurrent: " + mCurrentUserID);
+                    // Log.d("FECO", "chat_windows_open: " + dataSnapshot.child
+                    // ("chat_window_open").getValue() + " mCurrent: " + mCurrentUserID);
                     if (!dataSnapshot.child("chat_window_open").getValue().equals(mCurrentUserID)) {
                         chatNotification();
                     }
@@ -594,14 +586,13 @@ public class ChatActivity extends AppCompatActivity {
 
             mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                 @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                public void onComplete(DatabaseError databaseError, DatabaseReference
+                        databaseReference) {
                     if (databaseError != null) {
                         Log.d("ERROR", databaseError.getMessage());
                     }
                 }
             });
-
-
         }
     }
 
@@ -623,14 +614,14 @@ public class ChatActivity extends AppCompatActivity {
 
         mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+            public void onComplete(DatabaseError databaseError, DatabaseReference
+                    databaseReference) {
                 if (databaseError != null) {
-                    Toast.makeText(ChatActivity.this, "There was some error.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "There was some error.", Toast
+                            .LENGTH_SHORT).show();
                 }
-
             }
         });
-
     }
 
     @Override
@@ -639,13 +630,15 @@ public class ChatActivity extends AppCompatActivity {
         messagesList.clear();
         messageQuery.addChildEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).addChildEventListener(requestTorloEventListener);
-        openChatWindow = true;
+
         // chehck the user logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child
+                    ("Users").child(mAuth.getCurrentUser().getUid());
             mUserDatabase.child("online").setValue("true");
-            // a chat üzenet nyitva ablakban nem elég azt jelezni, hogy nyitva van az ablak, azt is jelezni kell, hogy éppen kinek az ablka van nyitva.
+            // a chat üzenet nyitva ablakban nem elég azt jelezni, hogy nyitva van az ablak, azt
+            // is jelezni kell, hogy éppen kinek az ablka van nyitva.
             mUserDatabase.child("chat_window_open").setValue(mChatUser);
         }
     }
@@ -653,8 +646,9 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        openChatWindow = true;
-        NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationManager nMgr = (NotificationManager) getSystemService(Context
+                .NOTIFICATION_SERVICE);
         nMgr.cancelAll();
     }
 
@@ -664,7 +658,8 @@ public class ChatActivity extends AppCompatActivity {
         // chehck the user logged in
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
-            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
+            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child
+                    ("Users").child(currentUser.getUid());
             mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
             mUserDatabase.child("chat_window_open").setValue("false");
         }
@@ -675,6 +670,22 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
         messageQuery.removeEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).removeEventListener(requestTorloEventListener);
+    }
 
+    private void initAppbarColor() {
+        // get color info from SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        int colorValue = sharedPref.getInt("color", 0);
+        if (colorValue != 0)
+            setAppBarColor(colorValue);
+    }
+
+    private void setAppBarColor(int color) {
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(color)); // set your desired color
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(color);
+            getWindow().setStatusBarColor(color);
+        }
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
@@ -14,6 +15,10 @@
     <item
         android:id="@+id/main_all_users"
         android:title="@string/all_users" />
+
+    <item
+        android:id="@+id/main_color_picker"
+        android:title="@string/color_picker" />
     <item
         android:id="@+id/main_logout_btn"
         android:title="@string/log_out" />

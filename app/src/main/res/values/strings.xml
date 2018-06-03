@@ -55,4 +55,6 @@
     <string name="an_hour_ago">an hour ago</string>
     <string name="yesterday">yesterday</string>
     <string name="days_ago">days ago</string>
+    <string name="delete_message">If you delete the conversation, this means you can not see anymore, but your partner can see. However the pictures will removing from the server.</string>
+    <string name="color_picker">Color Picker</string>
 </resources>

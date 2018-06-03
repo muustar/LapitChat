@@ -55,5 +55,6 @@
     <string name="an_hour_ago">egy órája</string>
     <string name="yesterday">tegnap</string>
     <string name="days_ago">nappal ezelőtt</string>
+    <string name="delete_message">A törölt beszélgetés a partnernél továbbra is látszik, habár a képek véglegesen törlésre kerülnek.</string>
 
 </resources>

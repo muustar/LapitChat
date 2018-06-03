@@ -60,8 +60,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="512da7" />
-                                      <entry key="foregroundImage" value="$USER_HOME$/Asztal/web_hi_res_512.png" />
+                                      <entry key="backgroundColor" value="2062af" />
+                                      <entry key="foregroundImage" value="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png" />
                                     </map>
                                   </option>
                                 </PersistentState>

@@ -1,6 +1,9 @@
 package com.muustar.feco.mychat;
 
 import android.app.Application;
+import android.content.Context;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +20,16 @@ import com.google.firebase.database.ValueEventListener;
 public class LapitChat extends Application {
     private DatabaseReference mUserDatabase;
     protected FirebaseAuth mAuth;
+
+    public void showKeyboard(View v){
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    public void hideKeyboard(View v){
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
 
     @Override
     public void onCreate() {

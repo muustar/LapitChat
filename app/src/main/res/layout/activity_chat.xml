@@ -3,19 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/myGrey"
     tools:context=".ChatActivity">
 
     <include
         android:id="@+id/chat_appbar"
-        layout="@layout/app_bar_layout"/>
+        layout="@layout/app_bar_layout" />
+
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/message_swipe_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/ll_bottom"
-        android:layout_below="@id/chat_appbar">
+        android:layout_below="@+id/chat_appbar"        >
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/message_list"

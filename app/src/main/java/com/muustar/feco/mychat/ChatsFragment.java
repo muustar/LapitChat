@@ -168,7 +168,7 @@ public class ChatsFragment extends Fragment {
 
 
                 // profil adatok betöltése, név, kép
-                usersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                usersRef.child(list_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User u;

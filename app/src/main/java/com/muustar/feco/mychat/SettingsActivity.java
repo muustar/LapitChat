@@ -64,7 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
     private StorageReference mProfileImagesRef;
 
     private CircleImageView mImage;
-    private TextView mDisplayname, mStatus, mDeleteProfile;
+    private TextView mDisplayname, mUserEmailAddress, mStatus, mDeleteProfile;
     private EditText mNewDisplayName;
     private RelativeLayout mBackground;
     private Button mChangeImageBtn, mChangeStatusBtn;
@@ -83,6 +83,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         mDisplayname = findViewById(R.id.settings_displayname);
+        mUserEmailAddress = findViewById(R.id.settings_emailaddress);
         mStatus = findViewById(R.id.settings_status);
         mChangeImageBtn = findViewById(R.id.settings_changeImage);
         mChangeStatusBtn = findViewById(R.id.settings_changeStatus);
@@ -95,6 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
+        mUserEmailAddress.setText(mCurrentUser.getEmail());
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
         mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van beállítás a LapitChat.java fájlban és a manifestben.
         mProfileImagesRef = FirebaseStorage.getInstance().getReference().child("profile_images");
