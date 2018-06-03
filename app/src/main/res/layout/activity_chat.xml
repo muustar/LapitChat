@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/myGrey"
     tools:context=".ChatActivity">
 
@@ -17,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/ll_bottom"
-        android:layout_below="@+id/chat_appbar"        >
+        android:layout_below="@+id/chat_appbar">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/message_list"

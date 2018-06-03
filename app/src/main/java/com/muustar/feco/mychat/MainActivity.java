@@ -3,13 +3,16 @@ package com.muustar.feco.mychat;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -29,6 +32,7 @@ import java.util.Map;
 import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "FECO";
     private Toolbar mToolbar;
 
     private ViewPager mViewPager;
@@ -40,11 +44,28 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mDynamicMenuItem;
     private boolean isVisible = false;
 
+    private Constant constant;
+    private int mAppColor;
+    private int mAppTheme;
+    private Methods methods;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        mAppColor = sharedPref.getInt("color", -1);
+        mAppTheme = sharedPref.getInt("theme", -1);
+        constant.color = mAppColor;
+
+        if (mAppTheme == -1) {
+            setTheme(Constant.theme);
+        } else {
+            setTheme(mAppTheme);
+        }
+
+        setContentView(R.layout.activity_main);
+        methods = new Methods();
 
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
@@ -54,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Lapit Chat");
-
 
         // Tabs
         mViewPager = findViewById(R.id.main_tabPager);
@@ -85,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        initAppbarColor();
+        //initAppbarColor();
     }
 
     @Override
@@ -234,7 +254,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChooseColor(int position, int color) {
                 saveColor(position, color);
-                setAppBarColor(position, color);
             }
 
             @Override
@@ -248,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
         // get color info from SharedPreferences
         SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
         int colorValue = sharedPref.getInt("color", 0);
+
         if (colorValue != 0)
             setAppBarColor(0, colorValue);
     }
@@ -258,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setBackgroundDrawable(new ColorDrawable(color)); // set your desired color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setNavigationBarColor(color);
+
             getWindow().setStatusBarColor(color);
         }
     }
@@ -265,8 +286,15 @@ public class MainActivity extends AppCompatActivity {
     private void saveColor(int position, int color) {
         SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("position",position);
-        editor.putInt("color", color);
-        editor.apply();
+        Constant.color = color;
+        methods.setColorTheme();
+        editor.putInt("position", position);
+        editor.putInt("color", Constant.color);
+        editor.putInt("theme", Constant.theme);
+        editor.commit();
+        setTheme(Constant.theme);
+
+        Log.d(TAG, "saveColor: called " + constant.theme);
+        setAppBarColor(position, color);
     }
 }

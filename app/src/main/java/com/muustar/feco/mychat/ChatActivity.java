@@ -94,6 +94,18 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        int mAppTheme = sharedPref.getInt("theme", -1);
+        int mColorValue = sharedPref.getInt("color",0);
+        int colorPosition = sharedPref.getInt("position",0);
+
+        if (mAppTheme == -1) {
+            setTheme(Constant.theme);
+        } else {
+            setTheme(mAppTheme);
+        }
+
         setContentView(R.layout.activity_chat);
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -119,13 +131,8 @@ public class ChatActivity extends AppCompatActivity {
         mMessageList.setHasFixedSize(true);
         mMessageList.setLayoutManager(mLinearLayout);
 
-        // get color info from SharedPreferences
-        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
-        int colorPosition = sharedPref.getInt("position", 0);
-        if (colorPosition != 0) {
-            colorMyChat = colorPosition;
-        }
-        mAdapter = new MessageAdapter(messagesList, colorMyChat);
+
+        mAdapter = new MessageAdapter(messagesList, colorPosition);
         mMessageList.setAdapter(mAdapter);
 
         loadMessages();
@@ -135,6 +142,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatToolbar = findViewById(R.id.chat_appbar);
         setSupportActionBar(mChatToolbar);
         ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(mColorValue)); // set your desired color
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
@@ -233,7 +241,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        initAppbarColor();
+
     }
 
     private void loadSeenStatus() {
@@ -672,20 +680,5 @@ public class ChatActivity extends AppCompatActivity {
         mNotifyRef.child(mCurrentUserID).removeEventListener(requestTorloEventListener);
     }
 
-    private void initAppbarColor() {
-        // get color info from SharedPreferences
-        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
-        int colorValue = sharedPref.getInt("color", 0);
-        if (colorValue != 0)
-            setAppBarColor(colorValue);
-    }
 
-    private void setAppBarColor(int color) {
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(color)); // set your desired color
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setNavigationBarColor(color);
-            getWindow().setStatusBarColor(color);
-        }
-    }
 }

@@ -87,12 +87,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
 
     private int getBgDependsColor(int color) {
-        Log.d(TAG, "getBgDependsColor: szin-"+color);
-        Log.d(TAG, "getBgDependsColor: R.color.color1 "+R.color.color1);
-
-
         switch (color) {
-
             case 0:
                 return R.drawable.message_text_background_color1;
             case 1:
