@@ -1,6 +1,8 @@
 package com.muustar.feco.mychat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +45,16 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        int mAppTheme = sharedPref.getInt("theme", -1);
+        int mColorValue = sharedPref.getInt("color",0);
+        int colorPosition = sharedPref.getInt("position",0);
+
+        if (mAppTheme == -1) {
+            setTheme(Constant.theme);
+        } else {
+            setTheme(mAppTheme);
+        }
         setContentView(R.layout.activity_register);
 
         funnyStringInicializalas();
