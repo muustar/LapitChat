@@ -52,19 +52,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
-        mAppColor = sharedPref.getInt("color", -1);
-        mAppTheme = sharedPref.getInt("theme", -1);
-        constant.color = mAppColor;
-
-        if (mAppTheme == -1) {
-            setTheme(Constant.theme);
-        } else {
-            setTheme(mAppTheme);
-        }
-
+        setTheme(Constant.mAppTheme);
         setContentView(R.layout.activity_main);
+
         methods = new Methods();
 
         mAuth = FirebaseAuth.getInstance();
@@ -74,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         }
         mToolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Lapit Chat");
 
         // Tabs
         mViewPager = findViewById(R.id.main_tabPager);
@@ -105,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        //initAppbarColor();
     }
 
     @Override
@@ -209,13 +197,22 @@ public class MainActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.main_logout_btn) {
 
-            // kilogoláskor a devicetokent töröljük
+            // töröljük a sharedpreferences beállításokat
+            SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.clear();
+            editor.apply();
 
+            // kilogoláskor a devicetokent töröljük
             Map tokenMap = new HashMap();
             tokenMap.put("device_token", null);
             mUserDatabase.updateChildren(tokenMap);
             FirebaseAuth.getInstance().signOut();
-            sendToStart();
+
+            //vissza dobjuk a splash screenre
+            Intent startIntent = new Intent(MainActivity.this, SplashSreenActivity.class);
+            startActivity(startIntent);
+            finish();
 
             // if (mAuth.getCurrentUser() == null) {
             //   sendToStart();
@@ -254,6 +251,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChooseColor(int position, int color) {
                 saveColor(position, color);
+                Intent restartIntent = new Intent(MainActivity.this, SplashSreenActivity.class);
+                startActivity(restartIntent);
+                finish();
             }
 
             @Override
@@ -263,38 +263,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void initAppbarColor() {
-        // get color info from SharedPreferences
-        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
-        int colorValue = sharedPref.getInt("color", 0);
-
-        if (colorValue != 0)
-            setAppBarColor(0, colorValue);
-    }
-
-    private void setAppBarColor(int position, int color) {
-        mTabLayout.setBackgroundColor(color);
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(color)); // set your desired color
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setNavigationBarColor(color);
-
-            getWindow().setStatusBarColor(color);
-        }
-    }
-
     private void saveColor(int position, int color) {
         SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        Constant.color = color;
+        Constant.mColorValue = color;
         methods.setColorTheme();
         editor.putInt("position", position);
-        editor.putInt("color", Constant.color);
-        editor.putInt("theme", Constant.theme);
+        editor.putInt("color", color);
+        editor.putInt("theme", Constant.mAppTheme);
         editor.commit();
-        setTheme(Constant.theme);
 
-        Log.d(TAG, "saveColor: called " + constant.theme);
-        setAppBarColor(position, color);
     }
 }

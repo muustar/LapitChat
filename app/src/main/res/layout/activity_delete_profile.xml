@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:text="@string/delete_profile"
             android:layout_centerHorizontal="true"
-            android:background="@color/colorAccent"
+            android:background="?attr/colorAccent"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:textColor="@android:color/white"

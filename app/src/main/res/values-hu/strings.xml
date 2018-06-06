@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">My Chat</string>
+    <string name="app_name">Plinng</string>
     <string name="welcome_to_lapit_chat_app">Üdvözöl a My Chat</string>
     <string name="this_is_main_page">Ez a kezdőlap</string>
     <string name="need_a_new_account">Új fiókot szeretnék</string>
@@ -56,5 +56,9 @@
     <string name="yesterday">tegnap</string>
     <string name="days_ago">nappal ezelőtt</string>
     <string name="delete_message">A törölt beszélgetés a partnernél továbbra is látszik, habár a képek véglegesen törlésre kerülnek.</string>
+    <string name="color_picker">Színválasztó</string>
+    <string name="dummy_content">Plinng</string>
+    <string name="the_sound_what_are_you_waiting_for">- a hang amire vársz</string>
+
 
 </resources>

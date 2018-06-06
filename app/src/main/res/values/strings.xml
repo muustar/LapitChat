@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Chat</string>
+    <string name="app_name">Plinng</string>
     <string name="welcome_to_lapit_chat_app">Welcome to Lapit Chat App</string>
     <string name="this_is_main_page">This is main page</string>
     <string name="need_a_new_account">Need a New Account</string>
@@ -57,4 +57,6 @@
     <string name="days_ago">days ago</string>
     <string name="delete_message">If you delete the conversation, this means you can not see anymore, but your partner can see. However the pictures will removing from the server.</string>
     <string name="color_picker">Color Picker</string>
+    <string name="dummy_content">Plinng Chat</string>
+    <string name="the_sound_what_are_you_waiting_for">- the sound what are you waiting for</string>
 </resources>

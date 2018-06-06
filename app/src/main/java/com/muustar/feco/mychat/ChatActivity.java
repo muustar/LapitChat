@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -94,7 +95,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        /*
         SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
         int mAppTheme = sharedPref.getInt("theme", -1);
         int mColorValue = sharedPref.getInt("color",0);
@@ -105,6 +106,10 @@ public class ChatActivity extends AppCompatActivity {
         } else {
             setTheme(mAppTheme);
         }
+        */
+        int colorPosition = Constant.mColorPosition;
+        int mColorValue = Constant.mColorValue;
+        setTheme(Constant.mAppTheme);
 
         setContentView(R.layout.activity_chat);
 
@@ -142,8 +147,6 @@ public class ChatActivity extends AppCompatActivity {
         mChatToolbar = findViewById(R.id.chat_appbar);
         setSupportActionBar(mChatToolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(mColorValue)); // set your desired color
-
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         //actionBar.setTitle(mChatUserName);
@@ -394,7 +397,7 @@ public class ChatActivity extends AppCompatActivity {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child
                 (mChatUser);
-        messageQuery = messageRef.limitToLast(10);
+        messageQuery = messageRef.limitToLast(30);
 
         final DatabaseReference seenef = mRootRef.child("messages").child(mChatUser).child
                 (mCurrentUserID);
