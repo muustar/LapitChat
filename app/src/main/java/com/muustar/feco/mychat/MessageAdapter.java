@@ -143,7 +143,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (mMessageList.get(position).getType().equals("image")) {
             myChatViewHolder.imageMessage.setVisibility(View.VISIBLE);
             myChatViewHolder.messageText.setVisibility(View.GONE);
-            myChatViewHolder.imageMessage.setBackgroundResource(getBgDependsColor(color));
+            //myChatViewHolder.imageMessage.setBackgroundResource(getBgDependsColor(color));
 
             final String imgUrl = mMessageList.get(position).getMessage();
             myChatViewHolder.setImageMessage(ctx, imgUrl);
@@ -162,7 +162,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else {
             myChatViewHolder.imageMessage.setVisibility(View.GONE);
             myChatViewHolder.messageText.setVisibility(View.VISIBLE);
-            myChatViewHolder.messageText.setBackgroundResource(getBgDependsColor(color));
+            //myChatViewHolder.messageText.setBackgroundResource(getBgDependsColor(color));
             myChatViewHolder.messageText.setText(mMessageList.get(position).getMessage());
         }
 

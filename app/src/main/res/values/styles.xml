@@ -32,6 +32,7 @@
         <item name="colorPrimary">@color/colorPrimary1</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark1</item>
         <item name="colorAccent">@color/colorAccent1</item>
+        <item name="color">@color/textColor1</item>
 
         <!-- This is the styling for action bar -->
         <item name="android:actionBarStyle">@style/MyActionBar</item>
@@ -61,6 +62,7 @@
         <item name="colorPrimary">@color/colorPrimary2</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark2</item>
         <item name="colorAccent">@color/colorAccent2</item>
+        <item name="color">@color/textColor2</item>
 
         <!-- This is the styling for action bar -->
         <item name="android:actionBarStyle">@style/MyActionBar</item>
@@ -85,6 +87,7 @@
         <item name="colorPrimary">@color/colorPrimary3</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark3</item>
         <item name="colorAccent">@color/colorAccent3</item>
+        <item name="color">@color/textColor3</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme3.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -107,6 +110,7 @@
         <item name="colorPrimary">@color/colorPrimary4</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark4</item>
         <item name="colorAccent">@color/colorAccent4</item>
+        <item name="color">@color/textColor4</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme4.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -129,6 +133,7 @@
         <item name="colorPrimary">@color/colorPrimary5</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark5</item>
         <item name="colorAccent">@color/colorAccent5</item>
+        <item name="color">@color/textColor5</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme5.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -151,6 +156,7 @@
         <item name="colorPrimary">@color/colorPrimary6</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark6</item>
         <item name="colorAccent">@color/colorAccent6</item>
+        <item name="color">@color/textColor6</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme6.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -173,6 +179,7 @@
         <item name="colorPrimary">@color/colorPrimary7</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark7</item>
         <item name="colorAccent">@color/colorAccent7</item>
+        <item name="color">@color/textColor7</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme7.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -195,6 +202,7 @@
         <item name="colorPrimary">@color/colorPrimary8</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark8</item>
         <item name="colorAccent">@color/colorAccent8</item>
+        <item name="color">@color/textColor8</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme8.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -216,6 +224,7 @@
         <item name="colorPrimary">@color/colorPrimary9</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark9</item>
         <item name="colorAccent">@color/colorAccent9</item>
+        <item name="color">@color/textColor9</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme9.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -238,6 +247,7 @@
         <item name="colorPrimary">@color/colorPrimary10</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark10</item>
         <item name="colorAccent">@color/colorAccent10</item>
+        <item name="color">@color/textColor10</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme10.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -260,6 +270,7 @@
         <item name="colorPrimary">@color/colorPrimary11</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark11</item>
         <item name="colorAccent">@color/colorAccent11</item>
+        <item name="color">@color/textColor11</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme11.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -281,6 +292,7 @@
         <item name="colorPrimary">@color/colorPrimary12</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark12</item>
         <item name="colorAccent">@color/colorAccent12</item>
+        <item name="color">@color/textColor12</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme12.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -303,6 +315,7 @@
         <item name="colorPrimary">@color/colorPrimary13</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark13</item>
         <item name="colorAccent">@color/colorAccent13</item>
+        <item name="color">@color/textColor13</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme13.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -325,6 +338,7 @@
         <item name="colorPrimary">@color/colorPrimary14</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark14</item>
         <item name="colorAccent">@color/colorAccent14</item>
+        <item name="color">@color/textColor14</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme14.MenuTextStyle</item>
         <!--To change the background of options menu-->
@@ -347,6 +361,7 @@
         <item name="colorPrimary">@color/colorPrimary15</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark15</item>
         <item name="colorAccent">@color/colorAccent15</item>
+        <item name="color">@color/textColor15</item>
         <!--To change the text styling of options menu items</item>-->
         <item name="android:itemTextAppearance">@style/MyTheme15.MenuTextStyle</item>
         <!--To change the background of options menu-->
