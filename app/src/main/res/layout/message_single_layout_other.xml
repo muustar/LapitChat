@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="5dp"
-
+                android:autoLink="all"
                 android:background="@drawable/message_text_bgwhite"
                 android:padding="10dp"
                 android:text="TextView"
