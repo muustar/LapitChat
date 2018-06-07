@@ -137,6 +137,13 @@ public class RequestsFragment extends Fragment {
                                 startActivity(openChat);
                                 break;
 
+                            case "update":
+                                //töröljük és ugrunk a csetre
+                                Intent updateIntent = new Intent(ctx, UpdateActivity.class);
+                                updateIntent.putExtra("text", model.getText());
+                                startActivity(updateIntent);
+                                break;
+
                         }
                     }
                 });

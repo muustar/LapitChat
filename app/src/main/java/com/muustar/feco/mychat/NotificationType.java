@@ -5,7 +5,7 @@ package com.muustar.feco.mychat;
  * 2018.05.17.
  */
 public class NotificationType {
-    private String from, type;
+    private String from, type, text;
     private Boolean seen;
     private long timestamp;
 
@@ -16,6 +16,22 @@ public class NotificationType {
         this.type = type;
         this.seen = seen;
         this.timestamp = timestamp;
+    }
+
+    public NotificationType(String from, String type, Boolean seen, long timestamp, String text) {
+        this.from = from;
+        this.type = type;
+        this.seen = seen;
+        this.timestamp = timestamp;
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public Boolean getSeen() {

@@ -20,6 +20,10 @@
         android:id="@+id/main_color_picker"
         android:title="@string/color_picker" />
     <item
+        android:id="@+id/main_admin"
+        android:title="@string/admin"
+        android:visible="false"/>
+    <item
         android:id="@+id/main_logout_btn"
         android:title="@string/log_out" />
 </menu>

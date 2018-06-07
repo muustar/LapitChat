@@ -39,7 +39,11 @@
         </service>
 
         <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="lapitchat_TARGET_UPDATE" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity android:name=".StartActivity" />
         <activity
@@ -81,8 +85,8 @@
             android:parentActivityName=".SettingsActivity" />
         <activity
             android:name=".SplashSreenActivity"
-            android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -90,6 +94,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AdminActivity"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".UpdateActivity"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

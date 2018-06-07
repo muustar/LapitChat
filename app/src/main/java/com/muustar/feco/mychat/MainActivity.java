@@ -3,16 +3,12 @@ package com.muustar.feco.mychat;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -41,12 +37,10 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mUserDatabase, mNotifyDatabase;
-    private MenuItem mDynamicMenuItem;
+    private MenuItem mClearAllMenu, mAdminMenu;
     private boolean isVisible = false;
+    private Boolean mCurrentUserIsAdmin = false;
 
-    private Constant constant;
-    private int mAppColor;
-    private int mAppTheme;
     private Methods methods;
 
     @Override
@@ -61,6 +55,21 @@ public class MainActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
                     (mAuth.getCurrentUser().getUid());
+            mUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.hasChild("admin")) {
+                        if ((Boolean) dataSnapshot.child("admin").getValue()) {
+                            mCurrentUserIsAdmin = true;
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
         mToolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
@@ -176,9 +185,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT > 11) {
 
-            mDynamicMenuItem.setVisible(isVisible);
+            mAdminMenu.setVisible(mCurrentUserIsAdmin);
+            mClearAllMenu.setVisible(isVisible);
             invalidateOptionsMenu();
-            //menu.findItem(R.id.main_logout_btn).setVisible(true);
+
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -187,8 +197,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.request_menu, menu);
-        mDynamicMenuItem = menu.findItem(R.id.request_clear);
-        mDynamicMenuItem.setVisible(false);
+        mClearAllMenu = menu.findItem(R.id.request_clear);
+        mClearAllMenu.setVisible(false);
+
+        mAdminMenu = menu.findItem(R.id.main_admin);
+        mAdminMenu.setVisible(false);
         return true;
     }
 
@@ -234,10 +247,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (item.getItemId() == R.id.request_clear) {
             mNotifyDatabase.removeValue();
+            return true;
         }
 
         if (item.getItemId() == R.id.main_color_picker) {
             colorPicker();
+            return true;
+        }
+        if (item.getItemId() == R.id.main_admin) {
+            Intent adminIntent = new Intent(MainActivity.this, AdminActivity.class);
+            startActivity(adminIntent);
+            return true;
         }
         return false;
     }
@@ -272,6 +292,5 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("color", color);
         editor.putInt("theme", Constant.mAppTheme);
         editor.commit();
-
     }
 }

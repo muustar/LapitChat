@@ -59,4 +59,8 @@
     <string name="color_picker">Color Picker</string>
     <string name="dummy_content">Plinng Chat</string>
     <string name="the_sound_what_are_you_waiting_for">- the sound what are you waiting for</string>
+    <string name="send">Send</string>
+    <string name="here_you_can_sen_notifications_for_everyone_please_be_careful">Here you can send notifications for everyone, please be careful</string>
+    <string name="send_notification">Send Notification</string>
+    <string name="admin">Admin</string>
 </resources>

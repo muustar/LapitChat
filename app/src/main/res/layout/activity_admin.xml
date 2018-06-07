@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    tools:context=".AdminActivity">
+
+    <include
+        android:id="@+id/admin_appbar"
+        layout="@layout/app_bar_layout" />
+
+
+    <RelativeLayout
+        android:id="@+id/admin_rl"
+        android:layout_below="@id/admin_appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp">
+
+
+        <TextView
+            android:id="@+id/admin_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="17sp"
+            android:text="@string/here_you_can_sen_notifications_for_everyone_please_be_careful"
+            android:layout_marginBottom="15dp"/>
+
+        <EditText
+            android:id="@+id/admin_message"
+            android:layout_below="@id/admin_info_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/send_notification"
+            />
+
+        <Button
+            android:id="@+id/admin_send_btn"
+            android:layout_below="@id/admin_message"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentRight="true"
+            android:background="?attr/colorPrimaryDark"
+            android:text="@string/send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+</RelativeLayout>

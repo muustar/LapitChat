@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    tools:context=".UpdateActivity">
+
+    <include
+        android:id="@+id/update_appbar"
+        layout="@layout/app_bar_layout" />
+
+    <RelativeLayout
+        android:id="@+id/update_rl"
+        android:layout_below="@id/update_appbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp">
+
+
+
+    <TextView
+        android:id="@+id/updateInfo"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:autoLink="all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="The avaiable update is downloadable from this link"/>
+
+    <TextView
+        android:id="@+id/updateText"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/updateInfo"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:textSize="24sp"
+        android:autoLink="all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="szoveg"/>
+    </RelativeLayout>
+
+</RelativeLayout>

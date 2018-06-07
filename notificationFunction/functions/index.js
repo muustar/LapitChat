@@ -24,12 +24,12 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 
 			//console.log('a seen erteke: ', seen);
 			if (!seen){
-				
-			
+
+
 				const userQuery = admin.database().ref(`/Users/${from_user_id}`).once('value');
 				const deviceToken = admin.database().ref(`/Users/${userId}/device_token`).once('value');
-				
-				
+
+
 
 				return Promise.all([userQuery, deviceToken]).then(result =>{
 
@@ -40,35 +40,42 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 
 					var type = "";
 					var action="";
+					var extraText="";
 
 					if ( notify_type === 'new_message'){
-						type = "New Message";
+						type = "Új üzenet";
 						action = "lapitchat_TARGET_CHAT";
+						extraText = `${from_user_name} küldött neked egy új üzenetet.`;
 						//console.log('new message ag lefutott',type);
-						
-					}else{
-						type = "Friend Request";
+
+					}else if (notify_type === 'friend_request') {
+						type = "Barát jelölés";
 						action ="lapitchat_TARGET_FRIENDS";
+						extraText = `${from_user_name} bejelölt téged barátnak.`;
 						//console.log('new message ELSE ag lefutott');
-						
+
+					}else if (notify_type === 'update') {
+						type = "Frissítés";
+						action = "lapitchat_TARGET_UPDATE";
+						extraText = `Frissítés vált elérhetővé`;
 					}
 
 					const payload = {
 							notification: {
 								title: `${type}`,
-								body: `${from_user_name} has sent you a ${type}`,
+								body: extraText,
 								icon: "notify_icon",
 								click_action: `${action}`,
 								sound: "light",
-								vibrate: "ture"
+								vibrate: "true"
 							},
 							data: {
 								uid: from_user_id,
 								type: notify_type,
 								name: from_user_name,
 								img: from_user_img,
-								"ledColor": "[0, 0, 255, 0]",
-								"vibrationPattern": "[2000, 1000, 500, 500]"
+								ledColor: "[0, 0, 255, 0]",
+								vibrationPattern: "[2000, 1000, 500, 500]"
 							}
 						};
 

@@ -59,6 +59,8 @@
     <string name="color_picker">Színválasztó</string>
     <string name="dummy_content">Plinng</string>
     <string name="the_sound_what_are_you_waiting_for">- a hang amire vársz</string>
-
+    <string name="send">Küldés</string>
+    <string name="here_you_can_sen_notifications_for_everyone_please_be_careful">Ezen a képernyőn tudsz értesítést küldeni minden felhazsnálónak</string>
+    <string name="send_notification">Értesítés küldése</string>
 
 </resources>
