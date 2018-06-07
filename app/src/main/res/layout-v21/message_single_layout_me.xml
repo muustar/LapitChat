@@ -31,7 +31,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginStart="5dp"
             android:autoLink="all"
-            android:background="@drawable/message_text_background_kitkat"
+            android:background="@drawable/message_text_background"
             android:padding="10dp"
             android:text="ffd   ddfl khslh lkhs khklh lhk"
             android:textColor="@android:color/white"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:padding="10dp"
-            android:background="@drawable/message_text_background_kitkat"
+            android:background="@drawable/message_text_background"
             android:scaleType="fitCenter"
             android:visibility="gone"
             tools:ignore="ContentDescription" />

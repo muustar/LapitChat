@@ -81,7 +81,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 viewHolder = new OtherChatViewHolder(viewChatOther);
                 break;
         }
-        Fresco.initialize(ctx);
+
         return viewHolder;
     }
 

@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 import java.util.ArrayList;
 
 public class SplashSreenActivity extends AppCompatActivity {
@@ -36,6 +38,7 @@ public class SplashSreenActivity extends AppCompatActivity {
 
         setTheme(constant.mAppTheme);
 
+        Fresco.initialize(this);
         setContentView(R.layout.activity_splash_sreen);
         mFrame = findViewById(R.id.frame);
         mFrame.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
