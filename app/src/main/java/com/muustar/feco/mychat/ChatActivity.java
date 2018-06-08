@@ -480,7 +480,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages m = dataSnapshot.getValue(Messages.class);
-                if (!m.getSeen() && isVibrate) {
+                if (!m.getSeen() && isVibrate && (m.getFrom() != mCurrentUserID)) {
                     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     // Vibrate for 500 milliseconds
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -513,6 +513,7 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         };
+        mMessagesRef.child(mCurrentUserID).child(mChatUser).addChildEventListener(vibrateChildEventListener);
     }
 
     private void requestTorles() {
@@ -600,6 +601,7 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
 
+
             Map<String, Object> messageUserMap = new HashMap<String, Object>();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
@@ -686,7 +688,7 @@ public class ChatActivity extends AppCompatActivity {
         messagesList.clear();
         messageQuery.addChildEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).addChildEventListener(requestTorloEventListener);
-        mMessagesRef.child(mCurrentUserID).child(mChatUser).addChildEventListener(vibrateChildEventListener);
+
 
         // chehck the user logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
