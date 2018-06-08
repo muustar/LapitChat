@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Plinng</string>
-    <string name="welcome_to_lapit_chat_app">Üdvözöl a My Chat</string>
+    <string name="welcome_to_lapit_chat_app">Üdvözöl a Plinng chat</string>
     <string name="this_is_main_page">Ez a kezdőlap</string>
     <string name="need_a_new_account">Új fiókot szeretnék</string>
     <string name="displayname">Megjelenő Név</string>
@@ -67,5 +67,9 @@
     <string name="sent_a_new_message">Új üzenet</string>
     <string name="vibrate_at_new_message">Vibrálás új üzenetnél</string>
     <string name="the_avaiable_update_is_downloadable_from_this_link">A letöltés az alábbi linken elérhető</string>
+    <string name="need_a_new_password">Új jelszót kérek</string>
+    <string name="new_password_request">Új jelszó igénylés</string>
+    <string name="write_your_email_address_again">Add meg az email címed újra. Az új jelszó igénylése után kapni fogsz egy emailt benne egy linkkel melyen keresztül meg tudod változtatni a jelszavad.</string>
+
 
 </resources>

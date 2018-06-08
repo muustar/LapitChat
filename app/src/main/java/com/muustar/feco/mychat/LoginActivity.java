@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
+    private TextView mNewPasswd;
 
     private DatabaseReference mUsersDatabase;
 
@@ -61,6 +63,20 @@ public class LoginActivity extends AppCompatActivity {
         mEmail = (TextInputLayout) findViewById(R.id.login_email);
         mPassword = (TextInputLayout) findViewById(R.id.login_password);
         mLogin = (Button) findViewById(R.id.login_loginBtn);
+        mNewPasswd = findViewById(R.id.login_newpassword);
+
+        mNewPasswd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newPasswordIntent = new Intent(LoginActivity.this,ReqNewPasswordActivity.class);
+                String emailAddress = mEmail.getEditText().getText().toString().trim();
+                if (!TextUtils.isEmpty(emailAddress)){
+                    newPasswordIntent.putExtra("email", emailAddress);
+                }
+                startActivity(newPasswordIntent);
+
+            }
+        });
 
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override

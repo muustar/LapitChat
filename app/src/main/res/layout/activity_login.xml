@@ -12,20 +12,21 @@
         layout="@layout/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     <ProgressBar
         android:id="@+id/login_progressbar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/login_toolbar"
         android:indeterminate="true"
-        android:visibility="invisible"
-        android:layout_below="@id/login_toolbar"/>
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/title"
-        android:layout_below="@id/login_toolbar"
         android:layout_width="wrap_content"
         android:layout_height="27dp"
+        android:layout_below="@id/login_toolbar"
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
         android:text="@string/login_to_the_account"
@@ -34,18 +35,18 @@
         android:textStyle="bold" />
 
     <RelativeLayout
-        android:layout_marginTop="24dp"
         android:id="@+id/rl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title">
+        android:layout_below="@id/title"
+        android:layout_marginTop="0dp">
 
         <ImageView
-            android:layout_margin="16dp"
             android:layout_width="match_parent"
             android:layout_height="130dp"
-            android:background="@android:color/white"
-            android:alpha="0.7"/>
+            android:layout_margin="16dp"
+            android:alpha="0.0"
+            android:background="@android:color/white" />
 
 
         <android.support.design.widget.TextInputLayout
@@ -55,6 +56,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp">
+
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/login_emaildet"
                 android:layout_width="match_parent"
@@ -65,12 +67,13 @@
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/login_password"
-            android:layout_below="@id/login_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/login_email"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp">
+
             <android.support.design.widget.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,12 +82,24 @@
         </android.support.design.widget.TextInputLayout>
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/login_loginBtn"
-        android:layout_below="@id/rl"
-        android:layout_alignParentRight="true"
+    <TextView
+        android:id="@+id/login_newpassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/rl"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_toStartOf="@+id/login_loginBtn"
+        android:text="@string/need_a_new_password"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/login_loginBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/rl"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:background="@color/colorAccent"
@@ -93,8 +108,6 @@
         android:text="@string/login"
         android:textAllCaps="false"
         android:textColor="@android:color/white" />
-
-
 
 
 </RelativeLayout>
