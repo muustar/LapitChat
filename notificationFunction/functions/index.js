@@ -48,6 +48,7 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 					var extraText="";
 					var megjelenitettUzenet="";
 					var color = '#2062af';
+					var text = "";
 
 					if ( notify_type === 'new_message'){
 						type = "Új üzenet";
@@ -55,7 +56,6 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 						extraText = `${from_user_name} küldött neked egy új üzenetet.`;
 						megjelenitettUzenet = `${message}`;
 						//console.log('new message ag lefutott',type);
-
 					}else if ( notify_type === 'new_image'){
 						type = "Új üzenet";
 						action = "lapitchat_TARGET_CHAT";
@@ -74,6 +74,7 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 						type = "Frissítés";
 						action = "lapitchat_TARGET_UPDATE";
 						extraText = `Frissítés vált elérhetővé`;
+						text = `${message}`;
 						color = '#f44d28';
 					}
 
@@ -91,6 +92,7 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
 							data: {
 								uid: from_user_id,
 								type: notify_type,
+								text: `${text}`,
 								name: from_user_name,
 								tag: `${from_user_id}`,
 								img: from_user_img,

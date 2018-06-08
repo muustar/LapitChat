@@ -98,8 +98,13 @@
             android:name=".AdminActivity"
             android:parentActivityName=".MainActivity"></activity>
         <activity
-            android:name=".UpdateActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:name=".UpdateActivity">
+            <intent-filter>
+                <action android:name="lapitchat_TARGET_UPDATE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

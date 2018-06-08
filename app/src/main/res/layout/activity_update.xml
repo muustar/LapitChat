@@ -27,7 +27,7 @@
         android:autoLink="all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="The avaiable update is downloadable from this link"/>
+        android:text="@string/the_avaiable_update_is_downloadable_from_this_link"/>
 
     <TextView
         android:id="@+id/updateText"

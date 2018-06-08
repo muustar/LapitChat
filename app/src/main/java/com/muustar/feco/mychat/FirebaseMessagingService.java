@@ -37,6 +37,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String from_user_id = remoteMessage.getData().get("uid");
         String name = remoteMessage.getData().get("name");
         String img = remoteMessage.getData().get("img");
+        String text = remoteMessage.getData().get("text");
 
         //Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -62,6 +63,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         resultIntent.putExtra("name", name);
         resultIntent.putExtra("img", img);
         resultIntent.putExtra("tag", tag);
+        resultIntent.putExtra("text",text);
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(

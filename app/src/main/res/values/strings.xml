@@ -66,4 +66,5 @@
     <string name="wanna_be_your_friend">Wanna be your friend</string>
     <string name="sent_a_new_message">Sent a new message</string>
     <string name="vibrate_at_new_message">Vibrate at new message</string>
+    <string name="the_avaiable_update_is_downloadable_from_this_link">The avaiable update is downloadable from this link</string>
 </resources>
