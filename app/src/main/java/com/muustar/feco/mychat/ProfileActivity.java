@@ -56,12 +56,17 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference mRootRef;
 
     private long total_friends;
-
+    private SharedPreferences mSharedPref;
+    private Constant constant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Constant.mAppTheme);
+        mSharedPref = getSharedPreferences("colorInfo", MODE_PRIVATE);
+        constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
+        constant.mColorValue = mSharedPref.getInt("color", constant.color);
+        constant.mColorPosition = mSharedPref.getInt("position", 0);
+        setTheme(constant.mAppTheme);
         setContentView(R.layout.activity_profile);
 
 

@@ -62,5 +62,8 @@
     <string name="send">Küldés</string>
     <string name="here_you_can_sen_notifications_for_everyone_please_be_careful">Ezen a képernyőn tudsz értesítést küldeni minden felhazsnálónak</string>
     <string name="send_notification">Értesítés küldése</string>
+    <string name="admin">Admin</string>
+    <string name="wanna_be_your_friend">Barát jelölés</string>
+    <string name="sent_a_new_message">Új üzenet</string>
 
 </resources>

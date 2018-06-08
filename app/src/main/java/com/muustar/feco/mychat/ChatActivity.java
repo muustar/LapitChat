@@ -51,11 +51,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToDoubleBiFunction;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
-    private static final String TAG = "ChatActivity";
+    private static final String TAG = "FECO";
     private static final int GALLERY_PICK_REQ = 4;
     private Toolbar mChatToolbar;
     private TextView mTitle;
@@ -91,22 +92,16 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mNotifyRef;
     private DatabaseReference mMessagesRef;
     private int colorMyChat;
+    private Constant constant;
+    private String mNotificationTAG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*
-        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
-        int mAppTheme = sharedPref.getInt("theme", -1);
-        int mColorValue = sharedPref.getInt("color",0);
-        int colorPosition = sharedPref.getInt("position",0);
-
-        if (mAppTheme == -1) {
-            setTheme(Constant.theme);
-        } else {
-            setTheme(mAppTheme);
-        }
-        */
+        SharedPreferences mSharedPref = getSharedPreferences("colorInfo", MODE_PRIVATE);
+        constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
+        constant.mColorValue = mSharedPref.getInt("color", constant.color);
+        constant.mColorPosition = mSharedPref.getInt("position", 0);
         int colorPosition = Constant.mColorPosition;
         int mColorValue = Constant.mColorValue;
         setTheme(Constant.mAppTheme);
@@ -135,7 +130,6 @@ public class ChatActivity extends AppCompatActivity {
         mLinearLayout = new LinearLayoutManager(this);
         mMessageList.setHasFixedSize(true);
         mMessageList.setLayoutManager(mLinearLayout);
-
 
         mAdapter = new MessageAdapter(messagesList, colorPosition);
         mMessageList.setAdapter(mAdapter);
@@ -243,8 +237,6 @@ public class ChatActivity extends AppCompatActivity {
                         GALLERY_PICK_REQ);
             }
         });
-
-
     }
 
     private void loadSeenStatus() {
@@ -259,7 +251,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                Log.d("FECO", "seen: " + dataSnapshot.child("seen").toString());
+                //Log.d("FECO", "seen: " + dataSnapshot.child("seen").toString());
             }
 
             @Override
@@ -285,7 +277,7 @@ public class ChatActivity extends AppCompatActivity {
 
         if (requestCode == GALLERY_PICK_REQ && resultCode == RESULT_OK) {
             chatOpening();
-            chatNotification();
+
             Uri imageUri = data.getData();
 
             final String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
@@ -305,6 +297,10 @@ public class ChatActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
                         String download_url = task.getResult().getDownloadUrl().toString();
+
+                        // az értesítésben megküldjük a típusát és az urlt
+                        String type = "image";
+                        chatNotification(download_url, type);
 
                         Map<String, Object> messageMap = new HashMap<>();
                         messageMap.put("message", download_url);
@@ -395,6 +391,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadMessages() {
 
+        //a képernyő teteján megjelenített értéesítéseket törli
+        NotificationManager nMgr = (NotificationManager) getSystemService(Context
+                .NOTIFICATION_SERVICE);
+        nMgr.cancelAll();
+
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child
                 (mChatUser);
         messageQuery = messageRef.limitToLast(30);
@@ -448,8 +449,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 mMessageList.scrollToPosition(messagesList.size() - 1);
                 mLinearLayout.scrollToPositionWithOffset(messagesList.size() - 1, 0);
-                //Toast.makeText(ChatActivity.this, "load_sima", Toast.LENGTH_SHORT).show();
-
                 mRefreshLayout.setRefreshing(false);
             }
 
@@ -474,15 +473,12 @@ public class ChatActivity extends AppCompatActivity {
             }
         };
 
-        // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük
+        // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük az adatbázisból
         requestTorles();
-
-        //messageQuery.addChildEventListener(loadMessageChildEvent);
-
     }
 
     private void requestTorles() {
-        // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük
+        // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük az adatbázisból
         mNotifyRef.child(mCurrentUserID);
         requestTorloEventListener = new ChildEventListener() {
             @Override
@@ -544,33 +540,13 @@ public class ChatActivity extends AppCompatActivity {
     private void sendMessage() {
         chatOpening();
 
-        // csak akkor futtassuk le ha a másik user nem "online", vagyis ha meg van éppen nyitva a
-        // cset ablak akkor ne futtassunk értesítést.
-        mUsersRef.child(mChatUser).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                if (dataSnapshot.child("chat_window_open").exists()) {
-                    // Log.d("FECO", "chat_windows_open: " + dataSnapshot.child
-                    // ("chat_window_open").getValue() + " mCurrent: " + mCurrentUserID);
-                    if (!dataSnapshot.child("chat_window_open").getValue().equals(mCurrentUserID)) {
-                        chatNotification();
-                    }
-                } else {
-                    chatNotification();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        //chatNotification();
-
         String message = mChatMessageEdT.getText().toString().trim();
         if (!TextUtils.isEmpty(message)) {
+
+            //notifications kezelése
+            String type = "message";
+            ertesitesAzUzenetrol(message, type);
+
             mChatSendBtn.setEnabled(false);
             String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
             String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserID;
@@ -607,7 +583,32 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void chatNotification() {
+    private void ertesitesAzUzenetrol(final String message, final String type) {
+        // csak akkor futtassuk le ha a másik user nem "online", vagyis ha meg van éppen nyitva a
+        // cset ablak akkor ne futtassunk értesítést.
+        mUsersRef.child(mChatUser).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.child("chat_window_open").exists()) {
+                    // Log.d("FECO", "chat_windows_open: " + dataSnapshot.child
+                    // ("chat_window_open").getValue() + " mCurrent: " + mCurrentUserID);
+                    if (!dataSnapshot.child("chat_window_open").getValue().equals(mCurrentUserID)) {
+                        chatNotification(message, type);
+                    }
+                } else {
+                    chatNotification(message, type);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void chatNotification(String message, String type) {
 
         // notifications adatbázisba bejegyzés
         // ez az új üzenet írásakor fut le
@@ -616,9 +617,15 @@ public class ChatActivity extends AppCompatActivity {
         String newNotificationId = newNotificationRef.getKey();
         Map<String, Object> notificationDataMap = new HashMap<String, Object>();
         notificationDataMap.put("from", mCurrentUserID);
-        notificationDataMap.put("type", "new_message");
+        if (type.equals("message")) {
+            notificationDataMap.put("type", "new_message");
+        } else if (type.equals("image")) {
+            notificationDataMap.put("type", "new_image");
+        }
+
         notificationDataMap.put("seen", false);
         notificationDataMap.put("timestamp", ServerValue.TIMESTAMP);
+        notificationDataMap.put("text", message);
 
         Map<String, Object> requestMap = new HashMap<String, Object>();
         requestMap.put("Notifications/" + mChatUser + "/" + newNotificationId, notificationDataMap);
@@ -657,10 +664,6 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        NotificationManager nMgr = (NotificationManager) getSystemService(Context
-                .NOTIFICATION_SERVICE);
-        nMgr.cancelAll();
     }
 
     @Override
@@ -682,6 +685,4 @@ public class ChatActivity extends AppCompatActivity {
         messageQuery.removeEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).removeEventListener(requestTorloEventListener);
     }
-
-
 }

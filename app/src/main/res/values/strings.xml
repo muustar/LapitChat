@@ -63,4 +63,6 @@
     <string name="here_you_can_sen_notifications_for_everyone_please_be_careful">Here you can send notifications for everyone, please be careful</string>
     <string name="send_notification">Send Notification</string>
     <string name="admin">Admin</string>
+    <string name="wanna_be_your_friend">Wanna be your friend</string>
+    <string name="sent_a_new_message">Sent a new message</string>
 </resources>

@@ -33,9 +33,6 @@ public class SplashSreenActivity extends AppCompatActivity {
         constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
         constant.mColorValue = mSharedPref.getInt("color", constant.color);
         constant.mColorPosition = mSharedPref.getInt("position", 0);
-        Log.d(TAG, "onCreate: mAppTheme" + constant.mAppTheme);
-
-
         setTheme(constant.mAppTheme);
 
         Fresco.initialize(this);

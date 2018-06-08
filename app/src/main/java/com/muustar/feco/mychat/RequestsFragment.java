@@ -219,9 +219,9 @@ public class RequestsFragment extends Fragment {
                 mRequestDisplayname.setTypeface(Typeface.DEFAULT);
             }
             if (type.equals("friend_request")) {
-                mRequestType.setText("Wanna be your friend");
+                mRequestType.setText(R.string.wanna_be_your_friend);
             } else if (type.equals("new_message")) {
-                mRequestType.setText("Sent a new message");
+                mRequestType.setText(R.string.sent_a_new_message);
             } else {
                 mRequestType.setText(type);
             }

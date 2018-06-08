@@ -32,7 +32,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String notification_message = remoteMessage.getNotification().getBody();
         String click_action = remoteMessage.getNotification().getClickAction();
         String sound = "/raw/" + remoteMessage.getNotification().getSound();
-        String ledColor = remoteMessage.getNotification().getColor();
+        String tag = remoteMessage.getNotification().getTag();
+        String color = remoteMessage.getNotification().getColor(); //a notify ikon színe
         String from_user_id = remoteMessage.getData().get("uid");
         String name = remoteMessage.getData().get("name");
         String img = remoteMessage.getData().get("img");
@@ -44,6 +45,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.notify_icon)
+                .setColor(Color.parseColor(color))
                 .setContentTitle(notification_title)
                 .setContentText(notification_message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -59,6 +61,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         resultIntent.putExtra("uid", from_user_id);
         resultIntent.putExtra("name", name);
         resultIntent.putExtra("img", img);
+        resultIntent.putExtra("tag", tag);
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(

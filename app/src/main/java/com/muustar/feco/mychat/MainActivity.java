@@ -219,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
             // kilogoláskor a devicetokent töröljük
             Map tokenMap = new HashMap();
             tokenMap.put("device_token", null);
+            tokenMap.put("online",ServerValue.TIMESTAMP);
             mUserDatabase.updateChildren(tokenMap);
             FirebaseAuth.getInstance().signOut();
 
