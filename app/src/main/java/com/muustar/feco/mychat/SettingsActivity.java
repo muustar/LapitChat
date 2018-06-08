@@ -70,19 +70,22 @@ public class SettingsActivity extends AppCompatActivity {
     private RelativeLayout mBackground;
     private Button mChangeImageBtn, mChangeStatusBtn;
     private ProgressBar mProgressBar;
-    private Switch mEmailSwitch;
+    private Switch mEmailSwitch, mVibrateSwitch;
     private String status;
     private Uri resultUri;
     private String TAG = "FECO";
     private String displayname;
     private String mTaroltImage;
     private String mTaroltImage_thumb;
+    private SharedPreferences mSharedProfileSettingsPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(Constant.mAppTheme);
         setContentView(R.layout.activity_settings);
+        mSharedProfileSettingsPref = getSharedPreferences("profileSettings", MODE_PRIVATE);
+
 
         mDisplayname = findViewById(R.id.settings_displayname);
         mUserEmailAddress = findViewById(R.id.settings_emailaddress);
@@ -92,6 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
         mImage = findViewById(R.id.settings_image);
         mProgressBar = findViewById(R.id.settings_progressBar);
         mEmailSwitch = findViewById(R.id.settings_switch_email);
+        mVibrateSwitch = findViewById(R.id.settings_switch_vibrate);
         mDeleteProfile = findViewById(R.id.settings_deleteprofile);
         mNewDisplayName = (EditText) findViewById(R.id.settings_displayname_edit);
         mBackground = (RelativeLayout) findViewById(R.id.settings_background);
@@ -155,6 +159,18 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mUsersDatabase.child("email_visible").setValue(isChecked);
+            }
+        });
+
+        //vibrációs beállítások
+        mVibrateSwitch.setChecked(mSharedProfileSettingsPref.getBoolean("vibrate",true));
+        mVibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                SharedPreferences.Editor editor = mSharedProfileSettingsPref.edit();
+                editor.putBoolean("vibrate", isChecked);
+                editor.commit();
             }
         });
         mChangeImageBtn.setOnClickListener(new View.OnClickListener() {

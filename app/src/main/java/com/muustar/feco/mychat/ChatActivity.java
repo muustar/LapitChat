@@ -94,10 +94,15 @@ public class ChatActivity extends AppCompatActivity {
     private int colorMyChat;
     private Constant constant;
     private String mNotificationTAG;
+    private Boolean isVibrate; //a user beállítás szerint , ha igaz akkor vibrálhat, ha hamis
+    private ChildEventListener vibrateChildEventListener;
+    // akkor nem
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //téma betöltése
         SharedPreferences mSharedPref = getSharedPreferences("colorInfo", MODE_PRIVATE);
         constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
         constant.mColorValue = mSharedPref.getInt("color", constant.color);
@@ -105,8 +110,12 @@ public class ChatActivity extends AppCompatActivity {
         int colorPosition = Constant.mColorPosition;
         int mColorValue = Constant.mColorValue;
         setTheme(Constant.mAppTheme);
-
         setContentView(R.layout.activity_chat);
+
+        // vibrációs beállítások
+        SharedPreferences mSharedProfileSettingsPref = getSharedPreferences("profileSettings",
+                MODE_PRIVATE);
+        isVibrate = mSharedProfileSettingsPref.getBoolean("vibrate", true);
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mRootRef.keepSynced(true);
@@ -431,19 +440,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 messagesList.add(message);
                 loadSeenStatus();
-                if (!mCurrentUserID.equals(message.getFrom())) {
-
-                    // vibrálás ha érkezik uj üzenet
-                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    // Vibrate for 500 milliseconds
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect
-                                .DEFAULT_AMPLITUDE));
-                    } else {
-                        //deprecated in API 26
-                        v.vibrate(200);
-                    }
-                }
 
                 mAdapter.notifyDataSetChanged();
 
@@ -475,6 +471,48 @@ public class ChatActivity extends AppCompatActivity {
 
         // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük az adatbázisból
         requestTorles();
+        // ha betöltjük az üzeneteket és van közöttük olyan amit még nem láttak akkor vibrálunk
+        vibralasOlvasatlanEseten();
+    }
+
+    private void vibralasOlvasatlanEseten() {
+        vibrateChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Messages m = dataSnapshot.getValue(Messages.class);
+                if (!m.getSeen() && isVibrate) {
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect
+                                .DEFAULT_AMPLITUDE));
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(200);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
     }
 
     private void requestTorles() {
@@ -648,6 +686,7 @@ public class ChatActivity extends AppCompatActivity {
         messagesList.clear();
         messageQuery.addChildEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).addChildEventListener(requestTorloEventListener);
+        mMessagesRef.child(mCurrentUserID).child(mChatUser).addChildEventListener(vibrateChildEventListener);
 
         // chehck the user logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -677,6 +716,7 @@ public class ChatActivity extends AppCompatActivity {
             mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
             mUserDatabase.child("chat_window_open").setValue("false");
         }
+        mMessagesRef.child(mCurrentUserID).child(mChatUser).removeEventListener(vibrateChildEventListener);
     }
 
     @Override
