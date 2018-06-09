@@ -9,11 +9,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private Boolean mCurrentUserIsAdmin = false;
 
     private Methods methods;
+    private ChildEventListener requestTorloEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
+
+            // ellenőrizzük, hogy az adott felhazsnáló ADMIN-e
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
                     (mAuth.getCurrentUser().getUid());
             mUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -63,6 +68,86 @@ public class MainActivity extends AppCompatActivity {
                             mCurrentUserIsAdmin = true;
                         }
                     }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+            // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük az
+            // adatbázisból
+            requestTorloEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    String key = dataSnapshot.getKey();
+
+                    NotificationType n = dataSnapshot.getValue(NotificationType.class);
+
+                    if (n.getType().equals("update")) {
+                        mNotifyDatabase.child(key).removeValue();
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+
+
+            // az aktuális verzió mentése az adatbázisba
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
+                    (mAuth.getCurrentUser().getUid());
+            mUserDatabase.child("version").setValue(Constant.VERSION);
+
+            // ellenőrizzük, hogy van-e frissebb verzió
+            DatabaseReference mVerDBRef = FirebaseDatabase.getInstance().getReference().child
+                    ("Ver");
+            Query verQuery = mVerDBRef.limitToLast(1);
+            verQuery.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    VersionType ver = dataSnapshot.getValue(VersionType.class);
+                    Constant.AVAIABLE_VERSION = ver.getVersion();
+                    Constant.AVAIABLE_VERSION_DATE = ver.getRelease_date();
+                    Constant.updateTXT = ver.getText();
+                    if (Constant.VERSION == Constant.AVAIABLE_VERSION) {
+                        mNotifyDatabase.addChildEventListener(requestTorloEventListener);
+                    }else{
+                        mNotifyDatabase.removeEventListener(requestTorloEventListener);
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
                 }
 
                 @Override
@@ -188,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
             mAdminMenu.setVisible(mCurrentUserIsAdmin);
             mClearAllMenu.setVisible(isVisible);
             invalidateOptionsMenu();
-
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -219,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
             // kilogoláskor a devicetokent töröljük
             Map tokenMap = new HashMap();
             tokenMap.put("device_token", null);
-            tokenMap.put("online",ServerValue.TIMESTAMP);
+            tokenMap.put("online", ServerValue.TIMESTAMP);
             mUserDatabase.updateChildren(tokenMap);
             FirebaseAuth.getInstance().signOut();
 
@@ -258,6 +342,12 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.main_admin) {
             Intent adminIntent = new Intent(MainActivity.this, AdminActivity.class);
             startActivity(adminIntent);
+            return true;
+        }
+
+        if (item.getItemId() == R.id.main_appinfo) {
+            Intent appinfoIntent = new Intent(MainActivity.this, AppInfoActivity.class);
+            startActivity(appinfoIntent);
             return true;
         }
         return false;

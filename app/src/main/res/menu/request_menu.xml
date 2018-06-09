@@ -24,6 +24,15 @@
         android:title="@string/admin"
         android:visible="false"/>
     <item
+        android:id="@+id/main_appinfo"
+        android:title="@string/appinfo" />
+
+    <item
+        android:title=""
+        android:visible="true"/>
+    <item
         android:id="@+id/main_logout_btn"
         android:title="@string/log_out" />
+
+
 </menu>

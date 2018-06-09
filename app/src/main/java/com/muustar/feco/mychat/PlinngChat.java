@@ -17,7 +17,7 @@ import com.google.firebase.database.ValueEventListener;
  * Készítette: feco
  * 2018.05.03.
  */
-public class LapitChat extends Application {
+public class PlinngChat extends Application {
     private DatabaseReference mUserDatabase;
     protected FirebaseAuth mAuth;
 
@@ -35,7 +35,7 @@ public class LapitChat extends Application {
     public void onCreate() {
         super.onCreate();
         //FirebaseDatabase.getInstance().setPersistenceEnabled(true);  // helyben szinkronhoz
-        // manifestben: android:name=".LapitChat">
+        // manifestben: android:name=".PlinngChat">
 
         // Glide sync
         // http://bumptech.github.io/glide/doc/migrating.html#generated-api

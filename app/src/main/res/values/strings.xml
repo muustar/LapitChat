@@ -70,5 +70,8 @@
     <string name="need_a_new_password">Need a new password</string>
     <string name="new_password_request">New Password Request</string>
     <string name="write_your_email_address_again">Write your email address again, and click the Request button, you will got a new mail with a link for the new password setup.</string>
+    <string name="new_image">new image</string>
+    <string name="update">update</string>
+    <string name="appinfo">App Info</string>
 
 </resources>

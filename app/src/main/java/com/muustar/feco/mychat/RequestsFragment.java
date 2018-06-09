@@ -115,6 +115,7 @@ public class RequestsFragment extends Fragment {
                 String time = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(model.getTimestamp()));
                 holder.setTime(time);
 
+
                 // esemény kezelése
                 holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -136,9 +137,18 @@ public class RequestsFragment extends Fragment {
                                 openChat.putExtra("img", u[0].getImage_thumb());
                                 startActivity(openChat);
                                 break;
+                            case "new_image":
+                                //töröljük és ugrunk a csetre
+                                notificationsRef.child(getRef(position).getKey()).removeValue();
+                                Intent openChatImage = new Intent(ctx, ChatActivity.class);
+                                openChatImage.putExtra("uid", model.getFrom());
+                                openChatImage.putExtra("name", u[0].getName());
+                                openChatImage.putExtra("img", u[0].getImage_thumb());
+                                startActivity(openChatImage);
+                                break;
 
                             case "update":
-                                //töröljük és ugrunk a csetre
+                                // ugrunk az updatre
                                 Intent updateIntent = new Intent(ctx, UpdateActivity.class);
                                 updateIntent.putExtra("text", model.getText());
                                 startActivity(updateIntent);
@@ -152,8 +162,6 @@ public class RequestsFragment extends Fragment {
                     @Override
                     public boolean onLongClick(View v) {
                         notificationsRef.child(getRef(position).getKey()).removeValue();
-
-
                         return true;
                     }
                 });
@@ -161,7 +169,6 @@ public class RequestsFragment extends Fragment {
             }
         };
         mRequestRecycler.setAdapter(adapter);
-
         return v;
     }
 
@@ -222,8 +229,10 @@ public class RequestsFragment extends Fragment {
                 mRequestType.setText(R.string.wanna_be_your_friend);
             } else if (type.equals("new_message")) {
                 mRequestType.setText(R.string.sent_a_new_message);
-            } else {
-                mRequestType.setText(type);
+            } else if (type.equals("new_image")){
+                mRequestType.setText(R.string.new_image);
+            }else if (type.equals("update")){
+                mRequestType.setText(R.string.update);
             }
         }
     }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class AdminActivity extends AppCompatActivity {
     private Toolbar mToolbar;
-    private EditText mAdminMsg;
+    private EditText mAdminMsg, mAdminVersion;
     private Button mAdminSend;
     private DatabaseReference mNotificationsRef, mUsersRef;
     private String mCurrentUser;
@@ -36,6 +36,7 @@ public class AdminActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.admin_appbar);
         mAdminMsg = findViewById(R.id.admin_message);
         mAdminSend = findViewById(R.id.admin_send_btn);
+        mAdminVersion = findViewById(R.id.admin_version);
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(R.string.admin);
@@ -45,12 +46,24 @@ public class AdminActivity extends AppCompatActivity {
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
 
+        mAdminVersion.setText(String.valueOf(Constant.VERSION));
+
         mAdminSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String message = mAdminMsg.getText().toString().trim();
+                int newVersion = Integer.parseInt(mAdminVersion.getText().toString().trim());
                 if (!TextUtils.isEmpty(message)) {
                     mAdminMsg.setText("");
+
+                    Map versionMap = new HashMap<>();
+                    versionMap.put("version", newVersion);
+                    versionMap.put("release_date", ServerValue.TIMESTAMP);
+                    versionMap.put("text", message);
+
+                    DatabaseReference versionRef = FirebaseDatabase.getInstance().getReference()
+                            .child("Ver");
+                    versionRef.push().setValue(versionMap);
 
                     final Map notificationDataMap = new HashMap<>();
                     notificationDataMap.put("from", mCurrentUser);
@@ -63,6 +76,16 @@ public class AdminActivity extends AppCompatActivity {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             String user_id = dataSnapshot.getKey().toString();
+
+                            /*
+                            if (user_id.equals("USNwh8xQEFd9D01zaPBUgniK0Xv2") || user_id.equals
+                                    ("lc8r6Zw0tue3fPLKUbNDmbpqSrf2")) {
+                                mNotificationsRef.child(user_id).push().setValue
+                                        (notificationDataMap);
+                            }
+
+                            */
+
                             mNotificationsRef.child(user_id).push().setValue
                                     (notificationDataMap);
                         }

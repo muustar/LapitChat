@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".LapitChat"
+        android:name=".PlinngChat"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
@@ -26,11 +26,6 @@
         </service>
 
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="lapitchat_TARGET_UPDATE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity android:name=".StartActivity" />
         <activity
@@ -94,6 +89,9 @@
         <activity
             android:name=".ReqNewPasswordActivity"
             android:parentActivityName=".LoginActivity" />
+        <activity
+            android:name=".AppInfoActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

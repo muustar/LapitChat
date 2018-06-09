@@ -66,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private CircleImageView mImage;
     private TextView mDisplayname, mUserEmailAddress, mStatus, mDeleteProfile;
-    private EditText mNewDisplayName;
+    private EditText mNewDisplayName, mNewStatus;
     private RelativeLayout mBackground;
     private Button mChangeImageBtn, mChangeStatusBtn;
     private ProgressBar mProgressBar;
@@ -98,13 +98,14 @@ public class SettingsActivity extends AppCompatActivity {
         mVibrateSwitch = findViewById(R.id.settings_switch_vibrate);
         mDeleteProfile = findViewById(R.id.settings_deleteprofile);
         mNewDisplayName = (EditText) findViewById(R.id.settings_displayname_edit);
+        mNewStatus = findViewById(R.id.settings_status_edttext);
         mBackground = (RelativeLayout) findViewById(R.id.settings_background);
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
         mUserEmailAddress.setText(mCurrentUser.getEmail());
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
-        mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van beállítás a LapitChat.java fájlban és a manifestben.
+        mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van beállítás a PlinngChat.java fájlban és a manifestben.
         mProfileImagesRef = FirebaseStorage.getInstance().getReference().child("profile_images");
 
         mProgressBar.setVisibility(View.VISIBLE);
@@ -202,6 +203,18 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        // status megváltoztatása
+        // status változó tárolja
+        mStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mStatus.setVisibility(View.GONE);
+                mNewStatus.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        // Display name megváltoztatása
         mDisplayname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -222,7 +235,6 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
         });
-
         mNewDisplayName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

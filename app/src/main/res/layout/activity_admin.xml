@@ -37,9 +37,17 @@
             android:hint="@string/send_notification"
             />
 
+        <EditText
+            android:id="@+id/admin_version"
+            android:layout_below="@id/admin_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            />
+
         <Button
             android:id="@+id/admin_send_btn"
-            android:layout_below="@id/admin_message"
+            android:layout_below="@id/admin_version"
             android:layout_marginTop="20dp"
             android:layout_alignParentRight="true"
             android:background="?attr/colorPrimaryDark"

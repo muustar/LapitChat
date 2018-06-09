@@ -518,7 +518,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void requestTorles() {
         // ha betöltjük az üzeneteket, akkor a hozzá tartozó értesítéseket töröljük az adatbázisból
-        mNotifyRef.child(mCurrentUserID);
         requestTorloEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -526,7 +525,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 NotificationType n = dataSnapshot.getValue(NotificationType.class);
                 if (n.getFrom().equals(mChatUser)) {
-                    if (n.getType().equals("new_message")) {
+                    if (n.getType().equals("new_message") || n.getType().equals("new_image")) {
                         mNotifyRef.child(mCurrentUserID).child(key).removeValue();
                     }
                 }

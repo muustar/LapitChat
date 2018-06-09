@@ -70,6 +70,8 @@
     <string name="need_a_new_password">Új jelszót kérek</string>
     <string name="new_password_request">Új jelszó igénylés</string>
     <string name="write_your_email_address_again">Add meg az email címed újra. Az új jelszó igénylése után kapni fogsz egy emailt benne egy linkkel melyen keresztül meg tudod változtatni a jelszavad.</string>
-
+    <string name="new_image">Új kép üzenet</string>
+    <string name="update">frissítés</string>
+    <string name="appinfo">Alkalmazás Infó</string>
 
 </resources>
