@@ -39,7 +39,6 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
 /**
  * Készítette: feco
  * 2018.05.21.
@@ -53,11 +52,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Messages> mMessageList;
     private int color; //a szín pozíciója
     private String mCurrenUserId;
+    private String mChatuser;
     private Context ctx;
 
-    public MessageAdapter(List<Messages> mMessageList, int color) {
+    public MessageAdapter(List<Messages> mMessageList, int color, String mChatuser) {
         this.mMessageList = mMessageList;
         this.color = color;
+        this.mChatuser = mChatuser;
     }
 
     public void add(Messages messages) {
@@ -72,7 +73,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         RecyclerView.ViewHolder viewHolder = null;
         switch (viewType) {
             case VIEW_TYPE_ME:
-                View viewChatMine = layoutInflater.inflate(R.layout.message_single_layout_me, parent, false);
+                View viewChatMine = layoutInflater.inflate(R.layout.message_single_layout_me,
+                        parent, false);
                 viewHolder = new MyChatViewHolder(viewChatMine);
                 break;
             case VIEW_TYPE_OTHER:
@@ -84,7 +86,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         return viewHolder;
     }
-
 
     private int getBgDependsColor(int color) {
         // erre a API 19 miatt van szükség
@@ -121,9 +122,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 return R.drawable.message_text_background_color15;
 
             default:
-                return R.layout.message_single_layout_me;
+                return R.drawable.message_text_background;
         }
-
     }
 
     @Override
@@ -140,7 +140,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void configureMyChatViewHolder(final MyChatViewHolder myChatViewHolder, int position) {
-        final String fromUser = mMessageList.get(position).getFrom();
+        String key = mMessageList.get(position).getNodeKey();
         if (mMessageList.get(position).getType().equals("image")) {
             myChatViewHolder.imageMessage.setVisibility(View.VISIBLE);
             myChatViewHolder.messageText.setVisibility(View.GONE);
@@ -171,20 +171,35 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             myChatViewHolder.messageText.setText(mMessageList.get(position).getMessage());
         }
 
-        Boolean lattam = mMessageList.get(position).getSeen();
-        myChatViewHolder.setSeenText(lattam);
-        String lattamText = "";
-        if (lattam) {
-            lattamText = ctx.getString(R.string.seen);
-        } else {
-            lattamText = ctx.getString(R.string.sent);
-        }
+        // seen status
+        DatabaseReference mMessageRef = FirebaseDatabase.getInstance().getReference().child
+                ("messages").child(mChatuser).child(mCurrenUserId).child(key);
+
+        mMessageRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild("seen")) {
+                    String seenString = dataSnapshot.child("seen").getValue().toString();
+                    Boolean seen = Boolean.parseBoolean(seenString);
+                    myChatViewHolder.setSeen(seen);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         //üzenet idejánek beállítása
-        String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(mMessageList
-                .get(position).getTime()));
-        myChatViewHolder.timeText.setText(dateString + "\n" + lattamText);
+        String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date
+                (mMessageList
+                        .get(position).getTime()));
+        myChatViewHolder.timeText.setText(dateString);
         // ha rá kattintunk az üzenetre akkor jelenik meg
-        myChatViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        myChatViewHolder.itemView.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 if (myChatViewHolder.timeText.getVisibility() == View.GONE) {
@@ -216,19 +231,22 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         });
     }
 
-    private void configureOtherChatViewHolder(final OtherChatViewHolder otherChatViewHolder, int
-            position) {
+    private void configureOtherChatViewHolder(final OtherChatViewHolder otherChatViewHolder,
+                                              int
+                                                      position) {
         final String fromUser = mMessageList.get(position).getFrom();
 
         //profil képek betöltése
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child
+                ("Users");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User u;
                 if (!dataSnapshot.child(mCurrenUserId).exists()) {
                     //private String name, status, image, image_thumb, email, uid;
-                    u = new User("Törölt profile", "...", "default", "default", "törölt", "null",
+                    u = new User("Törölt profile", "...", "default", "default", "törölt",
+                            "null",
                             false);
                 } else {
                     u = dataSnapshot.child(mCurrenUserId).getValue(User.class);
@@ -279,8 +297,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         //üzenet idejánek beállítása
         String lattam = String.valueOf(mMessageList.get(position).getSeen());
-        String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(mMessageList
-                .get(position).getTime()));
+        String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date
+                (mMessageList
+                        .get(position).getTime()));
         otherChatViewHolder.timeText.setText(dateString);
 
         // ha rá kattintunk az üzenetre akkor jelenik meg
@@ -290,10 +309,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 if (otherChatViewHolder.timeText.getVisibility() == View.GONE) {
                     otherChatViewHolder.timeText.setVisibility(View.VISIBLE);
                     //animáció
-                    Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_show_time);
+                    Animation animation = AnimationUtils.loadAnimation(ctx, R.anim
+                            .anim_show_time);
                     otherChatViewHolder.timeText.startAnimation(animation);
                 } else {
-                    Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_hide_time);
+                    Animation animation = AnimationUtils.loadAnimation(ctx, R.anim
+                            .anim_hide_time);
                     otherChatViewHolder.timeText.startAnimation(animation);
                     animation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
@@ -360,7 +381,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private static class MyChatViewHolder extends RecyclerView.ViewHolder {
         private TextView messageText;
-        private TextView timeText, seenText;
+        private TextView timeText, seenTextView;
         private CircleImageView profileImage;
         private ImageView imageMessage;
 
@@ -371,17 +392,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             profileImage = (CircleImageView) itemView.findViewById(R.id
                     .message_single_profileimage_me);
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout_me);
-            seenText = (TextView) itemView.findViewById(R.id.message_single_seen_me);
-        }
-
-        public void setSeenText(Boolean b) {
-            if (b) {
-                seenText.setVisibility(View.GONE);
-                seenText.setText(R.string.seen);
-            } else {
-                seenText.setVisibility(View.VISIBLE);
-                seenText.setText(R.string.sent);
-            }
+            seenTextView = itemView.findViewById(R.id.message_single_seen_me);
         }
 
         public void setImageMessage(Context ctx, String url) {
@@ -392,6 +403,16 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .error(R.mipmap.placeholder_sad)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageMessage);
+        }
+
+        public void setSeen(Boolean seen) {
+            if (seen) {
+                seenTextView.setText(R.string.seen);
+                seenTextView.setVisibility(View.GONE);
+            } else {
+                seenTextView.setText(R.string.sent);
+                seenTextView.setVisibility(View.VISIBLE);
+            }
         }
     }
 

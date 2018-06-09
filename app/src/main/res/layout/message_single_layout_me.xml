@@ -31,7 +31,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginStart="5dp"
             android:autoLink="all"
-            android:background="@drawable/message_text_background_kitkat"
+            android:background="@drawable/message_text_background"
             android:padding="10dp"
             android:text="ffd   ddfl khslh lkhs khklh lhk"
             android:textColor="@android:color/white"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:padding="10dp"
-            android:background="@drawable/message_text_background_kitkat"
+            android:background="@drawable/message_text_background"
             android:scaleType="fitCenter"
             android:visibility="gone"
             tools:ignore="ContentDescription" />
@@ -65,7 +65,7 @@
         android:id="@+id/message_single_seen_me"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/seen"
+        android:text="@string/deleted_message"
         android:layout_below="@id/message_single_time_me"
         android:layout_alignParentEnd="true"
         android:visibility="visible"/>

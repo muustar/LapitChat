@@ -79,7 +79,7 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager mLinearLayout;
     private MessageAdapter mAdapter;
 
-    private static final int TOTAL_ITEMS_TO_LOAD = 5;
+    private static final int TOTAL_ITEMS_TO_LOAD = 30;
     private SwipeRefreshLayout mRefreshLayout;
     private int itemPos = 0;
     private String mLastKey = "";
@@ -140,8 +140,10 @@ public class ChatActivity extends AppCompatActivity {
         mMessageList.setHasFixedSize(true);
         mMessageList.setLayoutManager(mLinearLayout);
 
-        mAdapter = new MessageAdapter(messagesList, colorPosition);
+        mAdapter = new MessageAdapter(messagesList, colorPosition,mChatUser);
         mMessageList.setAdapter(mAdapter);
+
+
 
         loadMessages();
         loadSeenStatus();
@@ -246,6 +248,8 @@ public class ChatActivity extends AppCompatActivity {
                         GALLERY_PICK_REQ);
             }
         });
+
+
     }
 
     private void loadSeenStatus() {
@@ -407,7 +411,7 @@ public class ChatActivity extends AppCompatActivity {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child
                 (mChatUser);
-        messageQuery = messageRef.limitToLast(30);
+        messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
 
         final DatabaseReference seenef = mRootRef.child("messages").child(mChatUser).child
                 (mCurrentUserID);
@@ -439,7 +443,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
 
                 messagesList.add(message);
-                loadSeenStatus();
+                //loadSeenStatus();
 
                 mAdapter.notifyDataSetChanged();
 
@@ -513,7 +517,8 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         };
-        mMessagesRef.child(mCurrentUserID).child(mChatUser).addChildEventListener(vibrateChildEventListener);
+        mMessagesRef.child(mCurrentUserID).child(mChatUser).addChildEventListener
+                (vibrateChildEventListener);
     }
 
     private void requestTorles() {
@@ -599,7 +604,6 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
-
 
             Map<String, Object> messageUserMap = new HashMap<String, Object>();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
@@ -688,7 +692,6 @@ public class ChatActivity extends AppCompatActivity {
         messageQuery.addChildEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).addChildEventListener(requestTorloEventListener);
 
-
         // chehck the user logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
@@ -717,7 +720,8 @@ public class ChatActivity extends AppCompatActivity {
             mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
             mUserDatabase.child("chat_window_open").setValue("false");
         }
-        mMessagesRef.child(mCurrentUserID).child(mChatUser).removeEventListener(vibrateChildEventListener);
+        mMessagesRef.child(mCurrentUserID).child(mChatUser).removeEventListener
+                (vibrateChildEventListener);
     }
 
     @Override

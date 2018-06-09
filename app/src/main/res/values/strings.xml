@@ -74,5 +74,6 @@
     <string name="update">update</string>
     <string name="appinfo">App Info</string>
     <string name="profile_settings">Profile settings</string>
+    <string name="deleted_message">deleted message</string>
 
 </resources>

@@ -55,8 +55,10 @@
         <activity
             android:name=".ChatActivity"
             android:isScrollContainer="true"
+            android:resizeableActivity="true"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan|stateUnchanged">
             <intent-filter>
                 <action android:name="lapitchat_TARGET_CHAT" />
 

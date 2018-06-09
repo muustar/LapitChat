@@ -74,5 +74,6 @@
     <string name="update">frissítés</string>
     <string name="appinfo">Alkalmazás Infó</string>
     <string name="profile_settings">Fiók beállításai</string>
+    <string name="deleted_message">törölt üzenet</string>
 
 </resources>
