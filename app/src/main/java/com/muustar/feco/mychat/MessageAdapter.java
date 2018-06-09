@@ -86,7 +86,45 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
 
+    private int getBgDependsColor(int color) {
+        // erre a API 19 miatt van szükség
+        switch (color) {
+            case 0:
+                return R.drawable.message_text_background_color1;
+            case 1:
+                return R.drawable.message_text_background_color2;
+            case 2:
+                return R.drawable.message_text_background_color3;
+            case 3:
+                return R.drawable.message_text_background_color4;
+            case 4:
+                return R.drawable.message_text_background_color5;
+            case 5:
+                return R.drawable.message_text_background_color6;
+            case 6:
+                return R.drawable.message_text_background_color7;
+            case 7:
+                return R.drawable.message_text_background_color8;
+            case 8:
+                return R.drawable.message_text_background_color9;
+            case 9:
+                return R.drawable.message_text_background_color10;
+            case 10:
+                return R.drawable.message_text_background_color11;
+            case 11:
+                return R.drawable.message_text_background_color12;
+            case 12:
+                return R.drawable.message_text_background_color13;
+            case 13:
+                return R.drawable.message_text_background_color14;
+            case 14:
+                return R.drawable.message_text_background_color15;
 
+            default:
+                return R.layout.message_single_layout_me;
+        }
+
+    }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -106,7 +144,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (mMessageList.get(position).getType().equals("image")) {
             myChatViewHolder.imageMessage.setVisibility(View.VISIBLE);
             myChatViewHolder.messageText.setVisibility(View.GONE);
-            //myChatViewHolder.imageMessage.setBackgroundResource(getBgDependsColor(color));
+
+            // erre a API 19 miatt van szükség
+            myChatViewHolder.imageMessage.setBackgroundResource(getBgDependsColor(color));
 
             final String imgUrl = mMessageList.get(position).getMessage();
             myChatViewHolder.setImageMessage(ctx, imgUrl);
@@ -125,7 +165,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else {
             myChatViewHolder.imageMessage.setVisibility(View.GONE);
             myChatViewHolder.messageText.setVisibility(View.VISIBLE);
-            //myChatViewHolder.messageText.setBackgroundResource(getBgDependsColor(color));
+            myChatViewHolder.messageText.setBackgroundResource(getBgDependsColor(color));
+
+            // erre a API 19 miatt van szükség
             myChatViewHolder.messageText.setText(mMessageList.get(position).getMessage());
         }
 
