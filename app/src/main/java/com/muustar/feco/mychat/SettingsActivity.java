@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -84,8 +85,12 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(Constant.mAppTheme);
         setContentView(R.layout.activity_settings);
-        mSharedProfileSettingsPref = getSharedPreferences("profileSettings", MODE_PRIVATE);
 
+        setSupportActionBar((Toolbar)findViewById(R.id.settings_appbar));
+        getSupportActionBar().setTitle(R.string.profile_settings);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mSharedProfileSettingsPref = getSharedPreferences("profileSettings", MODE_PRIVATE);
 
         mDisplayname = findViewById(R.id.settings_displayname);
         mUserEmailAddress = findViewById(R.id.settings_emailaddress);
@@ -104,8 +109,10 @@ public class SettingsActivity extends AppCompatActivity {
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
         mUserEmailAddress.setText(mCurrentUser.getEmail());
-        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
-        mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van beállítás a PlinngChat.java fájlban és a manifestben.
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
+                (currentUserId);
+        mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van
+        // beállítás a PlinngChat.java fájlban és a manifestben.
         mProfileImagesRef = FirebaseStorage.getInstance().getReference().child("profile_images");
 
         mProgressBar.setVisibility(View.VISIBLE);
@@ -135,13 +142,17 @@ public class SettingsActivity extends AppCompatActivity {
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .listener(new RequestListener<Drawable>() {
                                 @Override
-                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                public boolean onLoadFailed(@Nullable GlideException e, Object
+                                        model, Target<Drawable> target, boolean isFirstResource) {
                                     mProgressBar.setVisibility(View.GONE);
                                     return false;
                                 }
 
                                 @Override
-                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                public boolean onResourceReady(Drawable resource, Object model,
+                                                               Target<Drawable> target,
+                                                               DataSource dataSource, boolean
+                                                                       isFirstResource) {
                                     mProgressBar.setVisibility(View.GONE);
                                     return false;
                                 }
@@ -164,7 +175,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         //vibrációs beállítások
-        mVibrateSwitch.setChecked(mSharedProfileSettingsPref.getBoolean("vibrate",true));
+        mVibrateSwitch.setChecked(mSharedProfileSettingsPref.getBoolean("vibrate", true));
         mVibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -174,17 +185,30 @@ public class SettingsActivity extends AppCompatActivity {
                 editor.commit();
             }
         });
-        mChangeImageBtn.setOnClickListener(new View.OnClickListener() {
+
+        // kép megváltoztatása a képre kattintással
+        mImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), GALLERY_PICK);
             }
         });
-
+        /*
+        mChangeImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent galleryIntent = new Intent();
+                galleryIntent.setType("image/*");
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"),
+                        GALLERY_PICK);
+            }
+        });
+        */
+        /*
         mChangeStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -193,11 +217,12 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(statusIntent);
             }
         });
-
+        */
         mDeleteProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent deleteprofileIntent = new Intent(SettingsActivity.this, DeleteProfileActivity.class);
+                Intent deleteprofileIntent = new Intent(SettingsActivity.this,
+                        DeleteProfileActivity.class);
                 finish();
                 startActivity(deleteprofileIntent);
             }
@@ -210,7 +235,54 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mStatus.setVisibility(View.GONE);
                 mNewStatus.setVisibility(View.VISIBLE);
+                mNewStatus.setText(status);
 
+                //show keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                        .INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+                mNewStatus.setSelection(0, mNewStatus.getText().length() - 1);
+                mNewStatus.setCursorVisible(true);
+            }
+        });
+        mNewStatus.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                        actionId == EditorInfo.IME_ACTION_DONE ||
+                        event != null &&
+                                event.getAction() == KeyEvent.ACTION_DOWN &&
+                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    if (event == null || !event.isShiftPressed()) {
+                        // the user is done typing.
+                        newStatusValidate();
+                        return true; // consume.
+                    }
+                }
+                return false; // pass on to other listeners.
+            }
+
+            private void newStatusValidate() {
+                //beirt szöveg ellenőrzése, mentése és billenytűzet elrejtése, vissza állítjuk a
+                // textview-t
+                String newStatusText = mNewStatus.getText().toString().trim();
+                if (!TextUtils.isEmpty(newStatusText)) {
+                    mStatus.setText(newStatusText);
+                    mNewStatus.setVisibility(View.GONE);
+                    mStatus.setVisibility(View.VISIBLE);
+                    //billentyűzet elrejtése
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                            .INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mNewDisplayName.getWindowToken(), 0);
+                    ujStatusTarolas(newStatusText);
+                }
+            }
+
+            private void ujStatusTarolas(String newStatusText) {
+                if (!TextUtils.equals(displayname, newStatusText)) {
+                    mUsersDatabase.child("status").setValue(newStatusText);
+                }
             }
         });
 
@@ -224,15 +296,14 @@ public class SettingsActivity extends AppCompatActivity {
                 mNewDisplayName.setVisibility(View.VISIBLE);
                 mNewDisplayName.setText(displayname);
 
-
                 //show keyboard
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                        .INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
                 int textLength = mNewDisplayName.getText().length();
                 mNewDisplayName.setSelection(0, textLength);
                 mNewDisplayName.setCursorVisible(true);
-
             }
         });
         mNewDisplayName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -271,7 +342,8 @@ public class SettingsActivity extends AppCompatActivity {
             mNewDisplayName.setVisibility(View.GONE);
             mDisplayname.setVisibility(View.VISIBLE);
             //billentyűzet elrejtése
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                    .INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(mNewDisplayName.getWindowToken(), 0);
             ujNevTarolas(newDisplayName);
         }
@@ -299,7 +371,8 @@ public class SettingsActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 mProgressBar.setVisibility(View.VISIBLE);
 
-                // elmentjük az új képet a szerveren, a régi képet nem kell törölni, mert azonos névvel kerül mentésre az új kép, ez felülírja a korábbit.
+                // elmentjük az új képet a szerveren, a régi képet nem kell törölni, mert azonos
+                // névvel kerül mentésre az új kép, ez felülírja a korábbit.
                 resultUri = result.getUri();
                 //mImage.setImageURI(resultUri);
 
@@ -318,7 +391,8 @@ public class SettingsActivity extends AppCompatActivity {
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 final byte[] thumb_byte = baos.toByteArray();
-                final StorageReference thumb_filePathRef = mProfileImagesRef.child("thumbs").child(mCurrentUser.getUid() + ".jpg");
+                final StorageReference thumb_filePathRef = mProfileImagesRef.child("thumbs")
+                        .child(mCurrentUser.getUid() + ".jpg");
 
                 // jobb méretű kép tömörítése
                 File img_filepath = new File(resultUri.getPath());
@@ -336,37 +410,39 @@ public class SettingsActivity extends AppCompatActivity {
 
                 StorageReference imgPath = mProfileImagesRef.child(mCurrentUser.getUid() + ".jpg");
                 UploadTask uploadTask_imgPath = imgPath.putBytes(img_byte);
-                uploadTask_imgPath.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                uploadTask_imgPath.addOnCompleteListener(new OnCompleteListener<UploadTask
+                        .TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
                             // a nagyméretű profil kép mentve, bejegyezzük az url-jét
-                            final String image_downloadUrl = task.getResult().getDownloadUrl().toString();
-
+                            final String image_downloadUrl = task.getResult().getDownloadUrl()
+                                    .toString();
 
                             // a thumb feltöltése
-                            UploadTask uploadTask_thumbImage = thumb_filePathRef.putBytes(thumb_byte);
+                            UploadTask uploadTask_thumbImage = thumb_filePathRef.putBytes
+                                    (thumb_byte);
                             uploadTask_thumbImage.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
-                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot>
+                                                               task) {
                                     if (task.isSuccessful()) {
-                                        String image_thumbDownlUrl = task.getResult().getDownloadUrl().toString();
+                                        String image_thumbDownlUrl = task.getResult()
+                                                .getDownloadUrl().toString();
 
                                         Map imageUrlMap = new HashMap<>();
                                         imageUrlMap.put("image", image_downloadUrl);
                                         imageUrlMap.put("image_thumb", image_thumbDownlUrl);
 
                                         mUsersDatabase.updateChildren(imageUrlMap);
-                                        //mUsersDatabase.child("image_thumb").setValue(image_thumbDownlUrl);
+                                        //mUsersDatabase.child("image_thumb").setValue
+                                        // (image_thumbDownlUrl);
                                     }
                                 }
                             });
                         }
-
                     }
                 });
-
-
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Log.e(TAG, error.getMessage().toString());
@@ -380,7 +456,8 @@ public class SettingsActivity extends AppCompatActivity {
         // chehck the user logged in
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
-            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
+            DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child
+                    ("Users").child(currentUser.getUid());
             mUserDatabase.child("online").setValue("true");
         }
     }

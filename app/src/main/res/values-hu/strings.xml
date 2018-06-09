@@ -73,5 +73,6 @@
     <string name="new_image">Új kép üzenet</string>
     <string name="update">frissítés</string>
     <string name="appinfo">Alkalmazás Infó</string>
+    <string name="profile_settings">Fiók beállításai</string>
 
 </resources>
