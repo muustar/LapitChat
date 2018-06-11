@@ -11,9 +11,11 @@ public class Constant  {
     public static int mColorValue = color;
     public static int mColorPosition = 0;
 
-    private static int versionBeforePush = 57;
+    private static int versionBeforePush = 58;
     public static int VERSION = versionBeforePush +1;
     public static int AVAIABLE_VERSION = 0;
     public static long AVAIABLE_VERSION_DATE = 0;
     public static String updateTXT = "";
+
+    public static Boolean mCurrentUserIsAdmin = false;
 }

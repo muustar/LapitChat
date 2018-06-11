@@ -3,7 +3,6 @@ package com.muustar.feco.mychat;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -20,14 +19,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,7 +37,7 @@ public class UsersActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private RecyclerView mUsersList;
     private FirebaseRecyclerAdapter<User, UsersViewHolder> adapter;
-    private DatabaseReference usersRef;
+    private DatabaseReference mUsersRef;
     private Context ctx;
 
     @Override
@@ -61,7 +57,7 @@ public class UsersActivity extends AppCompatActivity {
         mUsersList.setHasFixedSize(true);
         mUsersList.setLayoutManager(new LinearLayoutManager(this));
 
-        usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
 
         //a firebase UI recycrerview kezelőjét használjuk
@@ -69,9 +65,7 @@ public class UsersActivity extends AppCompatActivity {
 
         // https://github.com/firebase/FirebaseUI-Android/blob/master/database/README.md
 
-        Query query = FirebaseDatabase.getInstance()
-                .getReference()
-                .child("Users")
+        Query query = mUsersRef
                 .orderByChild("name");
 
         FirebaseRecyclerOptions<User> options =
@@ -93,13 +87,18 @@ public class UsersActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull final UsersViewHolder holder, int position, @NonNull final User model) {
                 holder.setmSingleImage(getApplicationContext(), model.getImage_thumb());
-                holder.setmSingleDisplayname(model.getName());
+                if (Constant.mCurrentUserIsAdmin){
+                    holder.setmSingleDisplayname(model.getName()+" "+model.getVersion());
+                }else{
+                    holder.setmSingleDisplayname(model.getName());
+                }
+
                 holder.setmSingleStatus(model.getStatus());
                 holder.setmEmail(model.getEmail_visible(), model.getEmail());
 
 
                 // online dot
-                usersRef.child(model.getUid()).addValueEventListener(new ValueEventListener() {
+                mUsersRef.child(model.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.child("online").getValue() != null) {

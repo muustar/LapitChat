@@ -75,5 +75,9 @@
     <string name="appinfo">App Info</string>
     <string name="profile_settings">Profile settings</string>
     <string name="deleted_message">deleted message</string>
+    <string name="change_email">Change Email</string>
+    <string name="az_email_c_m_cser_j_hez">Az email cím cseréjéhez</string>
+    <string name="current_email_address">Current email address</string>
+    <string name="new_email_address">New email address</string>
 
 </resources>

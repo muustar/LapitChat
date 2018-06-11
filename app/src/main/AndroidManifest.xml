@@ -25,8 +25,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity"></activity>
         <activity android:name=".StartActivity" />
         <activity
             android:name=".RegisterActivity"
@@ -34,8 +33,9 @@
         <activity
             android:name=".LoginActivity"
             android:parentActivityName=".StartActivity" />
-        <activity android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".StatusActivity"
             android:parentActivityName=".SettingsActivity" />
@@ -54,11 +54,8 @@
         </activity>
         <activity
             android:name=".ChatActivity"
-            android:isScrollContainer="true"
-            android:resizeableActivity="true"
-            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustPan|stateUnchanged">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="lapitchat_TARGET_CHAT" />
 
@@ -95,6 +92,10 @@
         <activity
             android:name=".AppInfoActivity"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".ChangeEmailActivity"
+            android:parentActivityName=".SettingsActivity">
+
+        </activity>
     </application>
 
 </manifest>

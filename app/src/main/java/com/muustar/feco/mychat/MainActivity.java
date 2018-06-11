@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     if (dataSnapshot.hasChild("admin")) {
                         if ((Boolean) dataSnapshot.child("admin").getValue()) {
                             mCurrentUserIsAdmin = true;
+                            Constant.mCurrentUserIsAdmin = mCurrentUserIsAdmin;
                         }
                     }
                 }

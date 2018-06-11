@@ -54,6 +54,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private String mCurrenUserId;
     private String mChatuser;
     private Context ctx;
+    private int lastPosition = -1;
 
     public MessageAdapter(List<Messages> mMessageList, int color, String mChatuser) {
         this.mMessageList = mMessageList;
@@ -136,6 +137,24 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             configureMyChatViewHolder((MyChatViewHolder) holder, position);
         } else {
             configureOtherChatViewHolder((OtherChatViewHolder) holder, position);
+        }
+    }
+
+    private void setAnimation(View viewToAnimate, int position, int viewType)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            if (viewType == VIEW_TYPE_ME){
+                Animation animation = AnimationUtils.loadAnimation(ctx, android.R.anim.slide_in_left);
+                viewToAnimate.startAnimation(animation);
+                lastPosition = position;
+            }else{
+                Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.slide_in_right);
+                viewToAnimate.startAnimation(animation);
+                lastPosition = position;
+            }
+
         }
     }
 
@@ -229,6 +248,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             }
         });
+        setAnimation(myChatViewHolder.itemView, position, VIEW_TYPE_ME);
     }
 
     private void configureOtherChatViewHolder(final OtherChatViewHolder otherChatViewHolder,
@@ -359,6 +379,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             }
         });
+        setAnimation(otherChatViewHolder.itemView, position, VIEW_TYPE_OTHER);
     }
 
     @Override

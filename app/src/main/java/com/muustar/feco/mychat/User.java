@@ -1,13 +1,22 @@
 package com.muustar.feco.mychat;
 
 public class User {
-    private String name, status, image, image_thumb, email, uid;
+    private String chat_window_open = null;
+    private String email;
     private Boolean email_visible;
+    private String image;
+    private String image_thumb;
+    private String name;
+    private String online = null;
+    private String status;
+    private String uid;
+    private int version = 0;
 
     public User() {
     }
 
-    public User(String name, String status, String image, String image_thumb, String email, String uid, Boolean email_visible) {
+    public User(String name, String status, String image, String image_thumb, String email,
+                String uid, Boolean email_visible) {
         this.name = name;
         this.status = status;
         this.image = image;
@@ -15,6 +24,21 @@ public class User {
         this.email = email;
         this.uid = uid;
         this.email_visible = email_visible;
+    }
+
+    public User(String name, String status, String image, String image_thumb, String email, String uid, Boolean email_visible, int version) {
+        this.name = name;
+        this.status = status;
+        this.image = image;
+        this.image_thumb = image_thumb;
+        this.email = email;
+        this.uid = uid;
+        this.email_visible = email_visible;
+        this.version = version;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     public Boolean getEmail_visible() {

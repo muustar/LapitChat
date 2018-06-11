@@ -24,18 +24,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -69,7 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView mDisplayname, mUserEmailAddress, mStatus, mDeleteProfile;
     private EditText mNewDisplayName, mNewStatus;
     private RelativeLayout mBackground;
-    private Button mChangeImageBtn, mChangeStatusBtn;
+    private Button mChangeEmailBtn;
     private ProgressBar mProgressBar;
     private Switch mEmailSwitch, mVibrateSwitch;
     private String status;
@@ -79,6 +74,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String mTaroltImage;
     private String mTaroltImage_thumb;
     private SharedPreferences mSharedProfileSettingsPref;
+    private ValueEventListener felhasznaloAdataiValueListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
         setTheme(Constant.mAppTheme);
         setContentView(R.layout.activity_settings);
 
-        setSupportActionBar((Toolbar)findViewById(R.id.settings_appbar));
+        setSupportActionBar((Toolbar) findViewById(R.id.settings_appbar));
         getSupportActionBar().setTitle(R.string.profile_settings);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -95,8 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
         mDisplayname = findViewById(R.id.settings_displayname);
         mUserEmailAddress = findViewById(R.id.settings_emailaddress);
         mStatus = findViewById(R.id.settings_status);
-        mChangeImageBtn = findViewById(R.id.settings_changeImage);
-        mChangeStatusBtn = findViewById(R.id.settings_changeStatus);
+        mChangeEmailBtn = findViewById(R.id.settings_changeEmail);
         mImage = findViewById(R.id.settings_image);
         mProgressBar = findViewById(R.id.settings_progressBar);
         mEmailSwitch = findViewById(R.id.settings_switch_email);
@@ -108,7 +103,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
-        mUserEmailAddress.setText(mCurrentUser.getEmail());
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
                 (currentUserId);
         mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van
@@ -116,7 +110,7 @@ public class SettingsActivity extends AppCompatActivity {
         mProfileImagesRef = FirebaseStorage.getInstance().getReference().child("profile_images");
 
         mProgressBar.setVisibility(View.VISIBLE);
-        mUsersDatabase.addValueEventListener(new ValueEventListener() {
+        felhasznaloAdataiValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -126,7 +120,7 @@ public class SettingsActivity extends AppCompatActivity {
                     status = dataSnapshot.child("status").getValue().toString();
                     mTaroltImage = dataSnapshot.child("image").getValue().toString();
                     mTaroltImage_thumb = dataSnapshot.child("image_thumb").getValue().toString();
-
+                    mUserEmailAddress.setText(u.getEmail());
                     if (dataSnapshot.child("email_visible").exists()) {
                         Boolean email_visible = u.getEmail_visible();
                         mEmailSwitch.setChecked(email_visible);
@@ -165,12 +159,21 @@ public class SettingsActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
 
         mEmailSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mUsersDatabase.child("email_visible").setValue(isChecked);
+            }
+        });
+
+        mChangeEmailBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newemailIntent = new Intent(SettingsActivity.this, ChangeEmailActivity.class);
+                startActivity(newemailIntent);
+                //finish();
             }
         });
 
@@ -193,7 +196,8 @@ public class SettingsActivity extends AppCompatActivity {
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), GALLERY_PICK);
+                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"),
+                        GALLERY_PICK);
             }
         });
         /*
@@ -233,7 +237,7 @@ public class SettingsActivity extends AppCompatActivity {
         mStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mStatus.setVisibility(View.GONE);
+                mStatus.setVisibility(View.INVISIBLE);
                 mNewStatus.setVisibility(View.VISIBLE);
                 mNewStatus.setText(status);
 
@@ -242,8 +246,18 @@ public class SettingsActivity extends AppCompatActivity {
                         .INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-                mNewStatus.setSelection(0, mNewStatus.getText().length() - 1);
+                int textLength = mNewStatus.getText().length();
+                mNewStatus.setSelection(0, textLength);
                 mNewStatus.setCursorVisible(true);
+            }
+        });
+        mNewStatus.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus){
+                    mNewStatus.setVisibility(View.INVISIBLE);
+                    mStatus.setVisibility(View.VISIBLE);
+                }
             }
         });
         mNewStatus.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -306,6 +320,16 @@ public class SettingsActivity extends AppCompatActivity {
                 mNewDisplayName.setCursorVisible(true);
             }
         });
+        mNewDisplayName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus){
+                    mNewDisplayName.setVisibility(View.INVISIBLE);
+                    mDisplayname.setVisibility(View.VISIBLE);
+                }
+
+            }
+        });
         mNewDisplayName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -324,14 +348,21 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        /*
+
         mBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                newNameValidate();
+                mNewDisplayName.setVisibility(View.INVISIBLE);
+                mDisplayname.setVisibility(View.VISIBLE);
+                mNewStatus.setVisibility(View.INVISIBLE);
+                mStatus.setVisibility(View.VISIBLE);
+                //billentyűzet elrejtése
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                        .INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mBackground.getWindowToken(), 0);
             }
         });
-        */
+
     }
 
     private void newNameValidate() {
@@ -460,5 +491,17 @@ public class SettingsActivity extends AppCompatActivity {
                     ("Users").child(currentUser.getUid());
             mUserDatabase.child("online").setValue("true");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mUsersDatabase.addValueEventListener(felhasznaloAdataiValueListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mUsersDatabase.removeEventListener(felhasznaloAdataiValueListener);
     }
 }

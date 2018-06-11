@@ -11,6 +11,7 @@ import android.graphics.ColorSpace;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
@@ -21,11 +22,18 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -63,9 +71,9 @@ public class ChatActivity extends AppCompatActivity {
     private TextView mLastSeen;
     private CircleImageView mProfileImage;
 
-    private ImageView mChatAddBtn;
+    private CircleImageView mChatAddBtn;
     private EditText mChatMessageEdT;
-    private ImageView mChatSendBtn;
+    private CircleImageView mChatSendBtn;
 
     private DatabaseReference mRootRef;
     private FirebaseAuth mAuth;
@@ -140,10 +148,8 @@ public class ChatActivity extends AppCompatActivity {
         mMessageList.setHasFixedSize(true);
         mMessageList.setLayoutManager(mLinearLayout);
 
-        mAdapter = new MessageAdapter(messagesList, colorPosition,mChatUser);
+        mAdapter = new MessageAdapter(messagesList, colorPosition, mChatUser);
         mMessageList.setAdapter(mAdapter);
-
-
 
         loadMessages();
         loadSeenStatus();
@@ -220,6 +226,69 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        // forgó elküldés gomb
+        final Boolean[] fordulhat = {true};
+        mChatMessageEdT.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Log.d(TAG, "sequence: " + s + " count: " + count);
+                RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF,
+                        0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                rotate.setDuration(500);
+                rotate.setInterpolator(new LinearInterpolator());
+
+                if (s.length() == 0) {
+                    fordulhat[0] = true;
+                }
+                if (s.length() == 1 && fordulhat[0]) {
+                    mChatSendBtn.startAnimation(rotate);
+                    fordulhat[0] = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        mChatMessageEdT.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch: TOUCH" + event);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageList.scrollToPosition(messagesList.size() - 1);
+                        mLinearLayout.scrollToPositionWithOffset(messagesList.size() - 1, 0);
+                    }
+                }, 200);
+                return false;
+            }
+        });
+
+        /*
+        mChatMessageEdT.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                Log.d(TAG, "onFocusChange: " + hasFocus);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageList.scrollToPosition(messagesList.size() - 1);
+                        mLinearLayout.scrollToPositionWithOffset(messagesList.size() - 1, 0);
+                    }
+                }, 200);
+            }
+        });
+        */
+
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -248,8 +317,6 @@ public class ChatActivity extends AppCompatActivity {
                         GALLERY_PICK_REQ);
             }
         });
-
-
     }
 
     private void loadSeenStatus() {
