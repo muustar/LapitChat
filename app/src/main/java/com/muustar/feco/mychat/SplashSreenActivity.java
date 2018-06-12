@@ -24,16 +24,19 @@ public class SplashSreenActivity extends AppCompatActivity {
     private SharedPreferences mSharedPref;
     private FrameLayout mFrame;
     Constant constant;
+    private int mVisibleTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSharedPref = getSharedPreferences("colorInfo", MODE_PRIVATE);
+        mSharedPref = getSharedPreferences("Plinng", MODE_PRIVATE);
         constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
         constant.mColorValue = mSharedPref.getInt("color", constant.color);
         constant.mColorPosition = mSharedPref.getInt("position", 0);
+        mVisibleTime = mSharedPref.getInt("splash_time", 2000);
         setTheme(constant.mAppTheme);
+        Constant.mVisibleTime = mVisibleTime;
 
         Fresco.initialize(this);
         setContentView(R.layout.activity_splash_sreen);
@@ -47,11 +50,11 @@ public class SplashSreenActivity extends AppCompatActivity {
 
         mContentText = findViewById(R.id.fullscreen_content);
         mContentText.setScaleX(0.2f);
-        mContentText.animate().scaleXBy(1.0f).setDuration(3000);
+        mContentText.animate().scaleXBy(1.0f).setDuration(mVisibleTime);
 
         mSzlogen = findViewById(R.id.szlogen);
         mSzlogen.setScaleX(0.2f);
-        mSzlogen.animate().scaleXBy(1.0f).setDuration(3000);
+        mSzlogen.animate().scaleXBy(1.0f).setDuration(mVisibleTime);
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -60,6 +63,6 @@ public class SplashSreenActivity extends AppCompatActivity {
                 startActivity(mainIntent);
                 finish();
             }
-        }, 2000);
+        }, mVisibleTime);
     }
 }

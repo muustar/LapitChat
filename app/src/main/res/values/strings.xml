@@ -80,5 +80,6 @@
     <string name="current_email_address">Current email address</string>
     <string name="new_email_address">New email address</string>
     <string name="password_8_car">The password at least 8 caracter</string>
+    <string name="change_the_splash_screen_time">Change the splash screen time</string>
 
 </resources>

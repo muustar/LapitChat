@@ -64,7 +64,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSharedPref = getSharedPreferences("colorInfo", MODE_PRIVATE);
+        mSharedPref = getSharedPreferences("Plinng", MODE_PRIVATE);
         constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
         constant.mColorValue = mSharedPref.getInt("color", constant.color);
         constant.mColorPosition = mSharedPref.getInt("position", 0);

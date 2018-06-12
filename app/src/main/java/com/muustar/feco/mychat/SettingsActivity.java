@@ -22,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -76,6 +77,10 @@ public class SettingsActivity extends AppCompatActivity {
     private SharedPreferences mSharedProfileSettingsPref;
     private ValueEventListener felhasznaloAdataiValueListener;
 
+    // splash time settings
+    private SeekBar mSeekbarSplash;
+    private TextView mTextSplash;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.profile_settings);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mSharedProfileSettingsPref = getSharedPreferences("profileSettings", MODE_PRIVATE);
+        mSharedProfileSettingsPref = getSharedPreferences("Plinng", MODE_PRIVATE);
 
         mDisplayname = findViewById(R.id.settings_displayname);
         mUserEmailAddress = findViewById(R.id.settings_emailaddress);
@@ -100,6 +105,76 @@ public class SettingsActivity extends AppCompatActivity {
         mNewDisplayName = (EditText) findViewById(R.id.settings_displayname_edit);
         mNewStatus = findViewById(R.id.settings_status_edttext);
         mBackground = (RelativeLayout) findViewById(R.id.settings_background);
+        mSeekbarSplash = findViewById(R.id.settings_splash_time);
+        mTextSplash = findViewById(R.id.settings_splash_text);
+
+        // splash time beállító csúszka
+        /*
+        pozíciók:
+        200
+        500
+        1000
+        2000
+         */
+
+        switch (Constant.mVisibleTime) {
+            case 200:
+                mSeekbarSplash.setProgress(0);
+                mTextSplash.setText("0.2 s");
+                break;
+            case 500:
+                mSeekbarSplash.setProgress(1);
+                mTextSplash.setText("0.5 s");
+                break;
+            case 1000:
+                mSeekbarSplash.setProgress(2);
+                mTextSplash.setText("1 s");
+                break;
+            case 2000:
+                mSeekbarSplash.setProgress(3);
+                mTextSplash.setText("2 s");
+                break;
+        }
+        Log.d(TAG, "onProgressChanged: time: " + Constant.mVisibleTime);
+
+
+        mSeekbarSplash.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                switch (progress) {
+                    case 0:
+                        Constant.mVisibleTime = 200;
+                        mTextSplash.setText("0.2 s");
+                        break;
+                    case 1:
+                        Constant.mVisibleTime = 500;
+                        mTextSplash.setText("0.5 s");
+                        break;
+                    case 2:
+                        Constant.mVisibleTime = 1000;
+                        mTextSplash.setText("1 s");
+                        break;
+                    case 3:
+                        Constant.mVisibleTime = 2000;
+                        mTextSplash.setText("2 s");
+                        break;
+                }
+                SharedPreferences.Editor editor = mSharedProfileSettingsPref.edit();
+                editor.putInt("splash_time", Constant.mVisibleTime);
+                editor.commit();
+                Log.d(TAG, "onProgressChanged: time: " + Constant.mVisibleTime);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
@@ -171,7 +246,8 @@ public class SettingsActivity extends AppCompatActivity {
         mChangeEmailBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent newemailIntent = new Intent(SettingsActivity.this, ChangeEmailActivity.class);
+                Intent newemailIntent = new Intent(SettingsActivity.this, ChangeEmailActivity
+                        .class);
                 startActivity(newemailIntent);
                 //finish();
             }
@@ -254,7 +330,7 @@ public class SettingsActivity extends AppCompatActivity {
         mNewStatus.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus){
+                if (!hasFocus) {
                     mNewStatus.setVisibility(View.INVISIBLE);
                     mStatus.setVisibility(View.VISIBLE);
                 }
@@ -323,11 +399,10 @@ public class SettingsActivity extends AppCompatActivity {
         mNewDisplayName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus){
+                if (!hasFocus) {
                     mNewDisplayName.setVisibility(View.INVISIBLE);
                     mDisplayname.setVisibility(View.VISIBLE);
                 }
-
             }
         });
         mNewDisplayName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -348,7 +423,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-
         mBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -362,7 +436,6 @@ public class SettingsActivity extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(mBackground.getWindowToken(), 0);
             }
         });
-
     }
 
     private void newNameValidate() {

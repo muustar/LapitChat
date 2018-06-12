@@ -294,28 +294,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.main_logout_btn) {
+            logOut();
 
-            // töröljük a sharedpreferences beállításokat
-            SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.clear();
-            editor.apply();
-
-            // kilogoláskor a devicetokent töröljük
-            Map tokenMap = new HashMap();
-            tokenMap.put("device_token", null);
-            tokenMap.put("online", ServerValue.TIMESTAMP);
-            mUserDatabase.updateChildren(tokenMap);
-            FirebaseAuth.getInstance().signOut();
-
-            //vissza dobjuk a splash screenre
-            Intent startIntent = new Intent(MainActivity.this, SplashSreenActivity.class);
-            startActivity(startIntent);
-            finish();
-
-            // if (mAuth.getCurrentUser() == null) {
-            //   sendToStart();
-            //}
             return true;
         }
 
@@ -354,6 +334,30 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    private void logOut() {
+        // töröljük a sharedpreferences beállításokat
+        SharedPreferences sharedPref = getSharedPreferences("Plinng", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.apply();
+
+        // kilogoláskor a devicetokent töröljük
+        Map tokenMap = new HashMap();
+        tokenMap.put("device_token", null);
+        tokenMap.put("online", ServerValue.TIMESTAMP);
+        mUserDatabase.updateChildren(tokenMap);
+        FirebaseAuth.getInstance().signOut();
+
+        //vissza dobjuk a splash screenre
+        Intent startIntent = new Intent(MainActivity.this, SplashSreenActivity.class);
+        startActivity(startIntent);
+        finish();
+
+        // if (mAuth.getCurrentUser() == null) {
+        //   sendToStart();
+        //}
+    }
+
     private void colorPicker() {
         ColorPicker colorPicker = new ColorPicker(this);
         colorPicker.dismissDialog();
@@ -376,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveColor(int position, int color) {
-        SharedPreferences sharedPref = getSharedPreferences("colorInfo", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("Plinng", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         Constant.mColorValue = color;
         methods.setColorTheme();

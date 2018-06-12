@@ -14,9 +14,9 @@
 
     <RelativeLayout
         android:id="@+id/settings_felsoresz"
-        android:layout_below="@id/settings_appbar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/settings_appbar">
 
         <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/settings_image"
@@ -41,9 +41,9 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/settings_image">
 
             <TextView
@@ -52,8 +52,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:textAlignment="center"
                 android:text="@string/display_name"
+                android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="24sp" />
 
@@ -88,24 +88,24 @@
                 android:layout_below="@+id/settings_emailaddress"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
+                android:autoLink="web"
                 android:text="@string/hi_there_i_m_using_lapit_chat_app"
                 android:textAlignment="center"
-                android:autoLink="web"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
-                android:visibility="visible"/>
+                android:visibility="visible" />
 
             <EditText
                 android:id="@+id/settings_status_edttext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapSentences"
                 android:layout_alignBaseline="@+id/settings_status"
                 android:layout_below="@+id/settings_emailaddress"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
-                android:textAlignment="center"
+                android:inputType="textCapSentences"
                 android:text="@string/hi_there_i_m_using_lapit_chat_app"
+                android:textAlignment="center"
                 android:textSize="16sp"
                 android:visibility="invisible" />
         </RelativeLayout>
@@ -127,7 +127,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="20dp"
                 android:checked="false"
                 android:text="@string/visible_email"
                 android:textColor="@android:color/white" />
@@ -142,6 +142,38 @@
                 android:checked="true"
                 android:text="@string/vibrate_at_new_message"
                 android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/settings_splash_info"
+                android:layout_below="@id/settings_switch_vibrate"
+                android:text="@string/change_the_splash_screen_time"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@android:color/white"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/settings_splash_info">
+
+                <SeekBar
+                    android:id="@+id/settings_splash_time"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="3"
+                    android:progress="3" />
+
+                <TextView
+                    android:id="@+id/settings_splash_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text="0.5 s"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
 
         </RelativeLayout>
     </ScrollView>
@@ -159,7 +191,7 @@
         android:text="@string/change_image"
         android:textAllCaps="false"
         android:textColor="?attr/colorPrimary"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/settings_changeEmail"
@@ -172,8 +204,7 @@
         android:text="@string/change_email"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
-        android:visibility="visible"/>
-
+        android:visibility="visible" />
 
 
     <TextView
@@ -184,7 +215,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
         android:text="@string/delete_profile"
-        android:textStyle="bold"
-        android:textColor="?attr/colorAccent" />
+        android:textColor="?attr/colorAccent"
+        android:textStyle="bold" />
 
 </RelativeLayout>

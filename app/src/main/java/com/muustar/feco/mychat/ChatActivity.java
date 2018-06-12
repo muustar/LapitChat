@@ -6,9 +6,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.ColorSpace;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -27,7 +24,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,7 +31,6 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +55,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToDoubleBiFunction;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -107,6 +101,9 @@ public class ChatActivity extends AppCompatActivity {
     private Boolean isVibrate; //a user beállítás szerint , ha igaz akkor vibrálhat, ha hamis
     private ChildEventListener vibrateChildEventListener;
     private ValueEventListener dotValueEventListener;
+    private TextView mPostCount; // a címsávban jelzi, hány bejegyzés történt eddig
+    private ValueEventListener counterEventListener;
+    private DatabaseReference mPostCounter;
     // akkor nem
 
     @Override
@@ -114,7 +111,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //téma betöltése
-        SharedPreferences mSharedPref = getSharedPreferences("colorInfo", MODE_PRIVATE);
+        SharedPreferences mSharedPref = getSharedPreferences("Plinng", MODE_PRIVATE);
         constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
         constant.mColorValue = mSharedPref.getInt("color", constant.color);
         constant.mColorPosition = mSharedPref.getInt("position", 0);
@@ -124,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         // vibrációs beállítások
-        SharedPreferences mSharedProfileSettingsPref = getSharedPreferences("profileSettings",
+        SharedPreferences mSharedProfileSettingsPref = getSharedPreferences("Plinng",
                 MODE_PRIVATE);
         isVibrate = mSharedProfileSettingsPref.getBoolean("vibrate", true);
 
@@ -170,6 +167,7 @@ public class ChatActivity extends AppCompatActivity {
         @SuppressLint("InflateParams") View action_bar_view = inflater.inflate(R.layout
                 .chat_custom_bar, null);
 
+        mPostCount = action_bar_view.findViewById(R.id.custom_bar_counter);
         mTitle = action_bar_view.findViewById(R.id.custom_bar_title);
         mTitle.setText(mChatUserName);
         mLastSeen = action_bar_view.findViewById(R.id.custom_bar_seen);
@@ -332,6 +330,27 @@ public class ChatActivity extends AppCompatActivity {
 
         // géplést jelző pontok inicializálása
         dotloaderInit();
+
+        // bejegyzés számláló
+        loadPostCounter();
+    }
+
+    private void loadPostCounter() {
+        mPostCounter = mRootRef.child("messages").child(mCurrentUserID).child(mChatUser);
+        counterEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //Log.d(TAG, "onDataChange: count: "+dataSnapshot.getChildrenCount());
+                long count = dataSnapshot.getChildrenCount();
+                mPostCount.setText(String.valueOf(count)+" bejegyzés");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mPostCounter.addValueEventListener(counterEventListener);
     }
 
     private void dotloaderInit() {
@@ -346,6 +365,9 @@ public class ChatActivity extends AppCompatActivity {
                     if (window.equals(mCurrentUserID) && typing.equals("true")) {
                         mDotloader.setVisibility(View.VISIBLE);
                     } else {
+                        mDotloader.setVisibility(View.INVISIBLE);
+                    }
+                    if (typing.equals("false")){
                         mDotloader.setVisibility(View.INVISIBLE);
                     }
                 }
@@ -519,10 +541,6 @@ public class ChatActivity extends AppCompatActivity {
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child
                 (mChatUser);
         messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
-
-        final DatabaseReference seenef = mRootRef.child("messages").child(mChatUser).child
-                (mCurrentUserID);
-
         loadMessageChildEvent = new ChildEventListener() {
             public Messages message;
             public Boolean b;
@@ -831,6 +849,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesRef.child(mCurrentUserID).child(mChatUser).removeEventListener
                 (vibrateChildEventListener);
         mUsersRef.child(mChatUser).removeEventListener(dotValueEventListener);
+        mPostCounter.addValueEventListener(counterEventListener);
     }
 
     @Override

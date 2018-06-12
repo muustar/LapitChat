@@ -14,7 +14,7 @@ public class UpdateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //téma betöltése
-        SharedPreferences mSharedPref = getSharedPreferences("colorInfo", MODE_PRIVATE);
+        SharedPreferences mSharedPref = getSharedPreferences("Plinng", MODE_PRIVATE);
         constant.mAppTheme = mSharedPref.getInt("theme", constant.theme);
         constant.mColorValue = mSharedPref.getInt("color", constant.color);
         constant.mColorPosition = mSharedPref.getInt("position", 0);
