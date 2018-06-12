@@ -76,8 +76,9 @@
     <string name="profile_settings">Fiók beállításai</string>
     <string name="deleted_message">törölt üzenet</string>
     <string name="change_email">E-mail cím módosítás</string>
-    <string name="az_email_c_m_cser_j_hez">Az email cím cseréjéhez</string>
-    <string name="current_email_address">Current email address</string>
-    <string name="new_email_address">New email address</string>
+    <string name="az_email_c_m_cser_j_hez">Az email cím cseréjéhez meg kell adni a jelenlegi email cimet és jelszót, majd az új emal címet.</string>
+    <string name="current_email_address">Jelenlegi email cím</string>
+    <string name="new_email_address">Új email cím</string>
+    <string name="password_8_car">A jelszó legalaább 8 karakter legyen</string>
 
 </resources>

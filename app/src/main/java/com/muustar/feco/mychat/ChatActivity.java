@@ -39,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bhargavms.dotloader.DotLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -70,6 +71,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView mTitle;
     private TextView mLastSeen;
     private CircleImageView mProfileImage;
+    private DotLoader mDotloader;
 
     private CircleImageView mChatAddBtn;
     private EditText mChatMessageEdT;
@@ -104,6 +106,7 @@ public class ChatActivity extends AppCompatActivity {
     private String mNotificationTAG;
     private Boolean isVibrate; //a user beállítás szerint , ha igaz akkor vibrálhat, ha hamis
     private ChildEventListener vibrateChildEventListener;
+    private ValueEventListener dotValueEventListener;
     // akkor nem
 
     @Override
@@ -143,6 +146,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatSendBtn = findViewById(R.id.chat_send);
         mMessageList = findViewById(R.id.message_list);
         mRefreshLayout = findViewById(R.id.message_swipe_layout);
+        mDotloader = findViewById(R.id.dot_loader);
 
         mLinearLayout = new LinearLayoutManager(this);
         mMessageList.setHasFixedSize(true);
@@ -244,10 +248,18 @@ public class ChatActivity extends AppCompatActivity {
 
                 if (s.length() == 0) {
                     fordulhat[0] = true;
+                    // gépelés befejeződött, mentük az adatbázisba
+                    mUsersRef.child(mCurrentUserID).child("typing").setValue(false);
                 }
-                if (s.length() == 1 && fordulhat[0]) {
-                    mChatSendBtn.startAnimation(rotate);
-                    fordulhat[0] = false;
+                if (s.length() == 1) {
+                    // gépelés megkezdődött, mentük az adatbázisba
+                    mUsersRef.child(mCurrentUserID).child("typing").setValue(true);
+
+                    // fordulás animáció
+                    if (fordulhat[0]) {
+                        mChatSendBtn.startAnimation(rotate);
+                        fordulhat[0] = false;
+                    }
                 }
             }
 
@@ -260,7 +272,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatMessageEdT.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "onTouch: TOUCH" + event);
+                //Log.d(TAG, "onTouch: TOUCH" + event);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -317,6 +329,34 @@ public class ChatActivity extends AppCompatActivity {
                         GALLERY_PICK_REQ);
             }
         });
+
+        // géplést jelző pontok inicializálása
+        dotloaderInit();
+    }
+
+    private void dotloaderInit() {
+
+        dotValueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild("typing")) {
+                    String window = dataSnapshot.child("chat_window_open").getValue().toString();
+                    String typing = dataSnapshot.child("typing").getValue().toString();
+                    //Log.d(TAG, "onDataChange: window: " + window + " typing: " + typing);
+                    if (window.equals(mCurrentUserID) && typing.equals("true")) {
+                        mDotloader.setVisibility(View.VISIBLE);
+                    } else {
+                        mDotloader.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mUsersRef.child(mChatUser).addValueEventListener(dotValueEventListener);
     }
 
     private void loadSeenStatus() {
@@ -786,9 +826,11 @@ public class ChatActivity extends AppCompatActivity {
                     ("Users").child(currentUser.getUid());
             mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
             mUserDatabase.child("chat_window_open").setValue("false");
+            mUserDatabase.child("typing").setValue("false");
         }
         mMessagesRef.child(mCurrentUserID).child(mChatUser).removeEventListener
                 (vibrateChildEventListener);
+        mUsersRef.child(mChatUser).removeEventListener(dotValueEventListener);
     }
 
     @Override

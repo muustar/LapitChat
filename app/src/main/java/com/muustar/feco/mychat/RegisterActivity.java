@@ -38,7 +38,9 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private ProgressBar mProgressBar;
 
-    private String DEFAULT_IMAGE_ON_STORAGE = "https://firebasestorage.googleapis.com/v0/b/lapitchat-9a229.appspot.com/o/profile_images%2Fdefault%2Fdefault.png?alt=media&token=c25f4f16-74c7-4952-8657-efad8a7f3098";
+    private String DEFAULT_IMAGE_ON_STORAGE = "https://firebasestorage.googleapis" +
+            ".com/v0/b/lapitchat-9a229.appspot.com/o/profile_images%2Fdefault%2Fdefault" +
+            ".png?alt=media&token=c25f4f16-74c7-4952-8657-efad8a7f3098";
     private String[] mFunnyStrings;
     private Random r = new Random();
 
@@ -53,18 +55,17 @@ public class RegisterActivity extends AppCompatActivity {
         //firebase section
         mAuth = FirebaseAuth.getInstance();
 
-
         // displeay elements imitializing
         mProgressBar = findViewById(R.id.reg_progressbar);
         mToolbar = findViewById(R.id.reg_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(R.string.create_account);
-        // setDisplayHomeAsUpEnabled(true) engedélyezi, hogy az appbaron ott legyen bal oldalt a kicsi nyíl
+        // setDisplayHomeAsUpEnabled(true) engedélyezi, hogy az appbaron ott legyen bal oldalt a
+        // kicsi nyíl
         // a manifestben meg kell határozni, ki a parent, oda mutat a visszanyíl
         //  <activity android:name=".RegisterActivity"
         //      android:parentActivityName=".StartActivity"></activity>
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         mDisplayname = findViewById(R.id.reg_name);
         mEmail = findViewById(R.id.reg_email);
@@ -78,14 +79,17 @@ public class RegisterActivity extends AppCompatActivity {
                 String email = mEmail.getEditText().getText().toString().trim();
                 String password = mPassword.getEditText().getText().toString().trim();
 
-                if (!TextUtils.isEmpty(display_name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-                    register_user(display_name, email, password);
+                if (!TextUtils.isEmpty(display_name) && !TextUtils.isEmpty(email) && !TextUtils
+                        .isEmpty(password)) {
+                    if (password.length() >= 8) {
+                        register_user(display_name, email, password);
+                    }else{
+                        Toast.makeText(RegisterActivity.this, getString(R.string.password_8_car), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
-
     }
-
 
     private void register_user(final String display_name, String email, String password) {
         mProgressBar.setVisibility(View.VISIBLE);
@@ -105,7 +109,8 @@ public class RegisterActivity extends AppCompatActivity {
                             int funnyPosition = r.nextInt(mFunnyStrings.length) + 1;
                             String funnyStatus = mFunnyStrings[funnyPosition];
 
-                            mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+                            mDatabase = FirebaseDatabase.getInstance().getReference().child
+                                    ("Users").child(uid);
 
                             Map<String, Object> userMap = new HashMap<>();
                             userMap.put("name", display_name);
@@ -125,15 +130,12 @@ public class RegisterActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-
-
                         } else {
                             mProgressBar.setVisibility(View.INVISIBLE);
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(RegisterActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-
                         }
 
                         // ...
@@ -147,9 +149,7 @@ public class RegisterActivity extends AppCompatActivity {
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();
-
     }
-
 
     private void funnyStringInicializalas() {
         mFunnyStrings = new String[]{
@@ -159,44 +159,57 @@ public class RegisterActivity extends AppCompatActivity {
                 "T.G.I.A. (Thank goodness I'm awesome!)",
                 "Sometimes I prefer to use my face as emoticons.",
                 "I think it's really cool how the word \"OK\" is a sideways person!",
-                "Today is the first day of the rest of your life...And if that doesn't work out for you, tomorrow is the first day of the rest of your life...",
-                "Keep calm and know Google can help you find a way to fix almost every problem. If not it will tell you who can fix it.",
+                "Today is the first day of the rest of your life...And if that doesn't work out " +
+                        "for you, tomorrow is the first day of the rest of your life...",
+                "Keep calm and know Google can help you find a way to fix almost every problem. " +
+                        "If not it will tell you who can fix it.",
                 "It hurts when you go to unfriend someone and you find they've beat you to it!",
-                "If twitter wasn't around in the olden days why is there a hashtag button on landlines?",
+                "If twitter wasn't around in the olden days why is there a hashtag button on " +
+                        "landlines?",
                 "Time is precious. Waste it wisely.",
                 "If something's not going right, try left.",
                 "About to dance my feet silly!",
                 "Why bother reading books? We have Eminem he can read a whole story in 4 minutes.",
-                "I tried being awesome today, but I was just so tired from being awesome yesterday.",
+                "I tried being awesome today, but I was just so tired from being awesome " +
+                        "yesterday.",
                 "Wife: I'm pregnant, what do you want it to be? Husband: A joke.",
                 "Everyone is normal until you add them as your Facebook friend.",
                 "Everyone is normal until you find them on Twitter.",
                 "Relationship Status: COMING SOON",
                 "Back in 5 minutes (If not, read this status again).",
-                "LIKE if you hate it when someone tags you in a photo you look horrible in because they happen to look so good in it.",
-                "Phew! Thank you, warning label. I was actually considering using my toaster in the shower this morning.",
+                "LIKE if you hate it when someone tags you in a photo you look horrible in " +
+                        "because they happen to look so good in it.",
+                "Phew! Thank you, warning label. I was actually considering using my toaster in " +
+                        "the shower this morning.",
                 "Looking at school books and thinking - What a waste of a tree!",
-                "Nobody around here treats me like a glamour model, so I'm just going to sit here taking selfies by myself.",
+                "Nobody around here treats me like a glamour model, so I'm just going to sit here" +
+                        " taking selfies by myself.",
                 "Why didn't you reply to my text? Well, how am I supposed to reply to LOL?",
                 "Line dancing was originally invented by women waiting in line for the bathroom.",
                 "Don't tell me the sky's the limit when there are footprints on the moon.",
                 "Nothing is illegal...Until you get caught.",
                 "Friends are like boobs... Some are real some are fake.",
-                "Birthdays are good for your health. Studies show those who have more Birthdays live longer.",
+                "Birthdays are good for your health. Studies show those who have more Birthdays " +
+                        "live longer.",
                 "Food is an important part of a balanced diet.",
-                "When I get a pimple on my tongue I always feel guilty in case I've told a white lie.",
+                "When I get a pimple on my tongue I always feel guilty in case I've told a white " +
+                        "lie.",
                 "I dance like a car dealerships inflatable tube man.",
                 "I forgot to work out today. That's 5 years in a row!",
                 "If I went to hell, it would take me a week to realise I wasn't at work.",
                 "I hate it when I'm singing a song and the artist gets the words wrong.",
-                "That moment when you try talking to someone you're hot for and you say GFBLQRINABAH instead of \"I'm good thanks!\"",
+                "That moment when you try talking to someone you're hot for and you say " +
+                        "GFBLQRINABAH instead of \"I'm good thanks!\"",
                 "You look like I need a drink.",
                 "I wasn't drunk, I was just testing if the plant was as soft as my bed.",
-                "That awkward moment when you have a crush on the most inconvenient person possible.",
-                "I've got a dig bick. You read that wrong. The awkward when you read that wrong too and said 'Moment ' when it wasn' t there.",
+                "That awkward moment when you have a crush on the most inconvenient person " +
+                        "possible.",
+                "I've got a dig bick. You read that wrong. The awkward when you read that wrong " +
+                        "too and said 'Moment ' when it wasn' t there.",
                 "I put the 'Me' in 'Someone' and things get awkward.",
                 "Stop calling yourself hot, the only thing you turn on is the microwave !",
-                "That moment when someone you met for 3 seconds sends you a Facebook friend request.",
+                "That moment when someone you met for 3 seconds sends you a Facebook friend " +
+                        "request.",
                 "I tried being normal once. Most boring hour of my life.",
                 "You didn't notice that that I used a word twice in this sentence.",
                 "A fact of life: After Monday and Tuesday even the calender says W T F.",
@@ -206,7 +219,6 @@ public class RegisterActivity extends AppCompatActivity {
                 "Broken pencils are pointless.",
                 "\"What's up cake?\" - \"Muffin much\".",
                 "I don't have goals. Goals are for soccer. I' m not soccer."
-
         };
     }
 }

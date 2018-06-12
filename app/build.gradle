@@ -60,6 +60,10 @@ dependencies {
     //Colro Picker
     compile 'petrov.kristiyan:colorpicker-library:1.1.8'
 
+    // mozgó pontok
+    // https://github.com/bhargavms/DotLoader
+    compile 'com.github.bhargavms:DotLoader:1.1.1'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
