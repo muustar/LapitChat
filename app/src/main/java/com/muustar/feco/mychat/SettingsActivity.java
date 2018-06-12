@@ -108,141 +108,123 @@ public class SettingsActivity extends AppCompatActivity {
         mSeekbarSplash = findViewById(R.id.settings_splash_time);
         mTextSplash = findViewById(R.id.settings_splash_text);
 
-        // splash time beállító csúszka
-        /*
-        pozíciók:
-        200
-        500
-        1000
-        2000
-         */
-
-        switch (Constant.mVisibleTime) {
-            case 200:
-                mSeekbarSplash.setProgress(0);
-                mTextSplash.setText("0.2 s");
-                break;
-            case 500:
-                mSeekbarSplash.setProgress(1);
-                mTextSplash.setText("0.5 s");
-                break;
-            case 1000:
-                mSeekbarSplash.setProgress(2);
-                mTextSplash.setText("1 s");
-                break;
-            case 2000:
-                mSeekbarSplash.setProgress(3);
-                mTextSplash.setText("2 s");
-                break;
-        }
-        Log.d(TAG, "onProgressChanged: time: " + Constant.mVisibleTime);
-
-
-        mSeekbarSplash.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                switch (progress) {
-                    case 0:
-                        Constant.mVisibleTime = 200;
-                        mTextSplash.setText("0.2 s");
-                        break;
-                    case 1:
-                        Constant.mVisibleTime = 500;
-                        mTextSplash.setText("0.5 s");
-                        break;
-                    case 2:
-                        Constant.mVisibleTime = 1000;
-                        mTextSplash.setText("1 s");
-                        break;
-                    case 3:
-                        Constant.mVisibleTime = 2000;
-                        mTextSplash.setText("2 s");
-                        break;
-                }
-                SharedPreferences.Editor editor = mSharedProfileSettingsPref.edit();
-                editor.putInt("splash_time", Constant.mVisibleTime);
-                editor.commit();
-                Log.d(TAG, "onProgressChanged: time: " + Constant.mVisibleTime);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = mCurrentUser.getUid();
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
                 (currentUserId);
-        mUsersDatabase.keepSynced(true); // ezzel tarthatjuk helyben is syncronizálva, ehhez van
-        // beállítás a PlinngChat.java fájlban és a manifestben.
+        mUsersDatabase.keepSynced(true);
         mProfileImagesRef = FirebaseStorage.getInstance().getReference().child("profile_images");
 
-        mProgressBar.setVisibility(View.VISIBLE);
-        felhasznaloAdataiValueListener = new ValueEventListener() {
+
+
+        // amikor megnyílik az Activity ez a metódis tölti fel
+        kezdetiAdatokBetoltese();
+
+        // splash time beállító csúszka
+        splashInit();
+
+        // email csere gomb figyelése
+        emailCsere();
+
+        // email láthatóságának beállítása - figyelése
+        emaiLathatosag();
+
+        //vibrációs beállítások
+       vibraciosBeallitasok();
+
+        // kép megváltoztatása a képre kattintással
+       kepcsereEljaras();
+
+        //profil törlése gomb figyelése
+        profilTorlesFigyeles();
+
+        // status megváltoztatása
+        statusAtirasEljaras();
+
+        // Display name megváltoztatása
+        displayNameAtirasEljaras();
+
+        // háttéren való kattintás figyelés
+        backgroundClick();
+    }
+
+    private void backgroundClick() {
+        mBackground.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    User u = dataSnapshot.getValue(User.class);
-                    String name = dataSnapshot.child("name").getValue().toString();
-                    status = dataSnapshot.child("status").getValue().toString();
-                    mTaroltImage = dataSnapshot.child("image").getValue().toString();
-                    mTaroltImage_thumb = dataSnapshot.child("image_thumb").getValue().toString();
-                    mUserEmailAddress.setText(u.getEmail());
-                    if (dataSnapshot.child("email_visible").exists()) {
-                        Boolean email_visible = u.getEmail_visible();
-                        mEmailSwitch.setChecked(email_visible);
-                    }
-
-                    mDisplayname.setText(name);
-                    mStatus.setText(status);
-
-                    GlideApp.with(getApplicationContext())
-                            .load(mTaroltImage_thumb)
-                            .placeholder(R.mipmap.ic_placeholder_face)
-                            .error(R.mipmap.ic_placeholder_face)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .listener(new RequestListener<Drawable>() {
-                                @Override
-                                public boolean onLoadFailed(@Nullable GlideException e, Object
-                                        model, Target<Drawable> target, boolean isFirstResource) {
-                                    mProgressBar.setVisibility(View.GONE);
-                                    return false;
-                                }
-
-                                @Override
-                                public boolean onResourceReady(Drawable resource, Object model,
-                                                               Target<Drawable> target,
-                                                               DataSource dataSource, boolean
-                                                                       isFirstResource) {
-                                    mProgressBar.setVisibility(View.GONE);
-                                    return false;
-                                }
-                            })
-                            .into(mImage);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-
-        mEmailSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mUsersDatabase.child("email_visible").setValue(isChecked);
+            public void onClick(View v) {
+                mNewDisplayName.setVisibility(View.INVISIBLE);
+                mDisplayname.setVisibility(View.VISIBLE);
+                mNewStatus.setVisibility(View.INVISIBLE);
+                mStatus.setVisibility(View.VISIBLE);
+                //billentyűzet elrejtése
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                        .INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mBackground.getWindowToken(), 0);
             }
         });
+    }
 
+    private void displayNameAtirasEljaras() {
+        mDisplayname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayname = mDisplayname.getText().toString();
+                mDisplayname.setVisibility(View.INVISIBLE);
+
+                mNewDisplayName.setVisibility(View.VISIBLE);
+                mNewDisplayName.setText(displayname);
+
+                //show keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                        .INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+                int textLength = mNewDisplayName.getText().length();
+                mNewDisplayName.setSelection(0, textLength);
+                mNewDisplayName.setCursorVisible(true);
+            }
+        });
+        mNewDisplayName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    mNewDisplayName.setVisibility(View.INVISIBLE);
+                    mDisplayname.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        mNewDisplayName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                        actionId == EditorInfo.IME_ACTION_DONE ||
+                        event != null &&
+                                event.getAction() == KeyEvent.ACTION_DOWN &&
+                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    if (event == null || !event.isShiftPressed()) {
+                        // the user is done typing.
+                        newNameValidate();
+                        return true; // consume.
+                    }
+                }
+                return false; // pass on to other listeners.
+            }
+        });
+    }
+
+    private void profilTorlesFigyeles() {
+        mDeleteProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent deleteprofileIntent = new Intent(SettingsActivity.this,
+                        DeleteProfileActivity.class);
+                finish();
+                startActivity(deleteprofileIntent);
+            }
+        });
+    }
+
+    private void emailCsere() {
         mChangeEmailBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -252,20 +234,18 @@ public class SettingsActivity extends AppCompatActivity {
                 //finish();
             }
         });
+    }
 
-        //vibrációs beállítások
-        mVibrateSwitch.setChecked(mSharedProfileSettingsPref.getBoolean("vibrate", true));
-        mVibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+    private void emaiLathatosag(){
+        mEmailSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                SharedPreferences.Editor editor = mSharedProfileSettingsPref.edit();
-                editor.putBoolean("vibrate", isChecked);
-                editor.commit();
+                mUsersDatabase.child("email_visible").setValue(isChecked);
             }
         });
+    }
 
-        // kép megváltoztatása a képre kattintással
+    private void kepcsereEljaras() {
         mImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,39 +256,9 @@ public class SettingsActivity extends AppCompatActivity {
                         GALLERY_PICK);
             }
         });
-        /*
-        mChangeImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"),
-                        GALLERY_PICK);
-            }
-        });
-        */
-        /*
-        mChangeStatusBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent statusIntent = new Intent(SettingsActivity.this, StatusActivity.class);
-                statusIntent.putExtra("status", status);
-                startActivity(statusIntent);
-            }
-        });
-        */
-        mDeleteProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent deleteprofileIntent = new Intent(SettingsActivity.this,
-                        DeleteProfileActivity.class);
-                finish();
-                startActivity(deleteprofileIntent);
-            }
-        });
+    }
 
-        // status megváltoztatása
+    private void statusAtirasEljaras() {
         // status változó tárolja
         mStatus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -376,66 +326,142 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        // Display name megváltoztatása
-        mDisplayname.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private void vibraciosBeallitasok() {
+        //vibrációs beállítások
+        mVibrateSwitch.setChecked(mSharedProfileSettingsPref.getBoolean("vibrate", true));
+        mVibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                displayname = mDisplayname.getText().toString();
-                mDisplayname.setVisibility(View.INVISIBLE);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                mNewDisplayName.setVisibility(View.VISIBLE);
-                mNewDisplayName.setText(displayname);
-
-                //show keyboard
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context
-                        .INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-
-                int textLength = mNewDisplayName.getText().length();
-                mNewDisplayName.setSelection(0, textLength);
-                mNewDisplayName.setCursorVisible(true);
+                SharedPreferences.Editor editor = mSharedProfileSettingsPref.edit();
+                editor.putBoolean("vibrate", isChecked);
+                editor.commit();
             }
         });
-        mNewDisplayName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+    }
+
+    private void kezdetiAdatokBetoltese() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        felhasznaloAdataiValueListener = new ValueEventListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    mNewDisplayName.setVisibility(View.INVISIBLE);
-                    mDisplayname.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-        mNewDisplayName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                        actionId == EditorInfo.IME_ACTION_DONE ||
-                        event != null &&
-                                event.getAction() == KeyEvent.ACTION_DOWN &&
-                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    if (event == null || !event.isShiftPressed()) {
-                        // the user is done typing.
-                        newNameValidate();
-                        return true; // consume.
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    User u = dataSnapshot.getValue(User.class);
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    status = dataSnapshot.child("status").getValue().toString();
+                    mTaroltImage = dataSnapshot.child("image").getValue().toString();
+                    mTaroltImage_thumb = dataSnapshot.child("image_thumb").getValue().toString();
+                    mUserEmailAddress.setText(u.getEmail());
+                    if (dataSnapshot.child("email_visible").exists()) {
+                        Boolean email_visible = u.getEmail_visible();
+                        mEmailSwitch.setChecked(email_visible);
                     }
+
+                    mDisplayname.setText(name);
+                    mStatus.setText(status);
+
+                    GlideApp.with(getApplicationContext())
+                            .load(mTaroltImage_thumb)
+                            .placeholder(R.mipmap.ic_placeholder_face)
+                            .error(R.mipmap.ic_placeholder_face)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .listener(new RequestListener<Drawable>() {
+                                @Override
+                                public boolean onLoadFailed(@Nullable GlideException e, Object
+                                        model, Target<Drawable> target, boolean isFirstResource) {
+                                    mProgressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(Drawable resource, Object model,
+                                                               Target<Drawable> target,
+                                                               DataSource dataSource, boolean
+                                                                       isFirstResource) {
+                                    mProgressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+                            })
+                            .into(mImage);
                 }
-                return false; // pass on to other listeners.
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+    }
+
+    private void splashInit() {
+         /*
+        pozíciók:
+        200
+        500
+        1000
+        2000
+         */
+
+        switch (Constant.mVisibleTime) {
+            case 200:
+                mSeekbarSplash.setProgress(0);
+                mTextSplash.setText("0.2 s");
+                break;
+            case 500:
+                mSeekbarSplash.setProgress(1);
+                mTextSplash.setText("0.5 s");
+                break;
+            case 1000:
+                mSeekbarSplash.setProgress(2);
+                mTextSplash.setText("1 s");
+                break;
+            case 2000:
+                mSeekbarSplash.setProgress(3);
+                mTextSplash.setText("2 s");
+                break;
+        }
+
+
+        mSeekbarSplash.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                switch (progress) {
+                    case 0:
+                        Constant.mVisibleTime = 200;
+                        mTextSplash.setText("0.2 s");
+                        break;
+                    case 1:
+                        Constant.mVisibleTime = 500;
+                        mTextSplash.setText("0.5 s");
+                        break;
+                    case 2:
+                        Constant.mVisibleTime = 1000;
+                        mTextSplash.setText("1 s");
+                        break;
+                    case 3:
+                        Constant.mVisibleTime = 2000;
+                        mTextSplash.setText("2 s");
+                        break;
+                }
+                SharedPreferences.Editor editor = mSharedProfileSettingsPref.edit();
+                editor.putInt("splash_time", Constant.mVisibleTime);
+                editor.commit();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
 
-        mBackground.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mNewDisplayName.setVisibility(View.INVISIBLE);
-                mDisplayname.setVisibility(View.VISIBLE);
-                mNewStatus.setVisibility(View.INVISIBLE);
-                mStatus.setVisibility(View.VISIBLE);
-                //billentyűzet elrejtése
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context
-                        .INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mBackground.getWindowToken(), 0);
-            }
-        });
     }
 
     private void newNameValidate() {

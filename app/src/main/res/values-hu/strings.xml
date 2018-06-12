@@ -81,5 +81,8 @@
     <string name="new_email_address">Új email cím</string>
     <string name="password_8_car">A jelszó legalaább 8 karakter legyen</string>
     <string name="change_the_splash_screen_time">Splash screen időkorlátja</string>
+    <string name="open_profile">Profile megnyitása</string>
+    <string name="send_message">Üzenet küldés</string>
+    <string name="select_options">Kérlek válassz</string>
 
 </resources>

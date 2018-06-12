@@ -1,6 +1,5 @@
 package com.muustar.feco.mychat;
 
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,7 +33,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -46,21 +44,20 @@ public class FriendsFragment extends Fragment {
     private DatabaseReference usersRef;
     private DatabaseReference friendsRef;
 
-
     public FriendsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ctx = container.getContext();
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_friends, container, false);
-        mFriendsView = (RecyclerView) v.findViewById(R.id.friends_recycler);
+        View fragmentView = inflater.inflate(R.layout.fragment_friends, container, false);
+        mFriendsView = fragmentView.findViewById(R.id.friends_recycler);
         mFriendsView.setHasFixedSize(true);
         LinearLayoutManager mLayout = new LinearLayoutManager(ctx);
+
         //mLayout.setReverseLayout(true);
         mFriendsView.setLayoutManager(mLayout);
 
@@ -68,8 +65,8 @@ public class FriendsFragment extends Fragment {
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         usersRef.keepSynced(true);
 
-
-        friendsRef = FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrentUser);
+        friendsRef = FirebaseDatabase.getInstance().getReference().child("Friends").child
+                (mCurrentUser);
         friendsRef.keepSynced(true);
 
         Query query = friendsRef.orderByChild("date");
@@ -79,11 +76,10 @@ public class FriendsFragment extends Fragment {
                         .setQuery(query, Friend.class)
                         .build();
 
-
         adapter = new FirebaseRecyclerAdapter<Friend, FriendsFragment.FriendsViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull final FriendsViewHolder holder, int position, @NonNull final Friend model) {
-
+            protected void onBindViewHolder(@NonNull final FriendsViewHolder holder, int
+                    position, @NonNull final Friend model) {
 
                 holder.setmSingleStatus(model.getDate());
 
@@ -95,7 +91,8 @@ public class FriendsFragment extends Fragment {
                         User u;
                         if (!dataSnapshot.exists()) {
                             //private String name, status, image, image_thumb, email, uid;
-                            u = new User("Törölt profile", "...", "default", "default", "törölt", "null", false);
+                            u = new User("Törölt profile", "...", "default", "default", "törölt",
+                                    "null", false);
                         } else {
                             u = dataSnapshot.getValue(User.class);
                         }
@@ -116,25 +113,26 @@ public class FriendsFragment extends Fragment {
                             holder.setOnlineDot(online);
                         }
 
-
                         //kattintás feature
                         holder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
 
-
-                                // felugró menüből választhatunk, hogy a csetbe megyünk vagy a profilra
-                                CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
+                                // felugró menüből választhatunk, hogy a csetbe megyünk vagy a
+                                // profilra
+                                CharSequence options[] = new CharSequence[]{getString(R.string
+                                        .open_profile), getString(R.string.send_message)};
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-                                builder.setTitle("Select Options");
+                                builder.setTitle(R.string.select_options);
                                 builder.setItems(options, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
 
                                         if (which == 0) {
-                                            Intent profileIntent = new Intent(ctx, ProfileActivity.class);
+                                            Intent profileIntent = new Intent(ctx,
+                                                    ProfileActivity.class);
                                             profileIntent.putExtra("uid", list_user_id);
                                             startActivity(profileIntent);
                                         }
@@ -146,7 +144,6 @@ public class FriendsFragment extends Fragment {
                                             chatIntent.putExtra("img", chatUserImg);
                                             startActivity(chatIntent);
                                         }
-
                                     }
                                 });
                                 builder.show();
@@ -160,8 +157,6 @@ public class FriendsFragment extends Fragment {
                                 startActivity(chatIntent);*/
                             }
                         });
-
-
                     }
 
                     @Override
@@ -169,14 +164,13 @@ public class FriendsFragment extends Fragment {
 
                     }
                 });
-
-
             }
-
 
             @NonNull
             @Override
-            public FriendsFragment.FriendsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public FriendsFragment.FriendsViewHolder onCreateViewHolder(@NonNull ViewGroup
+                                                                                parent, int
+                                                                                viewType) {
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.users_single_layout, parent, false);
                 return new FriendsFragment.FriendsViewHolder(view);
@@ -188,24 +182,24 @@ public class FriendsFragment extends Fragment {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-                mFriendsView.smoothScrollToPosition(adapter.getItemCount());
+                //mFriendsView.smoothScrollToPosition(adapter.getItemCount());
+                mFriendsView.smoothScrollToPosition(0);
             }
         });
         mFriendsView.setAdapter(adapter);
 
-
-        return v;
+        return fragmentView;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         adapter.startListening();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         adapter.stopListening();
     }
 
@@ -229,18 +223,12 @@ public class FriendsFragment extends Fragment {
                 Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_offline);
                 mOnlineDot.startAnimation(animation);
             }
-
-
-        }
-
-        public void setmEmail(String mail) {
-            mEmail = mView.findViewById(R.id.users_single_email);
-            mEmail.setText(mail);
         }
 
         public void setmSingleImage(Context ctx, String imgurl) {
             mSingleImage = mView.findViewById(R.id.users_single_image);
-            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy
+                    .ALL); // ezzel lehet a képeket a lemezen synkronban tartani
             GlideApp
                     .with(ctx)
                     .load(imgurl)
@@ -264,8 +252,5 @@ public class FriendsFragment extends Fragment {
             super(itemView);
             mView = itemView;
         }
-
-
     }
-
 }

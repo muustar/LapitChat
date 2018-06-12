@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.muustar.feco.mychat">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -35,7 +38,8 @@
             android:parentActivityName=".StartActivity" />
         <activity
             android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".StatusActivity"
             android:parentActivityName=".SettingsActivity" />
@@ -92,7 +96,8 @@
         <activity
             android:name=".AppInfoActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".ChangeEmailActivity"
+        <activity
+            android:name=".ChangeEmailActivity"
             android:parentActivityName=".SettingsActivity">
 
         </activity>
