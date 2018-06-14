@@ -88,7 +88,6 @@
                 android:layout_below="@+id/settings_emailaddress"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
-                android:autoLink="web"
                 android:text="@string/hi_there_i_m_using_lapit_chat_app"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"

@@ -18,12 +18,16 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.drawable.ProgressBarDrawable;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -74,12 +78,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         RecyclerView.ViewHolder viewHolder = null;
         switch (viewType) {
             case VIEW_TYPE_ME:
-                View viewChatMine = layoutInflater.inflate(R.layout.message_single_layout_me,
+                View viewChatMine = layoutInflater.inflate(R.layout.message_single_layout_me_uj,
                         parent, false);
                 viewHolder = new MyChatViewHolder(viewChatMine);
                 break;
             case VIEW_TYPE_OTHER:
-                View viewChatOther = layoutInflater.inflate(R.layout.message_single_layout_other,
+                View viewChatOther = layoutInflater.inflate(R.layout.message_single_layout_other_uj,
                         parent, false);
                 viewHolder = new OtherChatViewHolder(viewChatOther);
                 break;
@@ -140,32 +144,53 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    private void setAnimation(View viewToAnimate, int position, int viewType)
-    {
+    private void setAnimation(View viewToAnimate, int position, int viewType) {
         // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > lastPosition)
-        {
-            if (viewType == VIEW_TYPE_ME){
-                Animation animation = AnimationUtils.loadAnimation(ctx, android.R.anim.slide_in_left);
+        if (position > lastPosition) {
+            if (viewType == VIEW_TYPE_ME) {
+                Animation animation = AnimationUtils.loadAnimation(ctx, android.R.anim
+                        .slide_in_left);
                 viewToAnimate.startAnimation(animation);
                 lastPosition = position;
-            }else{
+            } else {
                 Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.slide_in_right);
                 viewToAnimate.startAnimation(animation);
                 lastPosition = position;
             }
-
         }
     }
 
+    //=============================================================================
+    //  MY CHATVIEW HOLDER
+    //=============================================================================
     private void configureMyChatViewHolder(final MyChatViewHolder myChatViewHolder, int position) {
+
+        //profilkép beállítása
+        DatabaseReference UserRef = FirebaseDatabase.getInstance().getReference().child("Users")
+                .child(mCurrenUserId);
+        UserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                String imageUrl = user.getImage_thumb();
+                myChatViewHolder.setProfileImage(ctx, imageUrl);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //üzenet test betöltése
         String key = mMessageList.get(position).getNodeKey();
         if (mMessageList.get(position).getType().equals("image")) {
             myChatViewHolder.imageMessage.setVisibility(View.VISIBLE);
             myChatViewHolder.messageText.setVisibility(View.GONE);
 
             // erre a API 19 miatt van szükség
-            myChatViewHolder.imageMessage.setBackgroundResource(getBgDependsColor(color));
+            myChatViewHolder.szoveghatterLinearLayout.setBackgroundResource(getBgDependsColor
+                    (color));
 
             final String imgUrl = mMessageList.get(position).getMessage();
             myChatViewHolder.setImageMessage(ctx, imgUrl);
@@ -178,16 +203,22 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     //https://github.com/stfalcon-studio/FrescoImageViewer/blob/master/README.md
                     new ImageViewer.Builder(ctx, Collections.singletonList(imgUrl))
                             .setStartPosition(0)
+                            .setCustomDraweeHierarchyBuilder(new GenericDraweeHierarchyBuilder
+                                    (ctx.getResources())
+                                    .setFailureImage(R.mipmap.placeholder_sad)
+                                    .setPlaceholderImage(R.drawable.tenor))
                             .show();
                 }
             });
         } else {
+
             myChatViewHolder.imageMessage.setVisibility(View.GONE);
             myChatViewHolder.messageText.setVisibility(View.VISIBLE);
-            myChatViewHolder.messageText.setBackgroundResource(getBgDependsColor(color));
+            myChatViewHolder.messageText.setText(mMessageList.get(position).getMessage());
 
             // erre a API 19 miatt van szükség
-            myChatViewHolder.messageText.setText(mMessageList.get(position).getMessage());
+            myChatViewHolder.szoveghatterLinearLayout.setBackgroundResource(getBgDependsColor
+                    (color));
         }
 
         // seen status
@@ -215,6 +246,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 (mMessageList
                         .get(position).getTime()));
         myChatViewHolder.timeText.setText(dateString);
+        String shortTime = new SimpleDateFormat("HH:mm").format(new Date
+                (mMessageList
+                        .get(position).getTime()));
+        myChatViewHolder.setShortTime(shortTime);
+
         // ha rá kattintunk az üzenetre akkor jelenik meg
         myChatViewHolder.itemView.setOnClickListener(new View.OnClickListener()
 
@@ -248,9 +284,36 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             }
         });
+
+        myChatViewHolder.profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent profileIntent = new Intent(ctx, ProfileActivity.class);
+                profileIntent.putExtra("uid", mCurrenUserId);
+
+                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    // Do something for lollipop and above versions
+                    ctx.startActivity(profileIntent);
+                } else {
+                    // do something for phones running an SDK before lollipop
+                    Pair[] pairs = new Pair[1];
+                    pairs[0] = new Pair<View, String>(myChatViewHolder.profileImage,
+                            "imageTrans");
+                    ActivityOptions options;
+                    options = ActivityOptions
+                            .makeSceneTransitionAnimation((Activity) ctx, pairs);
+
+                    ctx.startActivity(profileIntent, options.toBundle());
+                }
+            }
+        });
+
         setAnimation(myChatViewHolder.itemView, position, VIEW_TYPE_ME);
     }
 
+    //=============================================================================
+    //  OTHER CHATVIEW HOLDER
+    //=============================================================================
     private void configureOtherChatViewHolder(final OtherChatViewHolder otherChatViewHolder,
                                               int
                                                       position) {
@@ -305,7 +368,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             .setStartPosition(0)
                             .setCustomDraweeHierarchyBuilder(new GenericDraweeHierarchyBuilder
                                     (ctx.getResources())
-                                    .setFailureImage(R.mipmap.placeholder_sad))
+                                    .setFailureImage(R.mipmap.placeholder_sad)
+                                    .setPlaceholderImage(R.drawable.tenor))
                             .show();
                 }
             });
@@ -316,11 +380,14 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         //üzenet idejánek beállítása
-        String lattam = String.valueOf(mMessageList.get(position).getSeen());
         String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date
                 (mMessageList
                         .get(position).getTime()));
         otherChatViewHolder.timeText.setText(dateString);
+        String shortTime = new SimpleDateFormat("HH:mm").format(new Date
+                (mMessageList
+                        .get(position).getTime()));
+        otherChatViewHolder.setShortTime(shortTime);
 
         // ha rá kattintunk az üzenetre akkor jelenik meg
         otherChatViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -400,11 +467,15 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    //=============================================================================
+    //  MyChatViewHolder
+    //=============================================================================
     private static class MyChatViewHolder extends RecyclerView.ViewHolder {
         private TextView messageText;
-        private TextView timeText, seenTextView;
+        private TextView timeText, seenTextView, shortTime;
         private CircleImageView profileImage;
         private ImageView imageMessage;
+        private LinearLayout szoveghatterLinearLayout;
 
         public MyChatViewHolder(View itemView) {
             super(itemView);
@@ -414,6 +485,22 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .message_single_profileimage_me);
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout_me);
             seenTextView = itemView.findViewById(R.id.message_single_seen_me);
+            shortTime = itemView.findViewById(R.id.message_single_text_shorttime_me);
+            szoveghatterLinearLayout = itemView.findViewById(R.id.message_single_text_ll);
+        }
+
+        public void setProfileImage(Context ctx, String url) {
+            GlideApp
+                    .with(ctx)
+                    .load(url)
+                    .placeholder(R.mipmap.ic_placeholder_face)
+                    .error(R.mipmap.placeholder_sad)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(profileImage);
+        }
+
+        public void setShortTime(String time) {
+            shortTime.setText(time);
         }
 
         public void setImageMessage(Context ctx, String url) {
@@ -437,7 +524,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    //=============================================================================
+    //  OtherChatViewHolder
+    //=============================================================================
     private static class OtherChatViewHolder extends RecyclerView.ViewHolder {
+        private TextView shortTime;
         private TextView messageText;
         private TextView timeText;
         private CircleImageView profileImage;
@@ -450,6 +541,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             profileImage = (CircleImageView) itemView.findViewById(R.id
                     .message_single_profileimage);
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout);
+            shortTime = itemView.findViewById(R.id.message_single_text_shorttime);
+        }
+
+        public void setShortTime(String time) {
+            shortTime.setText(time);
         }
 
         public void setImageMessage(Context ctx, String url) {

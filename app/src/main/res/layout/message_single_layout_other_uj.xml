@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/message_single_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="40dp"
+    android:layout_marginBottom="10dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/message_single_profileimage"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@mipmap/ic_placeholder_face"
+            android:transitionName="imageTrans"
+            android:layout_margin="3dp"
+            tools:targetApi="lollipop" />
+
+
+        <LinearLayout
+            android:id="@+id/message_single_text_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/message_text_bgwhite"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/message_single_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:autoLink="all"
+                android:padding="10dp"
+                android:text="An Ant build file defines the tasks for compiling JS and SWF components, useful if you make changes to the SM2 source and want to recompile. Google's Closure Compiler is used for the JS. AS2 compilation is done by MTASC, and AS3 is handled by Adobe's Open Source Flex SDK (mxmlc) compiler. Refer to build.xml for compiler downloads and path definitions."
+                android:textColor="@android:color/black"
+                android:transitionName="statusTrans"
+                android:visibility="visible"
+                tools:ignore="HardcodedText,UnusedAttribute" />
+
+            <ImageView
+                android:id="@+id/message_image_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="15dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/placeholder_kicsi"
+                android:visibility="gone"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/message_single_text_shorttime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="0"
+                android:textColor="@android:color/darker_gray"
+                android:text="21:12"
+                android:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/message_single_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginStart="40dp"
+        android:text="2018.03.01 10:23"
+        android:visibility="gone"
+        android:textColor="@android:color/darker_gray"
+        tools:ignore="HardcodedText" />
+
+
+</LinearLayout>

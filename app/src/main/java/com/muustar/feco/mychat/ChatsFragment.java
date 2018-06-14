@@ -226,9 +226,13 @@ public class ChatsFragment extends Fragment {
                             @Override
                             public boolean onLongClick(View v) {
 
+                                hosszukattintasKezelese();
+
+                                return true;
+                            }
+
+                            private void hosszukattintasKezelese() {
                                 //beszélgetés törlése feature
-
-
                                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(ctx);
                                 alertDialog.setTitle("Delete Chat");
                                 alertDialog.setIcon(android.R.drawable.ic_delete);
@@ -290,10 +294,7 @@ public class ChatsFragment extends Fragment {
                                             }
                                         });
                                 alertDialog.show();
-
-                                return true;
                             }
-
                         });
 
 
@@ -307,9 +308,8 @@ public class ChatsFragment extends Fragment {
 
             }
 
-        }
+        };
 
-        ;
         adapter.notifyDataSetChanged();
 
         // a megfelelő pozícióra ugrik - (többnyire :( )

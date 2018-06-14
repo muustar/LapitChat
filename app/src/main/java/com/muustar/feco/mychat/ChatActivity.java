@@ -83,7 +83,7 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager mLinearLayout;
     private MessageAdapter mAdapter;
 
-    private static final int TOTAL_ITEMS_TO_LOAD = 30;
+    private static final int TOTAL_ITEMS_TO_LOAD = 10;
     private SwipeRefreshLayout mRefreshLayout;
     private int itemPos = 0;
     private String mLastKey = "";
@@ -161,7 +161,6 @@ public class ChatActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
-        //actionBar.setTitle(mChatUserName);
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") View action_bar_view = inflater.inflate(R.layout
@@ -282,22 +281,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        mChatMessageEdT.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                Log.d(TAG, "onFocusChange: " + hasFocus);
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMessageList.scrollToPosition(messagesList.size() - 1);
-                        mLinearLayout.scrollToPositionWithOffset(messagesList.size() - 1, 0);
-                    }
-                }, 200);
-            }
-        });
-        */
 
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -328,8 +311,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        // géplést jelző pontok inicializálása
-        dotloaderInit();
+
 
         // bejegyzés számláló
         loadPostCounter();
@@ -540,7 +522,7 @@ public class ChatActivity extends AppCompatActivity {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserID).child
                 (mChatUser);
-        messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
+        messageQuery = messageRef.limitToLast(30);
         loadMessageChildEvent = new ChildEventListener() {
             public Messages message;
             public Boolean b;
@@ -832,6 +814,8 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // géplést jelző pontok inicializálása
+        dotloaderInit();
     }
 
     @Override
