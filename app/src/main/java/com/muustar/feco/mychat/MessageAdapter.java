@@ -2,7 +2,9 @@ package com.muustar.feco.mychat;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -17,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -59,6 +63,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private String mChatuser;
     private Context ctx;
     private int lastPosition = -1;
+
+
 
     public MessageAdapter(List<Messages> mMessageList, int color, String mChatuser) {
         this.mMessageList = mMessageList;
@@ -163,7 +169,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     //=============================================================================
     //  MY CHATVIEW HOLDER
     //=============================================================================
-    private void configureMyChatViewHolder(final MyChatViewHolder myChatViewHolder, int position) {
+    private void configureMyChatViewHolder(final MyChatViewHolder myChatViewHolder, final int
+            position) {
 
         //profilkép beállítása
         DatabaseReference UserRef = FirebaseDatabase.getInstance().getReference().child("Users")
@@ -222,7 +229,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         // seen status
-        DatabaseReference mMessageRef = FirebaseDatabase.getInstance().getReference().child
+        final DatabaseReference mMessageRef = FirebaseDatabase.getInstance().getReference().child
                 ("messages").child(mChatuser).child(mCurrenUserId).child(key);
 
         mMessageRef.addValueEventListener(new ValueEventListener() {
@@ -250,6 +257,29 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 (mMessageList
                         .get(position).getTime()));
         myChatViewHolder.setShortTime(shortTime);
+
+        myChatViewHolder.profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent profileIntent = new Intent(ctx, ProfileActivity.class);
+                profileIntent.putExtra("uid", mCurrenUserId);
+
+                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    // Do something for lollipop and above versions
+                    ctx.startActivity(profileIntent);
+                } else {
+                    // do something for phones running an SDK before lollipop
+                    Pair[] pairs = new Pair[1];
+                    pairs[0] = new Pair<View, String>(myChatViewHolder.profileImage,
+                            "imageTrans");
+                    ActivityOptions options;
+                    options = ActivityOptions
+                            .makeSceneTransitionAnimation((Activity) ctx, pairs);
+
+                    ctx.startActivity(profileIntent, options.toBundle());
+                }
+            }
+        });
 
         // ha rá kattintunk az üzenetre akkor jelenik meg
         myChatViewHolder.itemView.setOnClickListener(new View.OnClickListener()
@@ -285,28 +315,161 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
         });
 
-        myChatViewHolder.profileImage.setOnClickListener(new View.OnClickListener() {
+        //hosszan kattintunk
+        myChatViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent profileIntent = new Intent(ctx, ProfileActivity.class);
-                profileIntent.putExtra("uid", mCurrenUserId);
+            public boolean onLongClick(View v) {
 
-                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    // Do something for lollipop and above versions
-                    ctx.startActivity(profileIntent);
+                if (myChatViewHolder.mDelete.getVisibility() == View.VISIBLE) {
+                    myChatViewHolder.mDelete.setVisibility(View.GONE);
+                    myChatViewHolder.mEdit.setVisibility(View.INVISIBLE);
+                    myChatViewHolder.mEdited.setVisibility(View.INVISIBLE);
                 } else {
-                    // do something for phones running an SDK before lollipop
-                    Pair[] pairs = new Pair[1];
-                    pairs[0] = new Pair<View, String>(myChatViewHolder.profileImage,
-                            "imageTrans");
-                    ActivityOptions options;
-                    options = ActivityOptions
-                            .makeSceneTransitionAnimation((Activity) ctx, pairs);
-
-                    ctx.startActivity(profileIntent, options.toBundle());
+                    myChatViewHolder.mDelete.setVisibility(View.VISIBLE);
+                    myChatViewHolder.mEdit.setVisibility(View.VISIBLE);
+                    myChatViewHolder.mEdited.setVisibility(View.GONE);
                 }
+                return true;
             }
         });
+
+        // üzenet szerkesztése feature
+        myChatViewHolder.mEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: EDIT");
+
+                // a fleugró ablak
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ctx);
+                alertDialog.setTitle("Üzenet módosítása");
+                //alertDialog.setMessage("termék neve");
+                final EditText input = new EditText(ctx);
+                input.setText(mMessageList.get(position).getMessage());
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+
+                alertDialog.setView(input);
+                alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+                alertDialog.setPositiveButton("Módosítás",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // adatbázisba írás
+                                // TODO
+                                String newMessage = input.getText().toString().trim();
+                                DatabaseReference messageref = FirebaseDatabase.getInstance().getReference().child
+                                        ("messages");
+                                // Mcurrentuser oldala
+                                messageref.child(mCurrenUserId)
+                                        .child(mChatuser)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("message")
+                                        .setValue(newMessage);
+                                messageref.child(mCurrenUserId)
+                                        .child(mChatuser)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("edited_status")
+                                        .setValue("edited");
+
+                                //mChatUser oldala
+                                messageref.child(mChatuser)
+                                        .child(mCurrenUserId)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("message")
+                                        .setValue(newMessage);
+                                messageref.child(mChatuser)
+                                        .child(mCurrenUserId)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("edited_status")
+                                        .setValue("edited");
+
+                                //billentyűzet elrejtése
+                                InputMethodManager imm = (InputMethodManager) ctx
+                                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+                            }
+                        });
+                alertDialog.setNegativeButton("Mégsem",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // hide keyboard
+                                InputMethodManager imm = (InputMethodManager) ctx
+                                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+                                dialog.cancel();
+                            }
+                        });
+
+                alertDialog.show();
+                input.requestFocus();
+                InputMethodManager imm = (InputMethodManager) ctx.getSystemService(Context
+                        .INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+            }
+        });
+        // üzenet törlése feature
+        myChatViewHolder.mDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO ----
+                Log.d(TAG, "onClick: DELETE");
+                // a fleugró ablak
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ctx);
+                alertDialog.setTitle("Üzenet törlése");
+                alertDialog.setIcon(android.R.drawable.ic_delete);
+                alertDialog.setPositiveButton("Üzenet törlése",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // adatbázisba írás
+                                // TODO
+                                String newMessage = ". . . ";
+                                DatabaseReference messageref = FirebaseDatabase.getInstance().getReference().child
+                                        ("messages");
+                                // Mcurrentuser oldala
+                                messageref.child(mCurrenUserId)
+                                        .child(mChatuser)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("message")
+                                        .setValue(newMessage);
+                                messageref.child(mCurrenUserId)
+                                        .child(mChatuser)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("edited_status")
+                                        .setValue("deleted");
+
+                                //mChatUser oldala
+                                messageref.child(mChatuser)
+                                        .child(mCurrenUserId)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("message")
+                                        .setValue(newMessage);
+                                messageref.child(mChatuser)
+                                        .child(mCurrenUserId)
+                                        .child(mMessageList.get(position).getNodeKey())
+                                        .child("edited_status")
+                                        .setValue("deleted");
+
+                            }
+                        });
+                alertDialog.setNegativeButton("Mégsem",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                alertDialog.show();
+            }
+        });
+
+        // a szerkesztett jelzés megjelenítése
+        myChatViewHolder.setEdited(mMessageList.get(position).getEdited_status());
+        Log.d(TAG, "configureMyChatViewHolder: edited_status " + mMessageList.get(position)
+                .getEdited_status());
 
         setAnimation(myChatViewHolder.itemView, position, VIEW_TYPE_ME);
     }
@@ -446,6 +609,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             }
         });
+
+
+        // a szerkesztett jelzés megjelenítése
+        otherChatViewHolder.setEdited(mMessageList.get(position).getEdited_status());
+        Log.d(TAG, "configureMyChatViewHolder: edited_status " + mMessageList.get(position)
+                .getEdited_status());
         setAnimation(otherChatViewHolder.itemView, position, VIEW_TYPE_OTHER);
     }
 
@@ -476,6 +645,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         private CircleImageView profileImage;
         private ImageView imageMessage;
         private LinearLayout szoveghatterLinearLayout;
+        private ImageView mDelete, mEdit, mEdited; // az edited marad az üzenet mellett ha
+        // szerkesztve volt
 
         public MyChatViewHolder(View itemView) {
             super(itemView);
@@ -487,6 +658,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             seenTextView = itemView.findViewById(R.id.message_single_seen_me);
             shortTime = itemView.findViewById(R.id.message_single_text_shorttime_me);
             szoveghatterLinearLayout = itemView.findViewById(R.id.message_single_text_ll);
+            mEdit = itemView.findViewById(R.id.message_single_edit_me);
+            mDelete = itemView.findViewById(R.id.message_single_delete_me);
+            mEdited = itemView.findViewById(R.id.message_single_edited_me);
         }
 
         public void setProfileImage(Context ctx, String url) {
@@ -522,6 +696,22 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 seenTextView.setVisibility(View.VISIBLE);
             }
         }
+
+        public void setEdited(String edited) {
+            switch (edited) {
+                case "original":
+                    mEdited.setVisibility(View.INVISIBLE);
+                    break;
+                case "edited":
+                    mEdited.setVisibility(View.VISIBLE);
+                    break;
+                case "deleted":
+                    mEdited.setVisibility(View.VISIBLE);
+                    mEdited.setImageResource(R.mipmap.round_delete_forever_black_24dp);
+                    break;
+            }
+        }
+
     }
 
     //=============================================================================
@@ -532,7 +722,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         private TextView messageText;
         private TextView timeText;
         private CircleImageView profileImage;
-        private ImageView imageMessage;
+        private ImageView imageMessage, mEdited;
 
         public OtherChatViewHolder(View itemView) {
             super(itemView);
@@ -542,6 +732,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .message_single_profileimage);
             imageMessage = (ImageView) itemView.findViewById(R.id.message_image_layout);
             shortTime = itemView.findViewById(R.id.message_single_text_shorttime);
+            mEdited = itemView.findViewById(R.id.message_single_edited);
         }
 
         public void setShortTime(String time) {
@@ -566,6 +757,21 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .error(R.mipmap.ic_placeholder_face)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(profileImage);
+        }
+
+        public void setEdited(String edited) {
+            switch (edited) {
+                case "original":
+                    mEdited.setVisibility(View.INVISIBLE);
+                    break;
+                case "edited":
+                    mEdited.setVisibility(View.VISIBLE);
+                    break;
+                case "deleted":
+                    mEdited.setVisibility(View.VISIBLE);
+                    mEdited.setImageResource(R.mipmap.round_delete_forever_black_24dp);
+                    break;
+            }
         }
     }
 }

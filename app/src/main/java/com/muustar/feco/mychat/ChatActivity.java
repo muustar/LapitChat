@@ -561,7 +561,10 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                Messages updateMessage = dataSnapshot.getValue(Messages.class);
+                messagesList.set(0,updateMessage);
+                mAdapter.notifyItemChanged(0);
+                Toast.makeText(ChatActivity.this, "change", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -836,10 +839,12 @@ public class ChatActivity extends AppCompatActivity {
         mPostCounter.addValueEventListener(counterEventListener);
     }
 
+
     @Override
     protected void onStop() {
         super.onStop();
         messageQuery.removeEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).removeEventListener(requestTorloEventListener);
     }
+
 }
