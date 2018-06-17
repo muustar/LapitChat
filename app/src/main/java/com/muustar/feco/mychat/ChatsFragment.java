@@ -1,6 +1,7 @@
 package com.muustar.feco.mychat;
 
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.DownloadManager;

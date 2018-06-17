@@ -11,7 +11,7 @@ public class Constant  {
     public static int mColorValue = color;
     public static int mColorPosition = 0;
 
-    private static int versionBeforePush = 62;
+    private static int versionBeforePush = 64;
     public static int VERSION = versionBeforePush +1;
     public static int AVAIABLE_VERSION = 0;
     public static long AVAIABLE_VERSION_DATE = 0;

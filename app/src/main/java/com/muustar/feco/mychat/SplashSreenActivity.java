@@ -44,7 +44,6 @@ public class SplashSreenActivity extends AppCompatActivity {
         setTheme(constant.mAppTheme);
         Constant.mVisibleTime = mVisibleTime;
 
-        Fresco.initialize(this);
         setContentView(R.layout.activity_splash_sreen);
         mFrame = findViewById(R.id.frame);
         mFrame.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE

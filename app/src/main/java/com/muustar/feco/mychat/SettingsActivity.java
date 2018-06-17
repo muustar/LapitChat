@@ -488,6 +488,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GALLERY_PICK && resultCode == RESULT_OK) {
+
             // start picker to get image for cropping and then use the image in cropping activity
             CropImage.activity(data.getData())
                     .setCropShape(CropImageView.CropShape.OVAL)

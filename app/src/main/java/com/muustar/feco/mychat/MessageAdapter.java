@@ -316,6 +316,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         });
 
         //hosszan kattintunk
+        /*
         myChatViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -332,12 +333,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 return true;
             }
         });
+        */
 
         // üzenet szerkesztése feature
         myChatViewHolder.mEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onClick: EDIT");
 
                 // a fleugró ablak
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(ctx);
@@ -415,7 +416,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             @Override
             public void onClick(View v) {
                 // TODO ----
-                Log.d(TAG, "onClick: DELETE");
+
                 // a fleugró ablak
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(ctx);
                 alertDialog.setTitle("Üzenet törlése");
@@ -468,8 +469,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         // a szerkesztett jelzés megjelenítése
         myChatViewHolder.setEdited(mMessageList.get(position).getEdited_status());
-        Log.d(TAG, "configureMyChatViewHolder: edited_status " + mMessageList.get(position)
-                .getEdited_status());
+
 
         setAnimation(myChatViewHolder.itemView, position, VIEW_TYPE_ME);
     }
@@ -604,7 +604,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     ActivityOptions options;
                     options = ActivityOptions
                             .makeSceneTransitionAnimation((Activity) ctx, pairs);
-
                     ctx.startActivity(profileIntent, options.toBundle());
                 }
             }
@@ -613,8 +612,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         // a szerkesztett jelzés megjelenítése
         otherChatViewHolder.setEdited(mMessageList.get(position).getEdited_status());
-        Log.d(TAG, "configureMyChatViewHolder: edited_status " + mMessageList.get(position)
-                .getEdited_status());
+        //Log.d(TAG, "configureMyChatViewHolder: edited_status " + mMessageList.get(position).getEdited_status());
         setAnimation(otherChatViewHolder.itemView, position, VIEW_TYPE_OTHER);
     }
 

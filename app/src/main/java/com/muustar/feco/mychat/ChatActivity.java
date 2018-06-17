@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bhargavms.dotloader.DotLoader;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,6 +52,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,6 +122,9 @@ public class ChatActivity extends AppCompatActivity {
         int mColorValue = Constant.mColorValue;
         setTheme(Constant.mAppTheme);
         setContentView(R.layout.activity_chat);
+
+        // a képek miatt inicializáni kell a Frescot
+        Fresco.initialize(this);
 
         // vibrációs beállítások
         SharedPreferences mSharedProfileSettingsPref = getSharedPreferences("Plinng",
@@ -298,14 +304,16 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        // kép küldése - az onActivityRequest folytatja a kezelést
         mChatAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+
+
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-
                 startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"),
                         GALLERY_PICK_REQ);
             }
@@ -315,6 +323,8 @@ public class ChatActivity extends AppCompatActivity {
 
         // bejegyzés számláló
         loadPostCounter();
+
+
     }
 
     private void loadPostCounter() {
@@ -402,6 +412,15 @@ public class ChatActivity extends AppCompatActivity {
         if (requestCode == GALLERY_PICK_REQ && resultCode == RESULT_OK) {
             chatOpening();
 
+            RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF,
+                    0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            rotateAnimation.setDuration(1000);
+            rotateAnimation.setRepeatCount(Animation.INFINITE);
+            rotateAnimation.setInterpolator(new LinearInterpolator());
+            rotateAnimation.setRepeatMode(Animation.RESTART);
+            mChatAddBtn.startAnimation(rotateAnimation);
+            mChatAddBtn.setEnabled(false);
+
             Uri imageUri = data.getData();
 
             final String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
@@ -444,6 +463,9 @@ public class ChatActivity extends AppCompatActivity {
                                     databaseReference) {
                                 if (databaseError != null) {
                                     Log.d("ERROR", databaseError.getMessage());
+                                }else{
+                                    mChatAddBtn.clearAnimation();
+                                    mChatAddBtn.setEnabled(true);
                                 }
                             }
                         });
@@ -561,10 +583,14 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Messages updateMessage = dataSnapshot.getValue(Messages.class);
-                messagesList.set(0,updateMessage);
-                mAdapter.notifyItemChanged(0);
-                Toast.makeText(ChatActivity.this, "change", Toast.LENGTH_SHORT).show();
+
+
+
+
+
+
+
+
             }
 
             @Override
