@@ -6,17 +6,28 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.menu.MenuBuilder;
+
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -25,12 +36,14 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,8 +66,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +80,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ChatActivity extends AppCompatActivity {
     private static final String TAG = "FECO";
     private static final int GALLERY_PICK_REQ = 4;
+    private static final int REQ_CAMERA_CODE = 5;
+    private static final int REQ_CAMERA_PERMISSION = 6;
     private Toolbar mChatToolbar;
     private TextView mTitle;
     private TextView mLastSeen;
@@ -107,6 +125,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView mPostCount; // a címsávban jelzi, hány bejegyzés történt eddig
     private ValueEventListener counterEventListener;
     private DatabaseReference mPostCounter;
+    private String mCurrentPhotoPath;
     // akkor nem
 
     @Override
@@ -287,7 +306,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -306,25 +324,97 @@ public class ChatActivity extends AppCompatActivity {
 
         // kép küldése - az onActivityRequest folytatja a kezelést
         mChatAddBtn.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v) {
 
+                PopupMenu popupMenu = new PopupMenu(ChatActivity.this, mChatAddBtn);
+                popupMenu.inflate(R.menu.popup_menu);
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        if (item.getItemId() == R.id.pup_camera) {
+
+                            if (ContextCompat.checkSelfPermission(ChatActivity.this, android
+                                    .Manifest.permission.CAMERA)
+                                    == PackageManager.PERMISSION_DENIED) {
+                                ActivityCompat.requestPermissions(ChatActivity.this, new
+                                        String[]{android.Manifest.permission.CAMERA},
+                                        REQ_CAMERA_PERMISSION);
+                                Toast.makeText(ChatActivity.this, "Kérek engedélyt a CAMERA-hoz. (Alkalmazások/Plinng/Engedélyek)", Toast.LENGTH_SHORT).show();
+                            } else {
+
+                                Intent takePictureIntent = new Intent(MediaStore
+                                        .ACTION_IMAGE_CAPTURE);
+                                // Ensure that there's a camera activity to handle the intent
+                                if (takePictureIntent.resolveActivity(getPackageManager()) !=
+                                        null) {
+                                    // Create the File where the photo should go
+                                    File photoFile = null;
+                                    try {
+                                        photoFile = createImageFile();
+                                    } catch (IOException ex) {
+                                        // Error occurred while creating the File
+                                    }
+                                    // Continue only if the File was successfully created
+                                    Log.d(TAG, "onMenuItemClick: FILE CREATED");
+                                    if (photoFile != null) {
+                                        Uri photoURI = FileProvider.getUriForFile(ChatActivity.this,
+                                                "com.example.android.fileprovider",
+                                                photoFile);
+                                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                                photoURI);
+                                        startActivityForResult(takePictureIntent, REQ_CAMERA_CODE);
+                                    }
+                                }
+                            }
+                        } else if (item.getItemId() == R.id.pup_gallery) {
+
+                            Intent galleryIntent = new Intent();
+                            galleryIntent.setType("image/*");
+                            galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(Intent.createChooser(galleryIntent, "Select " +
+                                            "Image"),
+                                    GALLERY_PICK_REQ);
+                        }
+
+                        return true;
+                    }
+                });
+
+                @SuppressLint("RestrictedApi") MenuPopupHelper menuHelper = new MenuPopupHelper
+                        (ChatActivity.this, (MenuBuilder) popupMenu.getMenu(), mChatAddBtn);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
 
 
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"),
-                        GALLERY_PICK_REQ);
+                /*
+
+                 */
             }
         });
 
-
-
         // bejegyzés számláló
         loadPostCounter();
+    }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
 
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        Log.d(TAG, "createImageFile: path: " + mCurrentPhotoPath);
+        return image;
     }
 
     private void loadPostCounter() {
@@ -334,7 +424,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //Log.d(TAG, "onDataChange: count: "+dataSnapshot.getChildrenCount());
                 long count = dataSnapshot.getChildrenCount();
-                mPostCount.setText(String.valueOf(count)+" bejegyzés");
+                mPostCount.setText(String.valueOf(count) + " bejegyzés");
             }
 
             @Override
@@ -359,7 +449,7 @@ public class ChatActivity extends AppCompatActivity {
                     } else {
                         mDotloader.setVisibility(View.INVISIBLE);
                     }
-                    if (typing.equals("false")){
+                    if (typing.equals("false")) {
                         mDotloader.setVisibility(View.INVISIBLE);
                     }
                 }
@@ -410,69 +500,85 @@ public class ChatActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GALLERY_PICK_REQ && resultCode == RESULT_OK) {
-            chatOpening();
-
-            RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF,
-                    0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-            rotateAnimation.setDuration(1000);
-            rotateAnimation.setRepeatCount(Animation.INFINITE);
-            rotateAnimation.setInterpolator(new LinearInterpolator());
-            rotateAnimation.setRepeatMode(Animation.RESTART);
-            mChatAddBtn.startAnimation(rotateAnimation);
-            mChatAddBtn.setEnabled(false);
-
-            Uri imageUri = data.getData();
-
-            final String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
-            final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserID;
-
-            DatabaseReference user_message_push = mRootRef.child("messages")
-                    .child(mCurrentUserID).child(mChatUser).push();
-            final String push_id = user_message_push.getKey();
-
-            StorageReference filepath = mImageStorage.child("message_images").child(push_id + "" +
-                    ".jpg");
-
-            // képet küldünk üzenetben
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask
-                    .TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        String download_url = task.getResult().getDownloadUrl().toString();
-
-                        // az értesítésben megküldjük a típusát és az urlt
-                        String type = "image";
-                        chatNotification(download_url, type);
-
-                        Map<String, Object> messageMap = new HashMap<>();
-                        messageMap.put("message", download_url);
-                        messageMap.put("seen", false);
-                        messageMap.put("type", "image");
-                        messageMap.put("time", ServerValue.TIMESTAMP);
-                        messageMap.put("from", mCurrentUserID);
-
-                        Map<String, Object> messageUserMap = new HashMap<String, Object>();
-                        messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-                        messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-
-                        mRootRef.updateChildren(messageUserMap, new DatabaseReference
-                                .CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference
-                                    databaseReference) {
-                                if (databaseError != null) {
-                                    Log.d("ERROR", databaseError.getMessage());
-                                }else{
-                                    mChatAddBtn.clearAnimation();
-                                    mChatAddBtn.setEnabled(true);
-                                }
-                            }
-                        });
-                    }
-                }
-            });
+            elkeszultKepKuldese(data);
         }
+
+        if (requestCode == REQ_CAMERA_CODE && resultCode == RESULT_OK) {
+            //elkeszultKepKuldese(data);
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            File f = new File(mCurrentPhotoPath);
+            Uri contentUri = Uri.fromFile(f);
+            mediaScanIntent.setData(contentUri);
+            this.sendBroadcast(mediaScanIntent);
+
+            elkeszultKepKuldese(mediaScanIntent);
+        }
+    }
+
+    private void elkeszultKepKuldese(Intent data) {
+
+        Uri imageUri = data.getData();
+
+        chatOpening();
+
+        RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF,
+                0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotateAnimation.setDuration(1000);
+        rotateAnimation.setRepeatCount(Animation.INFINITE);
+        rotateAnimation.setInterpolator(new LinearInterpolator());
+        rotateAnimation.setRepeatMode(Animation.RESTART);
+        mChatAddBtn.startAnimation(rotateAnimation);
+        mChatAddBtn.setEnabled(false);
+
+        final String current_user_ref = "messages/" + mCurrentUserID + "/" + mChatUser;
+        final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserID;
+
+        DatabaseReference user_message_push = mRootRef.child("messages")
+                .child(mCurrentUserID).child(mChatUser).push();
+        final String push_id = user_message_push.getKey();
+
+        StorageReference filepath = mImageStorage.child("message_images").child(push_id + "" +
+                ".jpg");
+
+        // képet küldünk üzenetben
+        filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask
+                .TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    String download_url = task.getResult().getDownloadUrl().toString();
+
+                    // az értesítésben megküldjük a típusát és az urlt
+                    String type = "image";
+                    chatNotification(download_url, type);
+
+                    Map<String, Object> messageMap = new HashMap<>();
+                    messageMap.put("message", download_url);
+                    messageMap.put("seen", false);
+                    messageMap.put("type", "image");
+                    messageMap.put("time", ServerValue.TIMESTAMP);
+                    messageMap.put("from", mCurrentUserID);
+
+                    Map<String, Object> messageUserMap = new HashMap<String, Object>();
+                    messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                    messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+                    mRootRef.updateChildren(messageUserMap, new DatabaseReference
+                            .CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference
+                                databaseReference) {
+                            if (databaseError != null) {
+                                Log.d("ERROR", databaseError.getMessage());
+                            } else {
+                                mChatAddBtn.clearAnimation();
+                                mChatAddBtn.setEnabled(true);
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void loadMoreMessages() {
@@ -583,13 +689,6 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-
-
-
-
-
-
 
             }
 
@@ -865,12 +964,10 @@ public class ChatActivity extends AppCompatActivity {
         mPostCounter.addValueEventListener(counterEventListener);
     }
 
-
     @Override
     protected void onStop() {
         super.onStop();
         messageQuery.removeEventListener(loadMessageChildEvent);
         mNotifyRef.child(mCurrentUserID).removeEventListener(requestTorloEventListener);
     }
-
 }
