@@ -48,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bhargavms.dotloader.DotLoader;
+import com.facebook.common.file.FileUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -82,6 +83,7 @@ public class ChatActivity extends AppCompatActivity {
     private static final int GALLERY_PICK_REQ = 4;
     private static final int REQ_CAMERA_CODE = 5;
     private static final int REQ_CAMERA_PERMISSION = 6;
+    private static final int REQ_STUFF_PICK = 7;
     private Toolbar mChatToolbar;
     private TextView mTitle;
     private TextView mLastSeen;
@@ -341,9 +343,11 @@ public class ChatActivity extends AppCompatActivity {
                                     .Manifest.permission.CAMERA)
                                     == PackageManager.PERMISSION_DENIED) {
                                 ActivityCompat.requestPermissions(ChatActivity.this, new
-                                        String[]{android.Manifest.permission.CAMERA},
+                                                String[]{android.Manifest.permission.CAMERA},
                                         REQ_CAMERA_PERMISSION);
-                                Toast.makeText(ChatActivity.this, "Kérek engedélyt a CAMERA-hoz. (Alkalmazások/Plinng/Engedélyek)", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ChatActivity.this, "Kérek engedélyt a CAMERA-hoz. " +
+                                        "(Alkalmazások/Plinng/Engedélyek)", Toast.LENGTH_SHORT)
+                                        .show();
                             } else {
 
                                 Intent takePictureIntent = new Intent(MediaStore
@@ -359,7 +363,6 @@ public class ChatActivity extends AppCompatActivity {
                                         // Error occurred while creating the File
                                     }
                                     // Continue only if the File was successfully created
-                                    Log.d(TAG, "onMenuItemClick: FILE CREATED");
                                     if (photoFile != null) {
                                         Uri photoURI = FileProvider.getUriForFile(ChatActivity.this,
                                                 "com.example.android.fileprovider",
@@ -370,6 +373,7 @@ public class ChatActivity extends AppCompatActivity {
                                     }
                                 }
                             }
+                            return true;
                         } else if (item.getItemId() == R.id.pup_gallery) {
 
                             Intent galleryIntent = new Intent();
@@ -378,9 +382,10 @@ public class ChatActivity extends AppCompatActivity {
                             startActivityForResult(Intent.createChooser(galleryIntent, "Select " +
                                             "Image"),
                                     GALLERY_PICK_REQ);
+                            return true;
                         }
 
-                        return true;
+                        return false;
                     }
                 });
 
@@ -413,7 +418,6 @@ public class ChatActivity extends AppCompatActivity {
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
-        Log.d(TAG, "createImageFile: path: " + mCurrentPhotoPath);
         return image;
     }
 
@@ -519,6 +523,15 @@ public class ChatActivity extends AppCompatActivity {
 
         Uri imageUri = data.getData();
 
+        String mimeType = getContentResolver().getType(imageUri);
+        String typeExtension = "";
+        if (mimeType == null) {
+            String fileType = imageUri.getPath();
+            typeExtension = fileType.substring(fileType.length() - 3, fileType.length());
+        } else {
+            typeExtension = mimeType.substring(mimeType.indexOf("/") + 1, mimeType.length());
+        }
+
         chatOpening();
 
         RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF,
@@ -537,8 +550,8 @@ public class ChatActivity extends AppCompatActivity {
                 .child(mCurrentUserID).child(mChatUser).push();
         final String push_id = user_message_push.getKey();
 
-        StorageReference filepath = mImageStorage.child("message_images").child(push_id + "" +
-                ".jpg");
+        StorageReference filepath = mImageStorage.child("message_images").child(push_id + "." +
+                typeExtension);
 
         // képet küldünk üzenetben
         filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask

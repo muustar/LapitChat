@@ -1,6 +1,5 @@
 package com.muustar.feco.mychat;
 
-
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
@@ -61,12 +60,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.graphics.Typeface.DEFAULT;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ChatsFragment extends Fragment {
-
+    private static final String TAG = "FECO";
     private RecyclerView mConvView;
 
     private Context ctx;
@@ -81,7 +79,6 @@ public class ChatsFragment extends Fragment {
     public ChatsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -98,18 +95,17 @@ public class ChatsFragment extends Fragment {
 
         mConvView.setLayoutManager(mLayoutManager);
 
-
         mCurrentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         convRef = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrentUserId);
         convRef.keepSynced(true);
 
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        messageRef = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId);
+        messageRef = FirebaseDatabase.getInstance().getReference().child("messages").child
+                (mCurrentUserId);
         messageRef.keepSynced(true);
 
         final Query query = convRef.orderByChild("timestamp");
-
 
         FirebaseRecyclerOptions<Conv> options =
                 new FirebaseRecyclerOptions.Builder<Conv>()
@@ -127,7 +123,8 @@ public class ChatsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull final ConvViewHolder holder, int position, @NonNull final Conv model) {
+            protected void onBindViewHolder(@NonNull final ConvViewHolder holder, int position,
+                                            @NonNull final Conv model) {
 
                 final String list_user_id = getRef(position).getKey();
 
@@ -138,11 +135,12 @@ public class ChatsFragment extends Fragment {
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         Messages message = dataSnapshot.getValue(Messages.class);
 
-                        holder.setLastMessage(message.getMessage(), message.getSeen(), message.getType());
+                        holder.setLastMessage(message.getMessage(), message.getSeen(), message
+                                .getType());
                         long timestampLong = message.getTime();
-                        String timestampString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date(timestampLong));
+                        String timestampString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format
+                                (new Date(timestampLong));
                         holder.setmEmail(timestampString);
-
                     }
 
                     @Override
@@ -167,7 +165,6 @@ public class ChatsFragment extends Fragment {
                 };
                 lastMessageQuery.addChildEventListener(lastMessageQueryEventListener);
 
-
                 // profil adatok betöltése, név, kép
                 usersRef.child(list_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -175,7 +172,8 @@ public class ChatsFragment extends Fragment {
                         User u;
                         if (!dataSnapshot.exists()) {
                             //private String name, status, image, image_thumb, email, uid;
-                            u = new User("Törölt profile", "...", "default", "default", "törölt", "null", false);
+                            u = new User("Törölt profile", "...", "default", "default", "törölt",
+                                    "null", false);
                         } else {
                             u = dataSnapshot.getValue(User.class);
                         }
@@ -195,7 +193,6 @@ public class ChatsFragment extends Fragment {
                             holder.setOnlineDot(online);
                         }
 
-
                         //kattintás feature
                         holder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -205,21 +202,22 @@ public class ChatsFragment extends Fragment {
                                 chatIntent.putExtra("name", userName);
                                 chatIntent.putExtra("img", chatUserImg);
 
-                                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES
+                                        .LOLLIPOP) {
                                     // Do something for lollipop and above versions
                                     startActivity(chatIntent);
                                 } else {
                                     // do something for phones running an SDK before lollipop
                                     Pair[] pairs = new Pair[1];
-                                    pairs[0] = new Pair<View, String>(holder.mSingleStatus, "statusTrans");
-                                    //pairs[1] = new Pair<View, String>(holder.mSingleImage, "imageTrans");
+                                    pairs[0] = new Pair<View, String>(holder.mSingleStatus,
+                                            "statusTrans");
+                                    //pairs[1] = new Pair<View, String>(holder.mSingleImage,
+                                    // "imageTrans");
                                     ActivityOptions options = ActivityOptions
                                             .makeSceneTransitionAnimation(getActivity(), pairs);
 
                                     startActivity(chatIntent, options.toBundle());
                                 }
-
-
                             }
                         });
 
@@ -242,49 +240,70 @@ public class ChatsFragment extends Fragment {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 torolheto = true;
 
-
                                                 // Chat és a messages -ből kell törölni
-                                                DatabaseReference chatRefCuUser = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrentUserId).child(list_user_id);
+                                                DatabaseReference chatRefCuUser =
+                                                        FirebaseDatabase.getInstance()
+                                                                .getReference().child("Chat")
+                                                                .child(mCurrentUserId).child
+                                                                (list_user_id);
                                                 chatRefCuUser.removeValue();
 
-                                                // az üzenetek törlése esetén meg kell vizsgálni, hogy kép üzenetről van e szó,
-                                                // ha kép üzenetet találunk akkor törölni kell a tárolt képek közül is.
-
+                                                // az üzenetek törlése esetén meg kell vizsgálni,
+                                                // hogy kép üzenetről van e szó,
+                                                // ha kép üzenetet találunk akkor törölni kell a
+                                                // tárolt képek közül is.
 
                                                 // a képek vizsgálata és törlése
-                                                Query queryKepek = messageRef.child(list_user_id).orderByChild("type").equalTo("image");
+                                                Query queryKepek = messageRef.child(list_user_id)
+                                                        .orderByChild("type").equalTo("image");
                                                 queryKepek.addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        Iterable<DataSnapshot> ds = dataSnapshot.getChildren();
+                                                    public void onDataChange(DataSnapshot
+                                                                                     dataSnapshot) {
+                                                        Iterable<DataSnapshot> ds = dataSnapshot
+                                                                .getChildren();
                                                         for (DataSnapshot d : ds) {
-                                                            String filenev = d.getKey() + ".jpg";
+                                                            Messages message = d.getValue
+                                                                    (Messages.class);
+                                                            //Log.d(TAG, "onDataChange: message: "+message.getMessage());
+                                                            String filenev = message.getMessage();
                                                             Log.d("FECO", filenev);
-                                                            StorageReference torlendoFajl = FirebaseStorage.getInstance().getReference().child("message_images").child(filenev);
-                                                            torlendoFajl.delete().addOnFailureListener(new OnFailureListener() {
+                                                            StorageReference torlendoFajl =
+                                                                    FirebaseStorage.getInstance()
+                                                                            .getReference().child
+                                                                            ("message_images")
+                                                                            .child(filenev);
+                                                            torlendoFajl.delete()
+                                                            .addOnFailureListener(new
+                                                            OnFailureListener() {
                                                                 @Override
-                                                                public void onFailure(@NonNull Exception e) {
+                                                                public void onFailure(@NonNull
+                                                                Exception e) {
                                                                     Log.d("ERROR", e.getMessage());
                                                                 }
                                                             });
+
                                                         }
                                                     }
 
                                                     @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
+                                                    public void onCancelled(DatabaseError
+                                                                                    databaseError) {
 
                                                     }
                                                 });
 
-
                                                 //Log.d("FECO", torlendok.toString());
                                                 // a cset üzenetek törlése
-                                                DatabaseReference messRefCuUser = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId).child(list_user_id);
+
+                                                DatabaseReference messRefCuUser =
+                                                        FirebaseDatabase.getInstance()
+                                                                .getReference().child("messages")
+                                                                .child(mCurrentUserId).child
+                                                                (list_user_id);
                                                 messRefCuUser.removeValue();
 
-
                                             }
-
                                         });
                                 alertDialog.setNegativeButton("Cancel",
                                         new DialogInterface.OnClickListener()
@@ -297,8 +316,6 @@ public class ChatsFragment extends Fragment {
                                 alertDialog.show();
                             }
                         });
-
-
                     }
 
                     @Override
@@ -306,9 +323,7 @@ public class ChatsFragment extends Fragment {
 
                     }
                 });
-
             }
-
         };
 
         adapter.notifyDataSetChanged();
@@ -332,13 +347,11 @@ public class ChatsFragment extends Fragment {
         return v;
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
         adapter.startListening();
     }
-
 
     @Override
     public void onPause() {
@@ -365,8 +378,6 @@ public class ChatsFragment extends Fragment {
                 Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_offline);
                 mOnlineDot.startAnimation(animation);
             }
-
-
         }
 
         public void setmEmail(String mail) {
@@ -376,7 +387,8 @@ public class ChatsFragment extends Fragment {
 
         public void setmSingleImage(Context ctx, String imgurl) {
             mSingleImage = mView.findViewById(R.id.conv_single_image);
-            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL); // ezzel lehet a képeket a lemezen synkronban tartani
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy
+                    .ALL); // ezzel lehet a képeket a lemezen synkronban tartani
             GlideApp
                     .with(ctx)
                     .load(imgurl)

@@ -64,8 +64,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private Context ctx;
     private int lastPosition = -1;
 
-
-
     public MessageAdapter(List<Messages> mMessageList, int color, String mChatuser) {
         this.mMessageList = mMessageList;
         this.color = color;
@@ -206,18 +204,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             myChatViewHolder.imageMessage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    //https://github.com/stfalcon-studio/FrescoImageViewer/blob/master/README.md
-                    new ImageViewer.Builder(ctx, Collections.singletonList(imgUrl))
-                            .setStartPosition(0)
-                            .setCustomDraweeHierarchyBuilder(new GenericDraweeHierarchyBuilder
-                                    (ctx.getResources())
-                                    .setFailureImage(R.mipmap.placeholder_sad)
-                                    .setPlaceholderImage(R.drawable.tenor))
-                            .show();
+                    kepenKattintas(imgUrl);
                 }
             });
-        } else {
+        } else
+
+        {
 
             myChatViewHolder.imageMessage.setVisibility(View.GONE);
             myChatViewHolder.messageText.setVisibility(View.VISIBLE);
@@ -232,21 +224,28 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         final DatabaseReference mMessageRef = FirebaseDatabase.getInstance().getReference().child
                 ("messages").child(mChatuser).child(mCurrenUserId).child(key);
 
-        mMessageRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild("seen")) {
-                    String seenString = dataSnapshot.child("seen").getValue().toString();
-                    Boolean seen = Boolean.parseBoolean(seenString);
-                    myChatViewHolder.setSeen(seen);
-                }
-            }
+        mMessageRef.addValueEventListener(new
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                                                  ValueEventListener() {
+                                                      @Override
+                                                      public void onDataChange(DataSnapshot
+                                                                                       dataSnapshot) {
+                                                          if (dataSnapshot.hasChild("seen")) {
+                                                              String seenString = dataSnapshot
+                                                                      .child("seen").getValue()
+                                                                      .toString();
+                                                              Boolean seen = Boolean.parseBoolean
+                                                                      (seenString);
+                                                              myChatViewHolder.setSeen(seen);
+                                                          }
+                                                      }
 
-            }
-        });
+                                                      @Override
+                                                      public void onCancelled(DatabaseError
+                                                                                      databaseError) {
+
+                                                      }
+                                                  });
 
         //üzenet idejánek beállítása
         String dateString = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date
@@ -258,7 +257,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         .get(position).getTime()));
         myChatViewHolder.setShortTime(shortTime);
 
-        myChatViewHolder.profileImage.setOnClickListener(new View.OnClickListener() {
+        myChatViewHolder.profileImage.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent profileIntent = new Intent(ctx, ProfileActivity.class);
@@ -336,7 +337,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         */
 
         // üzenet szerkesztése feature
-        myChatViewHolder.mEdit.setOnClickListener(new View.OnClickListener() {
+        myChatViewHolder.mEdit.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
 
@@ -360,8 +363,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                 // adatbázisba írás
                                 // TODO
                                 String newMessage = input.getText().toString().trim();
-                                DatabaseReference messageref = FirebaseDatabase.getInstance().getReference().child
-                                        ("messages");
+                                DatabaseReference messageref = FirebaseDatabase.getInstance()
+                                        .getReference().child
+                                                ("messages");
                                 // Mcurrentuser oldala
                                 messageref.child(mCurrenUserId)
                                         .child(mChatuser)
@@ -412,7 +416,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
         });
         // üzenet törlése feature
-        myChatViewHolder.mDelete.setOnClickListener(new View.OnClickListener() {
+        myChatViewHolder.mDelete.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 // TODO ----
@@ -428,8 +434,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                 // adatbázisba írás
                                 // TODO
                                 String newMessage = ". . . ";
-                                DatabaseReference messageref = FirebaseDatabase.getInstance().getReference().child
-                                        ("messages");
+                                DatabaseReference messageref = FirebaseDatabase.getInstance()
+                                        .getReference().child
+                                                ("messages");
                                 // Mcurrentuser oldala
                                 messageref.child(mCurrenUserId)
                                         .child(mChatuser)
@@ -453,7 +460,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                         .child(mMessageList.get(position).getNodeKey())
                                         .child("edited_status")
                                         .setValue("deleted");
-
                             }
                         });
                 alertDialog.setNegativeButton("Mégsem",
@@ -468,10 +474,35 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         });
 
         // a szerkesztett jelzés megjelenítése
-        myChatViewHolder.setEdited(mMessageList.get(position).getEdited_status());
+        myChatViewHolder.setEdited(mMessageList.get(position).
 
+                getEdited_status());
 
         setAnimation(myChatViewHolder.itemView, position, VIEW_TYPE_ME);
+    }
+
+    private void kepenKattintas(String imgUrl) {
+
+        // kép kiterjesztésének megvizsgálása
+        int hossz = imgUrl.indexOf(".gif");
+
+        if (hossz > 0) {
+            Intent gifIntent = new Intent(ctx.getApplicationContext(), FullImageActivity.class);
+            gifIntent.putExtra("url", imgUrl);
+            ctx.startActivity(gifIntent);
+        } else {
+
+            //https://github
+            // .com/stfalcon-studio/FrescoImageViewer/blob/master/README.md
+            new ImageViewer.Builder(ctx, Collections.singletonList(imgUrl))
+                    .setStartPosition(0)
+                    .setCustomDraweeHierarchyBuilder(new
+                            GenericDraweeHierarchyBuilder
+                            (ctx.getResources())
+                            .setFailureImage(R.mipmap.placeholder_sad)
+                            .setPlaceholderImage(R.mipmap.placholder_sandclock))
+                    .show();
+        }
     }
 
     //=============================================================================
@@ -526,14 +557,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 @Override
                 public void onClick(View v) {
 
-                    //https://github.com/stfalcon-studio/FrescoImageViewer/blob/master/README.md
-                    new ImageViewer.Builder(ctx, Collections.singletonList(imgUrl))
-                            .setStartPosition(0)
-                            .setCustomDraweeHierarchyBuilder(new GenericDraweeHierarchyBuilder
-                                    (ctx.getResources())
-                                    .setFailureImage(R.mipmap.placeholder_sad)
-                                    .setPlaceholderImage(R.drawable.tenor))
-                            .show();
+                    kepenKattintas(imgUrl);
                 }
             });
         } else {
@@ -609,10 +633,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
         });
 
-
         // a szerkesztett jelzés megjelenítése
         otherChatViewHolder.setEdited(mMessageList.get(position).getEdited_status());
-        //Log.d(TAG, "configureMyChatViewHolder: edited_status " + mMessageList.get(position).getEdited_status());
         setAnimation(otherChatViewHolder.itemView, position, VIEW_TYPE_OTHER);
     }
 
@@ -635,8 +657,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     //=============================================================================
-    //  MyChatViewHolder
-    //=============================================================================
+//  MyChatViewHolder
+//=============================================================================
     private static class MyChatViewHolder extends RecyclerView.ViewHolder {
         private TextView messageText;
         private TextView timeText, seenTextView, shortTime;
@@ -709,12 +731,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     break;
             }
         }
-
     }
 
     //=============================================================================
-    //  OtherChatViewHolder
-    //=============================================================================
+//  OtherChatViewHolder
+//=============================================================================
     private static class OtherChatViewHolder extends RecyclerView.ViewHolder {
         private TextView shortTime;
         private TextView messageText;

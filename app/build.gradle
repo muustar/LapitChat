@@ -51,8 +51,13 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 
     compile 'id.zelory:compressor:2.1.0'
+
+    // Fresco image viewer
     compile 'com.github.stfalcon:frescoimageviewer:0.5.0'
     implementation 'com.facebook.fresco:fresco:1.9.0'
+    compile 'com.facebook.fresco:animated-gif:0.13.0'
+    compile 'com.facebook.fresco:animated-webp:0.13.0'
+    compile 'com.facebook.fresco:webpsupport:0.13.0'
 
     //Circle Image
     implementation 'de.hdodenhof:circleimageview:2.2.0'

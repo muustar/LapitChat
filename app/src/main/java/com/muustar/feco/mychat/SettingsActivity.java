@@ -250,7 +250,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
+                galleryIntent.setType("*/*");
+                String[] mimetypes = {"image/jpeg", "image/png", "image/bmp", "image/jpg"};
+                galleryIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"),
                         GALLERY_PICK);

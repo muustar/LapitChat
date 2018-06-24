@@ -64,7 +64,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:padding="10dp"
-                android:src="@drawable/ic_image" />
+                android:src="@mipmap/ic_attach" />
 
             <EditText
                 android:id="@+id/chat_message"
@@ -74,7 +74,7 @@
                 android:layout_toEndOf="@id/chat_add"
                 android:background="@drawable/edittext_bg"
                 android:hint="@string/enter_message_here"
-                android:inputType="text"
+                android:inputType="textCapSentences"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp" />
         </RelativeLayout>
