@@ -34,7 +34,7 @@ public class PlinngChat extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);  // helyben szinkronhoz
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);  // helyben szinkronhoz
         // manifestben: android:name=".PlinngChat">
 
         // Glide sync

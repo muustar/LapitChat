@@ -237,8 +237,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                                               Boolean seen = Boolean.parseBoolean
                                                                       (seenString);
                                                               myChatViewHolder.setSeen(seen);
-                                                          }
-                                                      }
+                                                          }}
 
                                                       @Override
                                                       public void onCancelled(DatabaseError

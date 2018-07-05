@@ -155,8 +155,11 @@ public class ChatActivity extends AppCompatActivity {
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mRootRef.keepSynced(true);
         mUsersRef = mRootRef.child("Users");
+        mUsersRef.keepSynced(true);
         mNotifyRef = mRootRef.child("Notifications");
+        mNotifyRef.keepSynced(true);
         mMessagesRef = mRootRef.child("messages");
+        mMessagesRef.keepSynced(true);
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserID = mAuth.getCurrentUser().getUid();
