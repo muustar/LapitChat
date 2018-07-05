@@ -236,8 +236,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                                                       .toString();
                                                               Boolean seen = Boolean.parseBoolean
                                                                       (seenString);
-                                                              myChatViewHolder.setSeen(seen);
-                                                          }}
+                                                              myChatViewHolder.setSeen(ctx, seen);
+                                                          }
+                                                      }
 
                                                       @Override
                                                       public void onCancelled(DatabaseError
@@ -292,6 +293,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     //animáció
                     Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_show_time);
                     myChatViewHolder.timeText.startAnimation(animation);
+
                 } else {
                     Animation animation = AnimationUtils.loadAnimation(ctx, R.anim.anim_hide_time);
                     myChatViewHolder.timeText.startAnimation(animation);
@@ -669,6 +671,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public MyChatViewHolder(View itemView) {
             super(itemView);
+            itemView.setAlpha(0.5f);
             messageText = (TextView) itemView.findViewById(R.id.message_single_text_me);
             timeText = (TextView) itemView.findViewById(R.id.message_single_time_me);
             profileImage = (CircleImageView) itemView.findViewById(R.id
@@ -706,7 +709,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .into(imageMessage);
         }
 
-        public void setSeen(Boolean seen) {
+        public void setSeen(Context ctx, Boolean seen) {
             if (seen) {
                 seenTextView.setText(R.string.seen);
                 seenTextView.setVisibility(View.GONE);
@@ -714,6 +717,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 seenTextView.setText(R.string.sent);
                 seenTextView.setVisibility(View.VISIBLE);
             }
+            itemView.setAlpha(1.0f);
         }
 
         public void setEdited(String edited) {
