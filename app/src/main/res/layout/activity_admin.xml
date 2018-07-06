@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/darker_gray"
-    tools:context=".AdminActivity">
+    tools:context="com.muustar.plinng.AdminActivity">
 
     <include
         android:id="@+id/admin_appbar"

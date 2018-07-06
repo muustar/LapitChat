@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UsersActivity">
+    tools:context="com.muustar.plinng.UsersActivity">
 
 
     <include layout="@layout/app_bar_layout" android:id="@+id/users_appbar"/>

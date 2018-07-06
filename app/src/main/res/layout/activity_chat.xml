@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@mipmap/chat_bg_1"
-    tools:context=".ChatActivity">
+    tools:context="com.muustar.plinng.ChatActivity">
 
     <include
         android:id="@+id/chat_appbar"
