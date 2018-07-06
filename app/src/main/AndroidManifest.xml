@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.muustar.feco.mychat">
+    package="com.muustar.feco.plinng">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -10,7 +10,7 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"></uses-permission>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -105,7 +105,7 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ChangeEmailActivity"
-            android:parentActivityName=".SettingsActivity"></activity>
+            android:parentActivityName=".SettingsActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -117,7 +117,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".FullImageActivity"></activity>
+        <activity android:name=".FullImageActivity" />
     </application>
 
 </manifest>
